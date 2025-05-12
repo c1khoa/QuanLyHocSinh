@@ -1,0 +1,18 @@
+# Build results
+bin
+obj
+
+# User-specific files
+.user
+.suo
+
+# Visual Studio settings
+.vs
+
+# Backup & log files
+.log
+.tmp
+.bak
+
+# Ignore app settings (optional)
+appsettings..json
