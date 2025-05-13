@@ -216,10 +216,6 @@ Chứa logic xử lý dữ liệu, liên kết với View (MVVM pattern).
 
 ---
 
-### 📋 Phân công công việc điều chỉnh cho 4 thành viên dự án WPF (cân bằng tải)
-
----
-
 #### 🧑‍💻 **Thành viên 1: Giao diện chính + Trang chủ + Điều hướng + Đăng nhập**
 ##### Mục tiêu:
 - Xây dựng giao diện chính của ứng dụng, trang chủ sau đăng nhập, và xử lý đăng nhập.
