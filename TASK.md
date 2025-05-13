@@ -216,7 +216,7 @@ Chứa logic xử lý dữ liệu, liên kết với View (MVVM pattern).
 
 ---
 
-#### 🧑‍💻 **Thành viên 1: Giao diện chính + Trang chủ + Điều hướng + Đăng nhập**
+#### 🧑‍💻 **Anh Khoa: Giao diện chính + Trang chủ + Điều hướng + Đăng nhập**
 ##### Mục tiêu:
 - Xây dựng giao diện chính của ứng dụng, trang chủ sau đăng nhập, và xử lý đăng nhập.
 
@@ -234,7 +234,7 @@ Chứa logic xử lý dữ liệu, liên kết với View (MVVM pattern).
 
 ---
 
-#### 👩‍💻 **Thành viên 2: Quản lý tài khoản + Quy định + Phân quyền**
+#### 👩‍💻 **Nick Võ: Quản lý tài khoản + Quy định + Phân quyền**
 ##### Mục tiêu:
 - Xây dựng UI và logic cho chức năng quản trị tài khoản, quy định hệ thống và xử lý phân quyền người dùng.
 
@@ -251,7 +251,7 @@ Chứa logic xử lý dữ liệu, liên kết với View (MVVM pattern).
 
 ---
 
-#### 👨‍💻 **Thành viên 3: Báo cáo + Tra cứu**
+#### 👨‍💻 **Khang Hy: Báo cáo + Tra cứu**
 ##### Mục tiêu:
 - Xây dựng chức năng báo cáo thống kê và các chức năng tra cứu thông tin.
 
@@ -264,7 +264,7 @@ Chứa logic xử lý dữ liệu, liên kết với View (MVVM pattern).
 
 ---
 
-#### 👩‍💻 **Thành viên 4: Xử lý dữ liệu (Model)**
+#### 👩‍💻 **Tuấn Anh: Xử lý dữ liệu (Model)**
 ##### Mục tiêu:
 - Xây dựng toàn bộ tầng dữ liệu (Entities & Relationships) phục vụ toàn hệ thống.
 
@@ -281,4 +281,5 @@ Chứa logic xử lý dữ liệu, liên kết với View (MVVM pattern).
 ### ✅ Lưu ý chung:
 - Sử dụng MVVM chuẩn.
 - Commit đúng chức năng, rõ message.
+- Tối thứ 6 mỗi tuần họp báo cáo tiến độ từ 23/05/2025
 
