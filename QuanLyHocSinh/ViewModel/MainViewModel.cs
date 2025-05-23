@@ -8,16 +8,33 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Controls;
 using QuanLyHocSinh.View.Windows;
-
+using QuanLyHocSinh.View.Controls;
+using QuanLyHocSinh.View.Controls.TraCuu;
 
 namespace QuanLyHocSinh.ViewModel
 {
     public class MainViewModel : BaseViewModel
     {
         public bool Isloaded { get; set; } = false;
-
         public ICommand LoadedWindowCommand { get; set; }
+
+        private UserControl _currentControl;
+        public UserControl CurrentControl
+        {
+            get => _currentControl;
+            set
+            {
+                _currentControl = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ICommand ShowTraCuuHSCommand { get; set; }
+        public ICommand ShowTraCuuGVCommand { get; set; }
+        public ICommand ShowTraCuuDiemCommand { get; set; }
+
         // Mọi thứ xử lý nằm trong này
         public MainViewModel()
         {
@@ -27,7 +44,7 @@ namespace QuanLyHocSinh.ViewModel
                 {
                     if (Isloaded) return;
                     Isloaded = true;
-                    LoginWindow login = new LoginWindow();
+                    var login = new LoginWindow();
                     login.ShowDialog();
                 }
             );
@@ -40,7 +57,20 @@ namespace QuanLyHocSinh.ViewModel
                 }
             };
 
-
+            //Xử lý chuyển trang tra cứu
+            CurrentControl = new TrangChuUC();
+            ShowTraCuuHSCommand = new RelayCommand<object>(
+                (p) => true,
+                (p) => { CurrentControl = new TraCuuHocSinhUC(); }
+            );
+            ShowTraCuuGVCommand = new RelayCommand<object>(
+                (p) => true,
+                (p) => { CurrentControl = new TraCuuGiaoVienUC(); }
+            );
+            ShowTraCuuDiemCommand = new RelayCommand<object>(
+                (p) => true,
+                (p) => { CurrentControl = new TraCuuDiemHocSinhUC(); }
+            );
         }
     }
 }

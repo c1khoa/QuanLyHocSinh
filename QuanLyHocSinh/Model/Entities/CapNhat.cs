@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.Model.Entities
 {
-    class CapNhat
+    public class CapNhat
     {
     }
 }
