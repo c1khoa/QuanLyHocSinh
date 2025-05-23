@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
@@ -8,7 +9,7 @@ public class DiemDAL
     public static List<Diem> GetAllDiemHocSinh()
     {
         List<Diem> list = new List<Diem>();
-        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
         string query = @"
             SELECT hs.HocSinhID AS MaHS, ho.HoTen, l.TenLop AS Lop, mh.TenMonHoc AS MonHoc,
                    IFNULL(diem_mieng.GiaTri, 0) AS DiemMieng,
@@ -58,7 +59,7 @@ public class DiemDAL
     public static List<string> GetAllMonHoc()
     {
         List<string> list = new List<string>();
-        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
         string query = "SELECT TenMonHoc FROM MONHOC";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
@@ -79,7 +80,7 @@ public class DiemDAL
     public static List<string> GetAllLop()
     {
         List<string> list = new List<string>();
-        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
         string query = "SELECT TenLop FROM LOP";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
@@ -100,7 +101,7 @@ public class DiemDAL
     // Sửa điểm
     public static void UpdateDiem(Diem diem)
     {
-        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
         string query = @"
             UPDATE DIEM d
             JOIN HOCSINH hs ON d.HocSinhID = hs.HocSinhID
