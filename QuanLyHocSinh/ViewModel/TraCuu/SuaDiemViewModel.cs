@@ -40,13 +40,27 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _monHoc = value; OnPropertyChanged(); }
         }
 
-        private float _diemMieng;
-        public float DiemMieng
+        private string _namHoc;
+        public string NamHoc
+        {
+            get => _namHoc;
+            set { _namHoc = value; OnPropertyChanged(); }
+        }
+
+        private int _hocKy;
+        public int HocKy
+        {
+            get => _hocKy;
+            set { _hocKy = value; OnPropertyChanged(); }
+        }
+
+        private float? _diemMieng;
+        public float? DiemMieng
         {
             get => _diemMieng;
             set 
             { 
-                if (value >= 0 && value <= 10)
+                if (value == null || (value >= 0 && value <= 10))
                 {
                     _diemMieng = value;
                     OnPropertyChanged();
@@ -55,13 +69,13 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             }
         }
 
-        private float _diem15p;
-        public float Diem15p
+        private float? _diem15p;
+        public float? Diem15p
         {
             get => _diem15p;
             set 
             { 
-                if (value >= 0 && value <= 10)
+                if (value == null || (value >= 0 && value <= 10))
                 {
                     _diem15p = value;
                     OnPropertyChanged();
@@ -70,13 +84,13 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             }
         }
 
-        private float _diem1Tiet;
-        public float Diem1Tiet
+        private float? _diem1Tiet;
+        public float? Diem1Tiet
         {
             get => _diem1Tiet;
             set 
             { 
-                if (value >= 0 && value <= 10)
+                if (value == null || (value >= 0 && value <= 10))
                 {
                     _diem1Tiet = value;
                     OnPropertyChanged();
@@ -85,13 +99,13 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             }
         }
 
-        private float _diemThi;
-        public float DiemThi
+        private float? _diemThi;
+        public float? DiemThi
         {
             get => _diemThi;
             set 
             { 
-                if (value >= 0 && value <= 10)
+                if (value == null || (value >= 0 && value <= 10))
                 {
                     _diemThi = value;
                     OnPropertyChanged();
@@ -100,8 +114,8 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             }
         }
 
-        private float _diemTB;
-        public float DiemTB
+        private float? _diemTB;
+        public float? DiemTB
         {
             get => _diemTB;
             set { _diemTB = value; OnPropertyChanged(); }
@@ -112,6 +126,12 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
 
         public ObservableCollection<string> DanhSachLop { get; } = 
             new ObservableCollection<string>(DiemDAL.GetAllLop());
+
+        public ObservableCollection<string> DanhSachNamHoc { get; } =
+            new ObservableCollection<string>(DiemDAL.GetAllNamHoc());
+
+        public ObservableCollection<int> DanhSachHocKy { get; } =
+            new ObservableCollection<int>(DiemDAL.GetAllHocKy());
 
         public ICommand SaveCommandDiem { get; }
         public ICommand CancelCommandDiem { get; }
@@ -128,6 +148,8 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             HoTen = diem.HoTen;
             Lop = diem.Lop;
             MonHoc = diem.MonHoc;
+            NamHoc = diem.NamHocID;
+            HocKy = diem.HocKy;
             DiemMieng = diem.DiemMieng;
             Diem15p = diem.Diem15p;
             Diem1Tiet = diem.Diem1Tiet;
@@ -166,13 +188,31 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                                 float heSo1Tiet = Convert.ToSingle(reader["HeSo1Tiet"]);
                                 float heSoThi = Convert.ToSingle(reader["HeSoThi"]);
 
-                                float tongHeSo = heSoMieng + heSo15p + heSo1Tiet + heSoThi;
-                                float tongDiem = (DiemMieng * heSoMieng) + 
-                                               (Diem15p * heSo15p) + 
-                                               (Diem1Tiet * heSo1Tiet) + 
-                                               (DiemThi * heSoThi);
+                                float tongHeSo = 0;
+                                float tongDiem = 0;
 
-                                DiemTB = (float)Math.Round(tongDiem / tongHeSo, 2);
+                                if (DiemMieng.HasValue && DiemMieng.Value >= 0)
+                                {
+                                    tongHeSo += heSoMieng;
+                                    tongDiem += DiemMieng.Value * heSoMieng;
+                                }
+                                if (Diem15p.HasValue && Diem15p.Value >= 0)
+                                {
+                                    tongHeSo += heSo15p;
+                                    tongDiem += Diem15p.Value * heSo15p;
+                                }
+                                if (Diem1Tiet.HasValue && Diem1Tiet.Value >= 0)
+                                {
+                                    tongHeSo += heSo1Tiet;
+                                    tongDiem += Diem1Tiet.Value * heSo1Tiet;
+                                }
+                                if (DiemThi.HasValue && DiemThi.Value >= 0)
+                                {
+                                    tongHeSo += heSoThi;
+                                    tongDiem += DiemThi.Value * heSoThi;
+                                }
+
+                                DiemTB = (tongHeSo > 0) ? (float)Math.Round(tongDiem / tongHeSo, 2) : -1;
                             }
                         }
                     }
@@ -186,12 +226,12 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
 
         private bool ValidateDiem()
         {
-            if (DiemMieng < 0 || DiemMieng > 10 ||
-                Diem15p < 0 || Diem15p > 10 ||
-                Diem1Tiet < 0 || Diem1Tiet > 10 ||
-                DiemThi < 0 || DiemThi > 10)
+            if ((DiemMieng.HasValue && (DiemMieng < 0 || DiemMieng > 10)) ||
+                (Diem15p.HasValue && (Diem15p < 0 || Diem15p > 10)) ||
+                (Diem1Tiet.HasValue && (Diem1Tiet < 0 || Diem1Tiet > 10)) ||
+                (DiemThi.HasValue && (DiemThi < 0 || DiemThi > 10)))
             {
-                MessageBox.Show("Điểm phải nằm trong khoảng từ 0 đến 10!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Điểm phải nằm trong khoảng từ 0 đến 10 hoặc để trống!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
             return true;
@@ -208,10 +248,12 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                 _diemGoc.HoTen = HoTen;
                 _diemGoc.Lop = Lop;
                 _diemGoc.MonHoc = MonHoc;
-                _diemGoc.DiemMieng = DiemMieng;
-                _diemGoc.Diem15p = Diem15p;
-                _diemGoc.Diem1Tiet = Diem1Tiet;
-                _diemGoc.DiemThi = DiemThi;
+                _diemGoc.NamHocID = NamHoc;
+                _diemGoc.HocKy = HocKy;
+                _diemGoc.DiemMieng = DiemMieng ?? -1;
+                _diemGoc.Diem15p = Diem15p ?? -1;
+                _diemGoc.Diem1Tiet = Diem1Tiet ?? -1;
+                _diemGoc.DiemThi = DiemThi ?? -1;
                 _diemGoc.DiemTB = DiemTB;
 
                 DiemDAL.UpdateDiem(_diemGoc);

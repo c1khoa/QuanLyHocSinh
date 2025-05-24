@@ -39,12 +39,44 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _selectedBoMon = value; OnPropertyChanged(nameof(SelectedBoMon)); Filter(); }
         }
 
+        //Lọc theo giới tính
+        private string _selectedGioiTinh;
+        public string SelectedGioiTinh
+        {
+            get => _selectedGioiTinh;
+            set { _selectedGioiTinh = value; OnPropertyChanged(nameof(SelectedGioiTinh)); Filter(); }
+        }
+
+        //Lọc theo lớp
+        private string _selectedLop;
+        public string SelectedLop
+        {
+            get => _selectedLop;
+            set { _selectedLop = value; OnPropertyChanged(nameof(SelectedLop)); Filter(); }
+        }
+
         //Danh sách bộ môn
         private ObservableCollection<string> _danhSachBoMon;
         public ObservableCollection<string> DanhSachBoMon
         {
             get => _danhSachBoMon;
             set { _danhSachBoMon = value; OnPropertyChanged(nameof(DanhSachBoMon)); }
+        }
+
+        //Danh sách lớp
+        private ObservableCollection<string> _danhSachLop;
+        public ObservableCollection<string> DanhSachLop
+        {
+            get => _danhSachLop;
+            set { _danhSachLop = value; OnPropertyChanged(nameof(DanhSachLop)); }
+        }
+
+        //Danh sách giới tính
+        private ObservableCollection<string> _danhSachGioiTinh;
+        public ObservableCollection<string> DanhSachGioiTinh
+        {
+            get => _danhSachGioiTinh;
+            set { _danhSachGioiTinh = value; OnPropertyChanged(nameof(DanhSachGioiTinh)); }
         }
 
         private GiaoVien _selectedGiaoVien;
@@ -68,12 +100,24 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             dsBoMon.Insert(0, "Tất cả");
             DanhSachBoMon = new ObservableCollection<string>(dsBoMon);
 
+            //Lấy danh sách lớp duy nhất
+            var dsLop = _allGiaoVien.Select(gv => gv.LopDayID).Distinct().OrderBy(l => l).ToList();
+            dsLop.Insert(0, "Tất cả");
+            DanhSachLop = new ObservableCollection<string>(dsLop);
+
+            //Lấy danh sách giới tính duy nhất
+            var dsGioiTinh = _allGiaoVien.Select(gv => gv.GioiTinh).Distinct().OrderBy(gt => gt).ToList();
+            dsGioiTinh.Insert(0, "Tất cả");
+            DanhSachGioiTinh = new ObservableCollection<string>(dsGioiTinh);
+
             //Khởi tạo các lệnh
             EditCommand = new RelayCommand(EditGiaoVien, () => SelectedGiaoVien != null);
             FilterCommand = new RelayCommand(Filter);
 
             //Mặc định chọn "Tất cả"
             SelectedBoMon = "Tất cả";
+            SelectedGioiTinh = "Tất cả";
+            SelectedLop = "Tất cả";
         }
 
         private void Filter()
@@ -81,6 +125,8 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             var filtered = _allGiaoVien.Where(gv =>
                 (string.IsNullOrEmpty(SearchText) || gv.HoTen.ToLower().Contains(SearchText.ToLower()))
                 && (SelectedBoMon == "Tất cả" || string.IsNullOrEmpty(SelectedBoMon) || gv.BoMon == SelectedBoMon)
+                && (SelectedGioiTinh == "Tất cả" || string.IsNullOrEmpty(SelectedGioiTinh) || gv.GioiTinh == SelectedGioiTinh)
+                && (SelectedLop == "Tất cả" || string.IsNullOrEmpty(SelectedLop) || gv.LopDayID == SelectedLop)
             ).ToList();
 
             DanhSachGiaoVien = new ObservableCollection<GiaoVien>(filtered);

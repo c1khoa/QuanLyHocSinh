@@ -10,11 +10,11 @@ public class DiemDAL
         List<Diem> list = new List<Diem>();
         string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
         string query = @"
-            SELECT hs.HocSinhID AS MaHS, ho.HoTen, l.TenLop AS Lop, mh.TenMonHoc AS MonHoc,
-                   IFNULL(diem_mieng.GiaTri, 0) AS DiemMieng,
-                   IFNULL(diem_15p.GiaTri, 0) AS Diem15p,
-                   IFNULL(diem_1tiet.GiaTri, 0) AS Diem1Tiet,
-                   IFNULL(diem_thi.GiaTri, 0) AS DiemThi,
+            SELECT hs.HocSinhID AS MaHS, ho.HoTen, l.TenLop AS Lop, mh.TenMonHoc AS MonHoc, d.NamHocID, d.HocKy,
+                   IFNULL(diem_mieng.GiaTri, -1) AS DiemMieng,
+                   IFNULL(diem_15p.GiaTri, -1) AS Diem15p,
+                   IFNULL(diem_1tiet.GiaTri, -1) AS Diem1Tiet,
+                   IFNULL(diem_thi.GiaTri, -1) AS DiemThi,
                    IFNULL(d.DiemTrungBinh, 0) AS DiemTB
             FROM HOCSINH hs
             JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
@@ -42,11 +42,13 @@ public class DiemDAL
                         HoTen = reader["HoTen"].ToString(),
                         Lop = reader["Lop"].ToString(),
                         MonHoc = reader["MonHoc"].ToString(),
-                        DiemMieng = float.Parse(reader["DiemMieng"].ToString()),
-                        Diem15p = float.Parse(reader["Diem15p"].ToString()),
-                        Diem1Tiet = float.Parse(reader["Diem1Tiet"].ToString()),
-                        DiemThi = float.Parse(reader["DiemThi"].ToString()),
-                        DiemTB = float.Parse(reader["DiemTB"].ToString())
+                        NamHocID = reader["NamHocID"].ToString(),
+                        HocKy = int.Parse(reader["HocKy"].ToString()),
+                        DiemMieng = float.TryParse(reader["DiemMieng"].ToString(), out float dm) ? dm : (float?)-1,
+                        Diem15p = float.TryParse(reader["Diem15p"].ToString(), out float d15) ? d15 : (float?)-1,
+                        Diem1Tiet = float.TryParse(reader["Diem1Tiet"].ToString(), out float d1t) ? d1t : (float?)-1,
+                        DiemThi = float.TryParse(reader["DiemThi"].ToString(), out float dt) ? dt : (float?)-1,
+                        DiemTB = float.TryParse(reader["DiemTB"].ToString(), out float dtb) ? dtb : (float?)-1
                     };
                     list.Add(dhs);
                 }
@@ -97,39 +99,194 @@ public class DiemDAL
         return list;
     }
 
-    // Sửa điểm
-    public static void UpdateDiem(Diem diem)
+    public static List<string> GetAllNamHoc()
     {
+        List<string> list = new List<string>();
         string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
-        string query = @"
-            UPDATE DIEM d
-            JOIN HOCSINH hs ON d.HocSinhID = hs.HocSinhID
-            JOIN MONHOC mh ON d.MonHocID = mh.MonHocID
-            JOIN CHITIETDIEM ctd_mieng ON ctd_mieng.DiemID = d.DiemID AND ctd_mieng.LoaiDiemID = 'LD001'
-            JOIN CHITIETDIEM ctd_15p ON ctd_15p.DiemID = d.DiemID AND ctd_15p.LoaiDiemID = 'LD002'
-            JOIN CHITIETDIEM ctd_1tiet ON ctd_1tiet.DiemID = d.DiemID AND ctd_1tiet.LoaiDiemID = 'LD003'
-            JOIN CHITIETDIEM ctd_thi ON ctd_thi.DiemID = d.DiemID AND ctd_thi.LoaiDiemID = 'LD004'
-            SET 
-                ctd_mieng.GiaTri = @DiemMieng,
-                ctd_15p.GiaTri = @Diem15p,
-                ctd_1tiet.GiaTri = @Diem1Tiet,
-                ctd_thi.GiaTri = @DiemThi,
-                d.DiemTrungBinh = @DiemTB
-            WHERE hs.HocSinhID = @MaHS AND mh.TenMonHoc = @MonHoc;";
+        string query = "SELECT DISTINCT NamHocID FROM DIEM";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
         {
             conn.Open();
             MySqlCommand cmd = new MySqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@DiemMieng", diem.DiemMieng);
-            cmd.Parameters.AddWithValue("@Diem15p", diem.Diem15p);
-            cmd.Parameters.AddWithValue("@Diem1Tiet", diem.Diem1Tiet);
-            cmd.Parameters.AddWithValue("@DiemThi", diem.DiemThi);
-            cmd.Parameters.AddWithValue("@DiemTB", diem.DiemTB);
-            cmd.Parameters.AddWithValue("@MaHS", diem.MaHS);
-            cmd.Parameters.AddWithValue("@MonHoc", diem.MonHoc);
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    list.Add(reader["NamHocID"].ToString());
+                }
+            }
+        }
+        return list;
+    }
 
-            cmd.ExecuteNonQuery();
+    public static List<int> GetAllHocKy()
+    {
+        List<int> list = new List<int>();
+        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        string query = "SELECT DISTINCT HocKy FROM DIEM";
+
+        using (MySqlConnection conn = new MySqlConnection(connectionString))
+        {
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    list.Add(int.Parse(reader["HocKy"].ToString()));
+                }
+            }
+        }
+        return list;
+    }
+
+    // Sửa điểm
+    public static void UpdateDiem(Diem diem)
+    {
+        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        using (MySqlConnection conn = new MySqlConnection(connectionString))
+        {
+            conn.Open();
+
+            // Lấy DiemID và MonHocID
+            string getIdQuery = @"
+                SELECT d.DiemID, mh.MonHocID
+                FROM DIEM d
+                JOIN MONHOC mh ON d.MonHocID = mh.MonHocID
+                WHERE d.HocSinhID = @MaHS AND mh.TenMonHoc = @MonHoc AND d.NamHocID = @NamHocID AND d.HocKy = @HocKy";
+            string diemID = "", monHocID = "";
+            using (var cmd = new MySqlCommand(getIdQuery, conn))
+            {
+                cmd.Parameters.AddWithValue("@MaHS", diem.MaHS);
+                cmd.Parameters.AddWithValue("@MonHoc", diem.MonHoc);
+                cmd.Parameters.AddWithValue("@NamHocID", diem.NamHocID);
+                cmd.Parameters.AddWithValue("@HocKy", diem.HocKy);
+
+                // Lấy thông tin điểm
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        diemID = reader["DiemID"].ToString();
+                        monHocID = reader["MonHocID"].ToString();
+                    }
+                }
+            }
+            if (string.IsNullOrEmpty(diemID) || string.IsNullOrEmpty(monHocID)) return; // Không tìm thấy
+
+            // Danh sách loại điểm và giá trị
+            var diemTypes = new Dictionary<string, float>
+            {
+                { "LD001", diem.DiemMieng ?? -1 },
+                { "LD002", diem.Diem15p ?? -1 },
+                { "LD003", diem.Diem1Tiet ?? -1 },
+                { "LD004", diem.DiemThi ?? -1 }
+            };
+
+            foreach (var item in diemTypes)
+            {
+                if (item.Value < 0) continue; // Bỏ qua nếu không có điểm
+
+                // Kiểm tra tồn tại
+                string checkQuery = "SELECT COUNT(*) FROM CHITIETDIEM WHERE DiemID = @DiemID AND LoaiDiemID = @LoaiDiemID";
+                int count = 0;
+                using (var cmd = new MySqlCommand(checkQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@DiemID", diemID);
+                    cmd.Parameters.AddWithValue("@LoaiDiemID", item.Key);
+                    count = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+
+                if (count == 0)
+                {
+                    // Sinh mã mới cho ChiTietDiemID
+                    string newChiTietDiemID = GenerateNewChiTietDiemID(conn);
+                    string insertQuery = "INSERT INTO CHITIETDIEM (ChiTietDiemID, DiemID, LoaiDiemID, GiaTri) VALUES (@ChiTietDiemID, @DiemID, @LoaiDiemID, @GiaTri)";
+                    using (var cmd = new MySqlCommand(insertQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@ChiTietDiemID", newChiTietDiemID);
+                        cmd.Parameters.AddWithValue("@DiemID", diemID);
+                        cmd.Parameters.AddWithValue("@LoaiDiemID", item.Key);
+                        cmd.Parameters.AddWithValue("@GiaTri", item.Value);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                else
+                {
+                    // Nếu đã có, update
+                    string updateQuery = "UPDATE CHITIETDIEM SET GiaTri = @GiaTri WHERE DiemID = @DiemID AND LoaiDiemID = @LoaiDiemID";
+                    using (var cmd = new MySqlCommand(updateQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@GiaTri", item.Value);
+                        cmd.Parameters.AddWithValue("@DiemID", diemID);
+                        cmd.Parameters.AddWithValue("@LoaiDiemID", item.Key);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+
+            // Sau khi cập nhật các điểm, cập nhật điểm trung bình
+            float diemTB = TinhDiemTrungBinh(diemID, conn);
+            string updateDiemTB = "UPDATE DIEM SET DiemTrungBinh = @DiemTB WHERE DiemID = @DiemID";
+            using (var cmd = new MySqlCommand(updateDiemTB, conn))
+            {
+                cmd.Parameters.AddWithValue("@DiemTB", diemTB);
+                cmd.Parameters.AddWithValue("@DiemID", diemID);
+                cmd.ExecuteNonQuery();
+            }
+        }
+    }
+
+    private static float TinhDiemTrungBinh(string diemID, MySqlConnection conn)
+    {
+        // Lấy điểm và loại điểm
+        string query = @"
+            SELECT ctd.GiaTri, ctd.LoaiDiemID, ld.HeSo
+            FROM CHITIETDIEM ctd
+            JOIN LOAIDIEM ld ON ctd.LoaiDiemID = ld.LoaiDiemID
+            WHERE ctd.DiemID = @DiemID";
+        float tongDiem = 0;
+        float tongHeSo = 0;
+        using (var cmd = new MySqlCommand(query, conn))
+        {
+            cmd.Parameters.AddWithValue("@DiemID", diemID);
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    float giaTri = float.Parse(reader["GiaTri"].ToString());
+                    float heSo = float.Parse(reader["HeSo"].ToString());
+                    if (giaTri >= 0)
+                    {
+                        tongDiem += giaTri * heSo;
+                        tongHeSo += heSo;
+                    }
+                }
+            }
+        }
+        if (tongHeSo == 0) return -1;
+        return (float)Math.Round(tongDiem / tongHeSo, 2);
+    }
+
+    // Hàm sinh mã mới cho ChiTietDiemID
+    private static string GenerateNewChiTietDiemID(MySqlConnection conn)
+    {
+        string prefix = "CTD";
+        string query = "SELECT ChiTietDiemID FROM CHITIETDIEM ORDER BY ChiTietDiemID DESC LIMIT 1";
+        using (var cmd = new MySqlCommand(query, conn))
+        {
+            var result = cmd.ExecuteScalar();
+            if (result != null && result.ToString().StartsWith(prefix))
+            {
+                string lastId = result.ToString();
+                int num = int.Parse(lastId.Substring(prefix.Length));
+                return prefix + (num + 1).ToString("D3");
+            }
+            else
+            {
+                return prefix + "001";
+            }
         }
     }
 }

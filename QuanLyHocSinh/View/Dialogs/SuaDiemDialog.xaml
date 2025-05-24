@@ -3,8 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:viewmodel="clr-namespace:QuanLyHocSinh.ViewModel.TraCuu"
-        Title="Sửa điểm học sinh" Height="600" Width="500"
+        xmlns:local="clr-namespace:QuanLyHocSinh.View.Dialogs"
+        Title="Sửa điểm học sinh" Height="700" Width="500"
         WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <local:DiemToStringConverter x:Key="DiemToStringConverter"/>
+    </Window.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -18,46 +22,65 @@
                    HorizontalAlignment="Center"
                    Margin="0,0,0,20"/>
 
-        <StackPanel Grid.Row="1" Margin="0,10">
-            <TextBox materialDesign:HintAssist.Hint="Học sinh"
-                      Text="{Binding HoTen}"
-                      IsReadOnly="True"
-                      Margin="0,5"/>
-
-            <ComboBox materialDesign:HintAssist.Hint="Môn học"
-                      ItemsSource="{Binding DanhSachMonHoc}"
-                      SelectedItem="{Binding MonHoc}"
-                      Margin="0,5"/>
-
+        <Grid Grid.Row="1" Margin="0,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,10,0">
+                <TextBlock Text="Họ tên" Margin="0,5,0,0"/>
+                <TextBox materialDesign:HintAssist.Hint="Học sinh"
+                         Text="{Binding HoTen}" IsReadOnly="True" Margin="0,5"/>
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,0">
+                <TextBlock Text="Môn học" Margin="0,5,0,0"/>
+                <TextBox materialDesign:HintAssist.Hint="Môn học"
+                         Text="{Binding MonHoc}" IsReadOnly="True" Margin="0,5"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,10,0">
+                <TextBlock Text="Năm học" Margin="0,5,0,0"/>
+                <TextBox materialDesign:HintAssist.Hint="Năm học"
+                         Text="{Binding NamHoc}" IsReadOnly="True" Margin="0,5"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,0">
+                <TextBlock Text="Học kỳ" Margin="0,5,0,0"/>
+                <TextBox materialDesign:HintAssist.Hint="Học kỳ"
+                         Text="{Binding HocKy}" IsReadOnly="True" Margin="0,5"/>
+            </StackPanel>
+        </Grid>
+        <StackPanel Grid.Row="2" Margin="0,10,0,0">
+            <TextBlock Text="Điểm miệng" Margin="0,5,0,0"/>
             <TextBox materialDesign:HintAssist.Hint="Điểm miệng"
-                     Text="{Binding DiemMieng, StringFormat='F2', UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding DiemMieng, Converter={StaticResource DiemToStringConverter}, UpdateSourceTrigger=PropertyChanged}"
                      PreviewTextInput="NumberValidationTextBox"
                      Margin="0,5"/>
-
+            <TextBlock Text="Điểm 15 phút" Margin="0,5,0,0"/>
             <TextBox materialDesign:HintAssist.Hint="Điểm 15 phút"
-                     Text="{Binding Diem15p, StringFormat='F2', UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding Diem15p, Converter={StaticResource DiemToStringConverter}, UpdateSourceTrigger=PropertyChanged}"
                      PreviewTextInput="NumberValidationTextBox"
                      Margin="0,5"/>
-
+            <TextBlock Text="Điểm 1 tiết" Margin="0,5,0,0"/>
             <TextBox materialDesign:HintAssist.Hint="Điểm 1 tiết"
-                     Text="{Binding Diem1Tiet, StringFormat='F2', UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding Diem1Tiet, Converter={StaticResource DiemToStringConverter}, UpdateSourceTrigger=PropertyChanged}"
                      PreviewTextInput="NumberValidationTextBox"
                      Margin="0,5"/>
-
+            <TextBlock Text="Điểm thi" Margin="0,5,0,0"/>
             <TextBox materialDesign:HintAssist.Hint="Điểm thi"
-                     Text="{Binding DiemThi, StringFormat='F2', UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding DiemThi, Converter={StaticResource DiemToStringConverter}, UpdateSourceTrigger=PropertyChanged}"
                      PreviewTextInput="NumberValidationTextBox"
                      Margin="0,5"/>
-
+            <TextBlock Text="Điểm trung bình" Margin="0,5,0,0"/>
             <TextBox materialDesign:HintAssist.Hint="Điểm trung bình"
                      Text="{Binding DiemTB, StringFormat='F2'}"
                      IsReadOnly="True"
                      Margin="0,5"/>
-
             <Button Content="Lưu"
                     Command="{Binding SaveCommandDiem}"
                     Margin="0,10"/>
-
             <Button Content="Hủy"
                     Command="{Binding CancelCommandDiem}"
                     Margin="0,10"/>
