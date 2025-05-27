@@ -53,7 +53,7 @@
                              Background="Transparent"
                              FontSize="13"
                              Foreground="Gray"
-                             Text="Họ và Tên"
+                             materialDesign:HintAssist.Hint="Họ và Tên"
                              BorderThickness="0"/>
                     <materialDesign:PackIcon Kind="Search"
                                              VerticalAlignment="Center"
@@ -63,43 +63,66 @@
             </Grid>
 
             <Grid Grid.Column="1">
-                <ComboBox materialDesign:HintAssist.Hint="Vai trò"
+                <ComboBox materialDesign:HintAssist.Hint="Lớp học"
                           IsEditable="False"
                           Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                           Margin="10"
                           FontSize="13">
 
                     <ComboBoxItem IsSelected="False"
-                                  Content="10/1"/>
-
+                                  Content="10A1"/>
                     <ComboBoxItem IsSelected="False"
-                                  Content="10/2"/>
-
+                                  Content="10A2"/>
                     <ComboBoxItem IsSelected="False"
-                                  Content="10/3"/>
-
+                                  Content="10A3"/>
                     <ComboBoxItem IsSelected="False"
-                                  Content="11/1"/>
-
+                                  Content="10B1"/>
                     <ComboBoxItem IsSelected="False"
-                                  Content="11/2"/>
-
+                                  Content="10B2"/>
                     <ComboBoxItem IsSelected="False"
-                                  Content="11/3"/>
-
+                                  Content="10C1"/>
                     <ComboBoxItem IsSelected="False"
-                                  Content="12/1"/>
-
+                                  Content="11A1"/>
                     <ComboBoxItem IsSelected="False"
-                                  Content="12/2"/>
-
+                                  Content="11A2"/>
                     <ComboBoxItem IsSelected="False"
-                                  Content="12/3"/>
-                    
+                                  Content="11A3"/>
+                    <ComboBoxItem IsSelected="False"
+                                  Content="11B1"/>
+                    <ComboBoxItem IsSelected="False"
+                                  Content="11B2"/>
+                    <ComboBoxItem IsSelected="False"
+                                  Content="11C1"/>
+                    <ComboBoxItem IsSelected="False"
+                                  Content="12A1"/>
+                    <ComboBoxItem IsSelected="False"
+                                  Content="12A2"/>
+                    <ComboBoxItem IsSelected="False"
+                                  Content="12A3"/>
+                    <ComboBoxItem IsSelected="False"
+                                  Content="12B1"/>
+                    <ComboBoxItem IsSelected="False"
+                                  Content="12B2"/>
+                    <ComboBoxItem IsSelected="False"
+                                  Content="12C1"/>
                 </ComboBox>
             </Grid>
 
-            <Border Grid.Column="2"
+            <Grid Grid.Column="2">
+                <ComboBox materialDesign:HintAssist.Hint="Giới tính"
+                          IsEditable="False"
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                          Margin="10"
+                          FontSize="13">
+
+                    <ComboBoxItem IsSelected="False"
+                                  Content="Nam"/>
+                    <ComboBoxItem IsSelected="False"
+                                  Content="Nữ"/>
+                </ComboBox>
+            </Grid>
+
+            <Border Grid.Column="3"
                     Margin="20"
                     BorderThickness="1"
                     CornerRadius="10"
@@ -126,61 +149,75 @@
                 </Button>
             </Border>
 
-
-            <Border Grid.Column="3"
-                    Margin="20"
-                    BorderThickness="0"
-                    CornerRadius="10"
-                    BorderBrush="#03a9f4"
-                    Background="#0078D7">
-
-                <Button ToolTip="Lọc tài khoản"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Padding="10"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch">
-                    <StackPanel Orientation="Horizontal"
-                                Margin="-10">
-                        <materialDesign:PackIcon Kind="Plus"
-                                                 VerticalAlignment="Center"
-                                                 Foreground="Black"/>
-                        <TextBlock Text="Thêm"
-                                   Margin="10 0 0 0"
-                                   FontWeight="Regular"
-                                   Foreground="Black"           
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-
-            </Border>
-
         </Grid>
-        <Grid Grid.Row="2">
-            <ListView ItemsSource="{Binding User}">
-                <ListView.View>
+        <Grid Grid.Row="2" Margin="10">
+            <DataGrid ItemsSource="{Binding HocSinh}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="All"
+                      FontSize="13"
+                      IsReadOnly="True"
+                      RowHeight="40"
+                      ColumnHeaderHeight="40">
+                <!-- Style="{StaticResource MaterialDesignDataGrid}" -->
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Foreground" Value="Black"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="Background" Value="#E0E0E0"/>
+                        <Setter Property="Height" Value="40"/>
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
 
-                    <GridView>
-                        <GridViewColumn Header="UserID" 
-                                        DisplayMemberBinding="{Binding username}" 
-                                        Width="120"/>
-                        <GridViewColumn Header="Họ và Tên" 
-                                        DisplayMemberBinding="{Binding fullname}" 
-                                        Width="150"/>
-                        <GridViewColumn Header="Tên đăng nhập" 
-                                        DisplayMemberBinding="{Binding username}" 
-                                        Width="200"/>
-                        <GridViewColumn Header="Mật khẩu" 
-                                        DisplayMemberBinding="{Binding password}" 
-                                        Width="200"/>
-                        <GridViewColumn Header="Vai trò" 
-                                        DisplayMemberBinding="{Binding role}" 
-                                        Width="120"/>
-                    </GridView>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="👤" Width="50">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <materialDesign:PackIcon Kind="AccountCircle" 
+                                                         Width="20" 
+                                                         Height="20" 
+                                                         HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                </ListView.View>
-            </ListView>
+                    <DataGridTextColumn Header="ID Học sinh"
+                                        Binding="{Binding StudentID}"
+                                        Width="*"
+                                        ElementStyle="{StaticResource TextTrimmingStyle}"/>
+
+                    <DataGridTextColumn Header="Họ và Tên"
+                                        Binding="{Binding Fullname}"
+                                        Width="*"
+                                        ElementStyle="{StaticResource TextTrimmingStyle}"/>
+
+                    <DataGridTextColumn Header="Lớp học"
+                                        Binding="{Binding Class}"
+                                        Width="*"
+                                        ElementStyle="{StaticResource TextTrimmingStyle}"/>
+
+                    <DataGridTextColumn Header="Giới tính"
+                                        Binding="{Binding Gender}"
+                                        Width="*"
+                                        ElementStyle="{StaticResource TextTrimmingStyle}"/>
+
+                    <DataGridTextColumn Header="Ngày sinh"
+                                        Binding="{Binding Birth}"
+                                        Width="*"
+                                        ElementStyle="{StaticResource TextTrimmingStyle}"/>
+
+                    <DataGridTextColumn Header="Địa chỉ"
+                                        Binding="{Binding Adress}"
+                                        Width="*"
+                                        ElementStyle="{StaticResource TextTrimmingStyle}"/>
+
+                    <DataGridTextColumn Header="Quyền"
+                                        Binding="{Binding Allowed}"
+                                        Width="*"
+                                        ElementStyle="{StaticResource TextTrimmingStyle}"/>
+                </DataGrid.Columns>
+            </DataGrid>
         </Grid>
     </Grid>
 </UserControl>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuanLyHocSinh.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,10 +19,12 @@ namespace QuanLyHocSinh.View.Windows
     /// Interaction logic for DangNhap.xaml
     /// </summary>
     public partial class LoginWindow : Window
-    {
+    {   
         public LoginWindow()
         {
             InitializeComponent();
+
         }
     }
+
 }

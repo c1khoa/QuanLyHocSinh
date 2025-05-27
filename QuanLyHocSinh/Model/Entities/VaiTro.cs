@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.Model.Entities
 {
-    class VaiTro
-    {
-    }
+        public class VaiTro
+        {
+            public int Id { get; set; }
+            public string TenVaiTro { get; set; }  // "Giáo vụ", "Giáo viên", v.v...
+        }
+
 }

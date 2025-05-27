@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.QuanLyTaiKhoan"
-
+             
              Background="White"
              FontSize="13"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
@@ -13,7 +13,8 @@
              d:DataContext="{d:DesignInstance Type=viewmodel:ControlBarViewModel}"
              Name="ucQuanLyTaiKhoan"
              mc:Ignorable="d"
-             MinHeight="600" MinWidth="800">
+             MinHeight="600" MinWidth="800" 
+             >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"></RowDefinition>
@@ -53,7 +54,7 @@
                              Background="Transparent"
                              FontSize="13"
                              Foreground="Gray"
-                             Text="Họ và Tên"
+                             materialDesign:HintAssist.Hint="Họ và Tên"
                              BorderThickness="0"/>
                     <materialDesign:PackIcon Kind="Search"
                                              VerticalAlignment="Center"
@@ -111,7 +112,8 @@
                     BorderBrush="#03a9f4"
                     Background="#0078D7">
 
-                <Button ToolTip="Lọc tài khoản"
+                <Button Command="{Binding ShowThemTaiKhoanCommand}"
+                        ToolTip="Thêm tài khoản"
                         Background="Transparent"
                         BorderThickness="0"
                         Padding="10"
@@ -134,30 +136,69 @@
             </Border>
             
         </Grid>
-        <Grid Grid.Row="2">
-            <ListView ItemsSource="{Binding User}">
-                <ListView.View>
-                    
-                    <GridView>
-                        <GridViewColumn Header="UserID" 
-                                        DisplayMemberBinding="{Binding username}" 
-                                        Width="120"/>
-                        <GridViewColumn Header="Họ và Tên" 
-                                        DisplayMemberBinding="{Binding fullname}" 
-                                        Width="150"/>
-                        <GridViewColumn Header="Tên đăng nhập" 
-                                        DisplayMemberBinding="{Binding username}" 
-                                        Width="200"/>
-                        <GridViewColumn Header="Mật khẩu" 
-                                        DisplayMemberBinding="{Binding password}" 
-                                        Width="200"/>
-                        <GridViewColumn Header="Vai trò" 
-                                        DisplayMemberBinding="{Binding role}" 
-                                        Width="120"/>
-                    </GridView>
-                    
-                </ListView.View>
-            </ListView>
+            <Grid Grid.Row="2" Margin="10">
+            <DataGrid ItemsSource="{Binding Users}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="All"
+                      FontSize="13"
+                      IsReadOnly="True"
+                      RowHeight="40"
+                      ColumnHeaderHeight="40">
+                <!-- Style="{StaticResource MaterialDesignDataGrid}" -->
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Foreground" Value="Black"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="Background" Value="#E0E0E0"/>
+                        <Setter Property="Height" Value="40"/>
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="👤" Width="50">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <materialDesign:PackIcon Kind="AccountCircle" 
+                                                         Width="20" 
+                                                         Height="20" 
+                                                         HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Header="UserID"
+                                        Binding="{Binding Userid}"
+                                        Width="*"
+                                        ElementStyle="{StaticResource TextTrimmingStyle}"/>
+
+                    <DataGridTextColumn Header="Họ và Tên"
+                                        Binding="{Binding Fullname}"
+                                        Width="*"
+                                        ElementStyle="{StaticResource TextTrimmingStyle}"/>
+
+                    <DataGridTextColumn Header="Tên đăng nhập"
+                                        Binding="{Binding Username}"
+                                        Width="*"
+                                        ElementStyle="{StaticResource TextTrimmingStyle}"/>
+
+                    <DataGridTextColumn Header="Mật khẩu"
+                                        Binding="{Binding Password}"
+                                        Width="*"
+                                        ElementStyle="{StaticResource TextTrimmingStyle}"/>
+
+                    <DataGridTextColumn Header="Vai trò"
+                                        Binding="{Binding Role}"
+                                        Width="*"
+                                        ElementStyle="{StaticResource TextTrimmingStyle}"/>
+
+                    <DataGridTextColumn Header="Quyền"
+                                        Binding="{Binding Allowed}"
+                                        Width="*"
+                                        ElementStyle="{StaticResource TextTrimmingStyle}"/>
+                </DataGrid.Columns>
+            </DataGrid>
         </Grid>
     </Grid>
 </UserControl>

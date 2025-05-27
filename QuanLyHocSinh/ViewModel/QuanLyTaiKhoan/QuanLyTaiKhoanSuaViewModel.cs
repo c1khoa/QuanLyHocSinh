@@ -6,7 +6,14 @@ using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 {
-    class QuanLyTaiKhoanSuaViewModel
+    public class QuanLyTaiKhoanSuaViewModel : BaseViewModel
     {
+        private MainViewModel _mainVM;
+        public QuanLyTaiKhoanSuaViewModel(MainViewModel mainVM)
+        {
+            _mainVM = mainVM;
+        }
+        // Các thuộc tính và phương thức khác cho ViewModel này
+        // Ví dụ: Thông tin tài khoản, các lệnh để lưu thay đổi, v.v.
     }
 }

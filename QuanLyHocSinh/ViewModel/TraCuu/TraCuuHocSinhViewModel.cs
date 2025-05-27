@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
-    class TraCuuHocSinhViewModel
+    public class TraCuuHocSinhViewModel : BaseViewModel
     {
+        private MainViewModel _mainVM;
+        public TraCuuHocSinhViewModel(MainViewModel mainVM)
+        {
+            _mainVM = mainVM;
+        }
     }
 }

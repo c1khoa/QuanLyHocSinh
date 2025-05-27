@@ -17,8 +17,15 @@ namespace QuanLyHocSinh.View.Windows;
 /// </summary>
 public partial class MainWindow : Window
 {
-    public MainWindow()
+    public MainViewModel ViewModel { get; set; }
+    public MainWindow(MainViewModel vm) 
     {
         InitializeComponent();
+        ViewModel = new MainViewModel();
+    }
+
+    // Nếu cần, thêm constructor không tham số:
+    public MainWindow() : this(new MainViewModel())
+    {
     }
 }
