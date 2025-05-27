@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
+using System.Configuration;
 
 namespace QuanLyHocSinh.Model.Entities
 {
@@ -57,7 +58,7 @@ namespace QuanLyHocSinh.Model.Entities
         public static List<string> GetAllNienKhoa()
         {
             List<string> list = new List<string>();
-            string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
             string query = "SELECT DISTINCT NienKhoa FROM HOSOHOCSINH";
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
