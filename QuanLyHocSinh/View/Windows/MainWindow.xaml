@@ -152,13 +152,16 @@
                                               Margin="10 0 0 0"/>
                             </StackPanel>
                         </Expander.Header>
-                        <ListView>
+                        <ListView x:Name="TraCuuListView">
                             <ListViewItem Content="Thông tin học sinh"
-                                             Margin="20 0 0 0"/>
+                                         Margin="20 0 0 0"
+                                         MouseLeftButtonUp="TraCuuHS_Click"/>
                             <ListViewItem Content="Thông tin giáo viên"
-                                             Margin="20 0 0 0"/>
+                                         Margin="20 0 0 0"
+                                         MouseLeftButtonUp="TraCuuGV_Click"/>
                             <ListViewItem Content="Điểm học sinh"
-                                             Margin="20 0 0 0"/>
+                                         Margin="20 0 0 0"
+                                         MouseLeftButtonUp="TraCuuDiem_Click"/>
                         </ListView>
                     </Expander>
 
@@ -194,7 +197,7 @@
             </Grid>
 
             <Grid Panel.ZIndex="0">
-                <uc:TrangChuUC></uc:TrangChuUC>
+                <ContentControl Content="{Binding CurrentControl}"/>
             </Grid>
 
         </Grid>

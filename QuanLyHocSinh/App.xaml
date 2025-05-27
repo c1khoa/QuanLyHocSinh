@@ -12,9 +12,10 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Secondary/MaterialDesignColor.Lime.xaml" />
-
                 <ResourceDictionary Source="/ResourceXaml/MainResource.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <!--Thêm ViewModel-->
+            <viewmodel:MainViewModel x:Key="MainVM"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

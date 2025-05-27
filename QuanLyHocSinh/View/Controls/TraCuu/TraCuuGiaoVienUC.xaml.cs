@@ -12,18 +12,16 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using QuanLyHocSinh.ViewModel.TraCuu;
 
 namespace QuanLyHocSinh.View.Controls.TraCuu
 {
-    /// <summary>
-    /// Interaction logic for TraCuuGiaoVien.xaml
-    /// </summary>
     public partial class TraCuuGiaoVienUC : UserControl
     {
         public TraCuuGiaoVienUC()
         {
             InitializeComponent();
+            this.DataContext = new TraCuuGiaoVienViewModel();
         }
     }
 }
