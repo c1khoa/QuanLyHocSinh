@@ -4,9 +4,233 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.QuanLyTaiKhoan"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+
+             Background="White"
+             FontSize="13"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+             xmlns:viewmodel="clr-namespace:QuanLyHocSinh.ViewModel" 
+             d:DataContext="{d:DesignInstance Type=viewmodel:ControlBarViewModel}"
+             Name="ucQuanLyTaiKhoanThem"
+             mc:Ignorable="d"
+             MinHeight="600" MinWidth="800">
+    <Border Margin="70"
+            BorderBrush="#03a9f4"
+            BorderThickness="2"
+            Background="#D0F0FD"
+            CornerRadius="10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"></RowDefinition>
+                <RowDefinition Height="5*"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+
+                <TextBlock Text="THÊM TÀI KHOẢN"
+                    FontSize="24"
+                    FontWeight="Bold"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Margin="10 10 0 10"/>
+            </Grid>
+            <Border Grid.Row="1"
+                BorderThickness="1"
+                CornerRadius="10"
+                BorderBrush="#03a9f4"
+                Background="White" 
+                Margin="50 0 50 0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="2*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Grid.Column="0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"></RowDefinition>
+                            <RowDefinition Height="1*"></RowDefinition>
+                            <RowDefinition Height="1*"></RowDefinition>
+                            <RowDefinition Height="1*"></RowDefinition>
+                            <RowDefinition Height="1*"></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <TextBlock Text="UserID"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Margin="10 10 0 10"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <TextBlock Text="Họ và Tên"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Margin="10 10 0 10"/>
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <TextBlock Text="Tên đăng nhập"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Margin="10 10 0 10"/>
+                        </Grid>
+                        <Grid Grid.Row="3">
+                            <TextBlock Text="Mật khẩu"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Margin="10 10 0 10"/>
+                        </Grid>
+                        <Grid Grid.Row="4">
+                            <TextBlock Text="Vai trò"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Margin="10 10 0 10"/>
+                        </Grid>
+                    </Grid>
+                    <Grid Grid.Column="1">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"></RowDefinition>
+                            <RowDefinition Height="1*"></RowDefinition>
+                            <RowDefinition Height="1*"></RowDefinition>
+                            <RowDefinition Height="1*"></RowDefinition>
+                            <RowDefinition Height="1*"></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <Grid Background="#f5f6f7" 
+                                  Margin="10"
+                                  materialDesign:ButtonAssist.CornerRadius="10">
+                                
+                                <TextBox Margin="10,0,30,0"
+                                         VerticalContentAlignment="Center"
+                                         Background="Transparent"
+                                         FontSize="13"
+                                         Foreground="Gray"
+                                         Text="UserID"
+                                         BorderThickness="0"/>
+                            </Grid>
+                        </Grid>
+                        
+                        <Grid Grid.Row="0">
+                            <Grid Background="#f5f6f7" 
+                                  Margin="10"
+                                  materialDesign:ButtonAssist.CornerRadius="10">
+                                
+                                <TextBox Margin="10,0,30,0"
+                                         VerticalContentAlignment="Center"
+                                         Background="Transparent"
+                                         FontSize="13"
+                                         Foreground="Gray"
+                                         materialDesign:HintAssist.Hint="UserID"
+                                         BorderThickness="0"/>
+                            </Grid>
+                        </Grid>
+                        
+                        <Grid Grid.Row="1">
+                            <Grid Background="#f5f6f7" 
+                                  Margin="10"
+                                  materialDesign:ButtonAssist.CornerRadius="10">
+                                
+                                <TextBox Margin="10,0,30,0"
+                                         VerticalContentAlignment="Center"
+                                         Background="Transparent"
+                                         FontSize="13"
+                                         Foreground="Gray"
+                                         materialDesign:HintAssist.Hint="Họ và Tên"
+                                         BorderThickness="0"/>
+                            </Grid>
+                        </Grid>
+                        
+                        <Grid Grid.Row="2">
+                            <Grid Background="#f5f6f7" 
+                                  Margin="10"
+                                  materialDesign:ButtonAssist.CornerRadius="10">
+                                
+                                <TextBox Margin="10,0,30,0"
+                                         VerticalContentAlignment="Center"
+                                         Background="Transparent"
+                                         FontSize="13"
+                                         Foreground="Gray"
+                                         materialDesign:HintAssist.Hint="Tên đăng nhập"
+                                         BorderThickness="0"/>
+                            </Grid>
+                        </Grid>
+                        
+                        <Grid Grid.Row="3">
+                            <Grid Background="#f5f6f7" 
+                                  Margin="10"
+                                  materialDesign:ButtonAssist.CornerRadius="10">
+
+                                <PasswordBox  Margin="10,0,30,0"
+                                              VerticalContentAlignment="Center"
+                                              Background="Transparent"
+                                              FontSize="13"
+                                              PasswordChar="●" 
+                                              BorderThickness="0"
+                                              materialDesign:HintAssist.Hint="Mật khẩu"
+                                              Foreground="Gray"/>
+                            </Grid>
+                        </Grid>
+
+                        <Grid Grid.Row="4">
+                            <Grid 
+                                  Margin="10 10 250 10"
+                                  materialDesign:ButtonAssist.CornerRadius="10"
+                                  Background="Transparent">
+                                
+                                <ComboBox materialDesign:HintAssist.Hint="Vai trò"
+                                          IsEditable="False"
+                                          Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                                          FontSize="13">            
+
+                                    <ComboBoxItem IsSelected="False"
+                                                  Content="Học sinh"/>
+                                    <ComboBoxItem IsSelected="False"
+                                                  Content="Giáo viên"/>
+                                </ComboBox>
+                            </Grid>
+                        </Grid>
+
+                    </Grid>
+                </Grid>
+            </Border>
+            <Grid Grid.Row="2"
+                  VerticalAlignment="Center"
+                  Margin="50 0 50 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Button Command="{Binding HuyThemTaiKhoanCommand}"
+                            Style="{StaticResource MaterialDesignRaisedLightButton}"
+                            Background="#EF9A9A"
+                            Margin="50 0 50 0"
+                            FontSize="13"
+                            Content="Hủy"
+                            FontWeight="Bold">
+                    </Button>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Button Style="{StaticResource MaterialDesignRaisedLightButton}"
+                            FontWeight="Bold"
+                            Margin="50 0 50 0"
+                            Content="Thêm">
+                    </Button>
+                </Grid>
+            </Grid>
+            </Grid>
+    </Border>
 </UserControl>

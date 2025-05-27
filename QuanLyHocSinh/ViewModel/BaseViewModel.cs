@@ -1,3 +1,4 @@
+using QuanLyHocSinh.View.Controls.QuanLyTaiKhoan;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,6 +17,11 @@ namespace QuanLyHocSinh.ViewModel
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public static implicit operator BaseViewModel(QuanLyTaiKhoanThemUC v)
+        {
+            throw new NotImplementedException();
         }
     }
     class RelayCommand<T> : ICommand

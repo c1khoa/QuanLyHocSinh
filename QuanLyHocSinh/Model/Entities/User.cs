@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.Model.Entities
 {
-    class User
+    public class User
     {
+        public int Id { get; set; }
+        public string TenDangNhap { get; set; }
+        public string MatKhau { get; set; }
+
+        public VaiTro VaiTro { get; set; }  // Navigation property
     }
+
 }

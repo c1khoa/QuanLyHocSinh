@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
 using System.Configuration;

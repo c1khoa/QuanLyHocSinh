@@ -5,41 +5,15 @@ using QuanLyHocSinh.ViewModel;
 
 namespace QuanLyHocSinh.View.Windows
 {
-    public partial class MainWindow : Window
+    public MainViewModel ViewModel { get; set; }
+    public MainWindow(MainViewModel vm) 
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+        ViewModel = new MainViewModel();
+    }
 
-        //Lệnh click vào nút tra cứu học sinh
-        private void TraCuuHS_Click(object sender, MouseButtonEventArgs e)
-        {
-            var mainVM = DataContext as MainViewModel;
-            if (mainVM != null)
-            {
-                mainVM.ShowTraCuuHSCommand.Execute(null);
-            }
-        }
-
-        //Lệnh click vào nút tra cứu giáo viên
-        private void TraCuuGV_Click(object sender, MouseButtonEventArgs e)
-        {
-            var mainVM = DataContext as MainViewModel;
-            if (mainVM != null)
-            {
-                mainVM.ShowTraCuuGVCommand.Execute(null);
-            }
-        }
-
-        //Lệnh click vào nút tra cứu điểm học sinh
-        private void TraCuuDiem_Click(object sender, MouseButtonEventArgs e)
-        {
-            var mainVM = DataContext as MainViewModel;
-            if (mainVM != null)
-            {
-                mainVM.ShowTraCuuDiemCommand.Execute(null);
-            }
-        }
+    // Nếu cần, thêm constructor không tham số:
+    public MainWindow() : this(new MainViewModel())
+    {
     }
 }

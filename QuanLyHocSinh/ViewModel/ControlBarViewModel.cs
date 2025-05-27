@@ -51,16 +51,23 @@ namespace QuanLyHocSinh.ViewModel
                 }
             );
             CloseWindowCommand = new RelayCommand<UserControl>(
-                (p) => { return p == null ? false : true; },
-                (p) => {
+                (p) => p != null,
+                (p) =>
+                {
                     FrameworkElement window = GetWindowParents(p);
-                    var w = (Window)window;
+                    var w = window as Window;
                     if (w != null)
                     {
-                        w.Close();
+                        var result = MessageBox.Show("Bạn có muốn thoát không?", "Thông báo", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            w.Close();
+                        }
+                        // Nếu No thì không làm gì cả
                     }
                 }
             );
+
             MouseDownWindowCommand =  new RelayCommand<UserControl>(
                 (p) => { return p == null ? false : true; },
                 (p) =>
