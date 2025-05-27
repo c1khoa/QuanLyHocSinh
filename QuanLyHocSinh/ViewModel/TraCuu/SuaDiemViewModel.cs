@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Input;
 using QuanLyHocSinh.Model.Entities;
 using MySql.Data.MySqlClient;
+using System.Configuration;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
@@ -164,7 +165,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         {
             try
             {
-                string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+                string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
                 string query = @"
                     SELECT 
                         SUM(CASE WHEN LoaiDiemID = 'LD001' THEN HeSo ELSE 0 END) as HeSoMieng,

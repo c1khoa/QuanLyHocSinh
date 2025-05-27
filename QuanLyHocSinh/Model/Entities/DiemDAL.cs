@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
+using System.Configuration;
 
 public class DiemDAL
 {
     public static List<Diem> GetAllDiemHocSinh()
     {
         List<Diem> list = new List<Diem>();
-        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
         string query = @"
             SELECT hs.HocSinhID AS MaHS, ho.HoTen, l.TenLop AS Lop, mh.TenMonHoc AS MonHoc, d.NamHocID, d.HocKy,
                    IFNULL(diem_mieng.GiaTri, -1) AS DiemMieng,
@@ -60,7 +61,7 @@ public class DiemDAL
     public static List<string> GetAllMonHoc()
     {
         List<string> list = new List<string>();
-        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
         string query = "SELECT TenMonHoc FROM MONHOC";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
@@ -81,7 +82,7 @@ public class DiemDAL
     public static List<string> GetAllLop()
     {
         List<string> list = new List<string>();
-        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
         string query = "SELECT TenLop FROM LOP";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
@@ -102,7 +103,7 @@ public class DiemDAL
     public static List<string> GetAllNamHoc()
     {
         List<string> list = new List<string>();
-        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
         string query = "SELECT DISTINCT NamHocID FROM DIEM";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
@@ -123,7 +124,7 @@ public class DiemDAL
     public static List<int> GetAllHocKy()
     {
         List<int> list = new List<int>();
-        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
         string query = "SELECT DISTINCT HocKy FROM DIEM";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
@@ -144,7 +145,7 @@ public class DiemDAL
     // Sửa điểm
     public static void UpdateDiem(Diem diem)
     {
-        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
         using (MySqlConnection conn = new MySqlConnection(connectionString))
         {
             conn.Open();

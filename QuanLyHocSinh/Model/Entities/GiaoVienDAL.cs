@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
+using System.Configuration;
 
 public class GiaoVienDAL
 {
     public static List<GiaoVien> GetAllGiaoVien()
     {
         List<GiaoVien> list = new List<GiaoVien>();
-        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
         string query = @"
             SELECT gv.GiaoVienID AS MaGV, ho.HoTen, ho.NgaySinh, ho.GioiTinh, ho.Email, ho.DiaChi, mh.TenMonHoc AS BoMon, l.TenLop AS LopDayID
             FROM GIAOVIEN gv
@@ -48,7 +49,7 @@ public class GiaoVienDAL
     //Cập nhật thông tin giáo viên
     public static void UpdateGiaoVien(GiaoVien giaoVien)
     {
-        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
         string query = @"UPDATE HOSO h
                             JOIN HOSOGIAOVIEN hgv ON h.HoSoID = hgv.HoSoID
                             LEFT JOIN CHITIETMONHOC ctmh ON ctmh.GiaoVienID = hgv.GiaoVienID

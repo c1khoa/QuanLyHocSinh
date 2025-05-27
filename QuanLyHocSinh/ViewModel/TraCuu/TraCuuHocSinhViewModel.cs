@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 using QuanLyHocSinh.Model.Entities;
 using QuanLyHocSinh.View.Dialogs;
+using System.Configuration;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {   
