@@ -1,8 +1,8 @@
 using System;
-using System.Configuration;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
+using System.Configuration;
 
 public class DiemDAL
 {
@@ -102,22 +102,30 @@ public class DiemDAL
 
     public static List<string> GetAllNamHoc()
     {
+        List<string> list = new List<string>();
         string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
-        string query = @"
-            UPDATE DIEM d
-            JOIN HOCSINH hs ON d.HocSinhID = hs.HocSinhID
-            JOIN MONHOC mh ON d.MonHocID = mh.MonHocID
-            JOIN CHITIETDIEM ctd_mieng ON ctd_mieng.DiemID = d.DiemID AND ctd_mieng.LoaiDiemID = 'LD001'
-            JOIN CHITIETDIEM ctd_15p ON ctd_15p.DiemID = d.DiemID AND ctd_15p.LoaiDiemID = 'LD002'
-            JOIN CHITIETDIEM ctd_1tiet ON ctd_1tiet.DiemID = d.DiemID AND ctd_1tiet.LoaiDiemID = 'LD003'
-            JOIN CHITIETDIEM ctd_thi ON ctd_thi.DiemID = d.DiemID AND ctd_thi.LoaiDiemID = 'LD004'
-            SET 
-                ctd_mieng.GiaTri = @DiemMieng,
-                ctd_15p.GiaTri = @Diem15p,
-                ctd_1tiet.GiaTri = @Diem1Tiet,
-                ctd_thi.GiaTri = @DiemThi,
-                d.DiemTrungBinh = @DiemTB
-            WHERE hs.HocSinhID = @MaHS AND mh.TenMonHoc = @MonHoc;";
+        string query = "SELECT DISTINCT NamHocID FROM DIEM";
+
+        using (MySqlConnection conn = new MySqlConnection(connectionString))
+        {
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    list.Add(reader["NamHocID"].ToString());
+                }
+            }
+        }
+        return list;
+    }
+
+    public static List<int> GetAllHocKy()
+    {
+        List<int> list = new List<int>();
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+        string query = "SELECT DISTINCT HocKy FROM DIEM";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
         {
@@ -137,7 +145,7 @@ public class DiemDAL
     // Sửa điểm
     public static void UpdateDiem(Diem diem)
     {
-        string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
         using (MySqlConnection conn = new MySqlConnection(connectionString))
         {
             conn.Open();
@@ -230,17 +238,18 @@ public class DiemDAL
             }
         }
     }
-
+    //TÍnh điểm trung bình
     private static float TinhDiemTrungBinh(string diemID, MySqlConnection conn)
     {
-        // Lấy điểm và loại điểm
         string query = @"
-            SELECT ctd.GiaTri, ctd.LoaiDiemID, ld.HeSo
-            FROM CHITIETDIEM ctd
-            JOIN LOAIDIEM ld ON ctd.LoaiDiemID = ld.LoaiDiemID
-            WHERE ctd.DiemID = @DiemID";
+        SELECT ctd.GiaTri, ctd.LoaiDiemID, ld.HeSo
+        FROM CHITIETDIEM ctd
+        JOIN LOAIDIEM ld ON ctd.LoaiDiemID = ld.LoaiDiemID
+        WHERE ctd.DiemID = @DiemID";
+
         float tongDiem = 0;
         float tongHeSo = 0;
+
         using (var cmd = new MySqlCommand(query, conn))
         {
             cmd.Parameters.AddWithValue("@DiemID", diemID);
@@ -248,12 +257,14 @@ public class DiemDAL
             {
                 while (reader.Read())
                 {
-                    float giaTri = float.Parse(reader["GiaTri"].ToString());
-                    float heSo = float.Parse(reader["HeSo"].ToString());
-                    if (giaTri >= 0)
+                    if (float.TryParse(reader["GiaTri"].ToString(), out float giaTri) &&
+                        float.TryParse(reader["HeSo"].ToString(), out float heSo))
                     {
-                        tongDiem += giaTri * heSo;
-                        tongHeSo += heSo;
+                        if (giaTri >= 0)
+                        {
+                            tongDiem += giaTri * heSo;
+                            tongHeSo += heSo;
+                        }
                     }
                 }
             }

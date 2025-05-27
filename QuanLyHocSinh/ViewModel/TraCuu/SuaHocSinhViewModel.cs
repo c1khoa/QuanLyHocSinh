@@ -9,7 +9,7 @@ using QuanLyHocSinh.Model.Entities;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
-    public class SuaHocSinhViewModel : INotifyPropertyChanged
+    public class SuaHocSinhViewModel : BaseViewModel
     {
         private string _hoTen;
         public string HoTen
@@ -60,7 +60,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _nienKhoa = value; OnPropertyChanged(); }
         }
 
-        public ObservableCollection<string> DanhSachGioiTinh { get; } = 
+        public ObservableCollection<string> DanhSachGioiTinh { get; } =
             new ObservableCollection<string> { "Nam", "Nữ" };
 
         public ObservableCollection<string> DanhSachLop { get; set; }
@@ -135,11 +135,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         {
             CloseDialog?.Invoke(false);
         }
-                
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+
     }
 }

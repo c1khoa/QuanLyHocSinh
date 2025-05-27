@@ -12,7 +12,7 @@ using QuanLyHocSinh.View.Dialogs;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
-    public class TraCuuGiaoVienViewModel : INotifyPropertyChanged
+    public class TraCuuGiaoVienViewModel : BaseViewModel
     {
         private ObservableCollection<GiaoVien> _danhSachGiaoVien;
         public ObservableCollection<GiaoVien> DanhSachGiaoVien
@@ -90,8 +90,10 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         public ICommand EditCommand { get; }
         public ICommand FilterCommand { get; }
 
-        public TraCuuGiaoVienViewModel()
+        private MainViewModel _mainVM;
+        public TraCuuGiaoVienViewModel(MainViewModel mainVM)
         {
+            _mainVM = mainVM;
             _allGiaoVien = new ObservableCollection<GiaoVien>(GiaoVienDAL.GetAllGiaoVien());
             DanhSachGiaoVien = new ObservableCollection<GiaoVien>(_allGiaoVien);
 
@@ -118,6 +120,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             SelectedBoMon = "Tất cả";
             SelectedGioiTinh = "Tất cả";
             SelectedLop = "Tất cả";
+            _mainVM = mainVM;
         }
 
         private void Filter()
@@ -143,12 +146,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                 _allGiaoVien = new ObservableCollection<GiaoVien>(GiaoVienDAL.GetAllGiaoVien());
                 Filter();
             }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

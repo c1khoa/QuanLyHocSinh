@@ -5,7 +5,7 @@ INSERT INTO VAITRO (VaiTroID, TenVaiTro) VALUES
 ('VT03', 'Giáo vụ');
 
 -- Dữ liệu mẫu cho bảng USER
-INSERT INTO USER (UserID, TenDangNhap, MatKhau, VaiTroID) VALUES
+INSERT INTO USERS (UserID, TenDangNhap, MatKhau, VaiTroID) VALUES
 ('U001', 'hs001', '123456', 'VT01'),
 ('U002', 'hs002', '123456', 'VT01'),
 ('U003', 'hs003', '123456', 'VT01'),
@@ -97,7 +97,6 @@ INSERT INTO CHITIETMONHOC (ChiTietMonHocID, GiaoVienID, MonHocID, LopDayID, Ngay
 ('CTMH005', 'GV005', 'MH05', '12A1', '2024-01-15', 'Chương 1: Văn học Việt Nam');
 
 -- Dữ liệu mẫu cho bảng CHUCVU
-DELETE FROM CHUCVU;
 INSERT INTO CHUCVU (ChucVuID, TenChucVu, MoTa, VaiTroID) VALUES
 ('CV001', 'Lop truong', 'Quản lý lớp học', 'VT01'),
 ('CV002', 'To truong', 'Quản lý tổ học tập', 'VT01'),
@@ -165,7 +164,6 @@ INSERT INTO CHITIETQUYEN (ChiTietQuyenID, QuyenID, VaiTroID, TuongTac) VALUES
 ('CTQ005', 'Q005', 'VT03', 'Duyet');
 
 -- Dữ liệu mẫu cho bảng PHANQUYEN
-DELETE FROM PHANQUYEN;
 INSERT INTO PHANQUYEN (PhanQuyenID, QuyenID, GiaoVuPhanQuyenID, UserDuocPhanQuyenID, NgayPhanQuyen) VALUES
 ('PQ001', 'Q001', 'GVU001', 'U001', '2023-09-01'),
 ('PQ002', 'Q002', 'GVU001', 'U002', '2023-09-01'),

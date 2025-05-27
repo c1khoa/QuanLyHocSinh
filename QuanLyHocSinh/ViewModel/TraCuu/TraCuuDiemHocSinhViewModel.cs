@@ -9,10 +9,11 @@ using System.ComponentModel;
 using System.Windows.Input;
 using QuanLyHocSinh.Model.Entities;
 using QuanLyHocSinh.View.Dialogs;
+using System.Configuration;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
-    public class TraCuuDiemHocSinhViewModel : INotifyPropertyChanged
+    public class TraCuuDiemHocSinhViewModel : BaseViewModel
     {
         private ObservableCollection<Diem> _danhSachDiem;
         public ObservableCollection<Diem> DanhSachDiem
@@ -106,8 +107,10 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         public ICommand EditCommand { get; }
         public ICommand FilterCommand { get; }
 
-        public TraCuuDiemHocSinhViewModel()
+        private MainViewModel _mainVM;
+        public TraCuuDiemHocSinhViewModel(MainViewModel mainVM)
         {
+            _mainVM = mainVM;
             _allDiem = new ObservableCollection<Diem>(DiemDAL.GetAllDiemHocSinh());
             DanhSachDiem = new ObservableCollection<Diem>(_allDiem);
 
@@ -142,14 +145,16 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         private void Filter()
         {
             DanhSachDiem = new ObservableCollection<Diem>(
-                _allDiem.Where(d => 
-                    (SelectedLop == "Tất cả" || d.Lop == SelectedLop) &&
-                    (SelectedMonHoc == "Tất cả" || d.MonHoc == SelectedMonHoc) &&
-                    (SelectedNamHoc == "Tất cả" || d.NamHocID == SelectedNamHoc) &&
-                    (SelectedHocKy == "Tất cả" || d.HocKy.ToString() == SelectedHocKy)
+                _allDiem.Where(d =>
+                    (string.IsNullOrEmpty(SearchText) || d.HoTen.ToLower().Contains(SearchText.ToLower()))
+                    && (SelectedLop == "Tất cả" || d.Lop == SelectedLop)
+                    && (SelectedMonHoc == "Tất cả" || d.MonHoc == SelectedMonHoc)
+                    && (SelectedNamHoc == "Tất cả" || d.NamHocID == SelectedNamHoc)
+                    && (SelectedHocKy == "Tất cả" || d.HocKy.ToString() == SelectedHocKy)
                 )
             );
         }
+
 
         private void EditDiem()
         {
@@ -162,12 +167,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                 _allDiem = new ObservableCollection<Diem>(DiemDAL.GetAllDiemHocSinh());
                 Filter();
             }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

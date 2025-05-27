@@ -7,10 +7,11 @@ using System.Windows;
 using System.Windows.Input;
 using QuanLyHocSinh.Model.Entities;
 using MySql.Data.MySqlClient;
+using System.Configuration;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
-    public class SuaDiemViewModel : INotifyPropertyChanged
+    public class SuaDiemViewModel : BaseViewModel
     {
         private string _maHS;
         public string MaHS
@@ -129,9 +130,8 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
 
         public ObservableCollection<string> DanhSachNamHoc { get; } =
             new ObservableCollection<string>(DiemDAL.GetAllNamHoc());
-
-        public ObservableCollection<int> DanhSachHocKy { get; } =
-            new ObservableCollection<int>(DiemDAL.GetAllHocKy());
+        //public ObservableCollection<int> DanhSachHocKy { get; } =
+        //    new ObservableCollection<int>(DiemDAL.GetAllHocKy());
 
         public ICommand SaveCommandDiem { get; }
         public ICommand CancelCommandDiem { get; }
@@ -164,7 +164,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         {
             try
             {
-                string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+                string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
                 string query = @"
                     SELECT 
                         SUM(CASE WHEN LoaiDiemID = 'LD001' THEN HeSo ELSE 0 END) as HeSoMieng,
@@ -269,12 +269,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         private void Cancel()
         {
             CloseDialog?.Invoke(false);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
