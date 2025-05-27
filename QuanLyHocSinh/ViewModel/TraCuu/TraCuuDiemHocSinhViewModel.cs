@@ -47,6 +47,22 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _selectedMonHoc = value; OnPropertyChanged(nameof(SelectedMonHoc)); Filter(); }
         }
 
+        //Danh sách năm học
+        private ObservableCollection<string> _danhSachNamHoc;
+        public ObservableCollection<string> DanhSachNamHoc
+        {
+            get => _danhSachNamHoc;
+            set { _danhSachNamHoc = value; OnPropertyChanged(nameof(DanhSachNamHoc)); }
+        }
+
+        //Danh sách học kỳ
+        private ObservableCollection<string> _danhSachHocKy;
+        public ObservableCollection<string> DanhSachHocKy
+        {
+            get => _danhSachHocKy;
+            set { _danhSachHocKy = value; OnPropertyChanged(nameof(DanhSachHocKy)); }
+        }
+
         //Danh sách lớp
         private ObservableCollection<string> _danhSachLop;
         public ObservableCollection<string> DanhSachLop
@@ -61,6 +77,22 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         {
             get => _danhSachMonHoc;
             set { _danhSachMonHoc = value; OnPropertyChanged(nameof(DanhSachMonHoc)); }
+        }
+
+        //Danh sách năm học
+        private string _selectedNamHoc;
+        public string SelectedNamHoc
+        {
+            get => _selectedNamHoc;
+            set { _selectedNamHoc = value; OnPropertyChanged(nameof(SelectedNamHoc)); Filter(); }
+        }
+
+        //Danh sách học kỳ
+        private string _selectedHocKy;
+        public string SelectedHocKy
+        {
+            get => _selectedHocKy;
+            set { _selectedHocKy = value; OnPropertyChanged(nameof(SelectedHocKy)); Filter(); }
         }
 
         private Diem _selectedDiem;
@@ -88,6 +120,14 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             dsMonHoc.Insert(0, "Tất cả");
             DanhSachMonHoc = new ObservableCollection<string>(dsMonHoc);
 
+            var dsNamHoc = _allDiem.Select(d => d.NamHocID).Distinct().OrderBy(n => n).ToList();
+            dsNamHoc.Insert(0, "Tất cả");
+            DanhSachNamHoc = new ObservableCollection<string>(dsNamHoc);
+
+            var dsHocKy = _allDiem.Select(d => d.HocKy.ToString()).Distinct().OrderBy(h => h).ToList();
+            dsHocKy.Insert(0, "Tất cả");
+            DanhSachHocKy = new ObservableCollection<string>(dsHocKy);
+
             //Khởi tạo các lệnh
             EditCommand = new RelayCommand(EditDiem, () => SelectedDiem != null);
             FilterCommand = new RelayCommand(Filter);
@@ -95,6 +135,8 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             //Mặc định chọn "Tất cả"
             SelectedLop = "Tất cả";
             SelectedMonHoc = "Tất cả";
+            SelectedNamHoc = "Tất cả";
+            SelectedHocKy = "Tất cả";
         }
 
         private void Filter()
@@ -102,7 +144,9 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             DanhSachDiem = new ObservableCollection<Diem>(
                 _allDiem.Where(d => 
                     (SelectedLop == "Tất cả" || d.Lop == SelectedLop) &&
-                    (SelectedMonHoc == "Tất cả" || d.MonHoc == SelectedMonHoc)
+                    (SelectedMonHoc == "Tất cả" || d.MonHoc == SelectedMonHoc) &&
+                    (SelectedNamHoc == "Tất cả" || d.NamHocID == SelectedNamHoc) &&
+                    (SelectedHocKy == "Tất cả" || d.HocKy.ToString() == SelectedHocKy)
                 )
             );
         }

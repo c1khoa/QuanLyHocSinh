@@ -54,6 +54,27 @@ namespace QuanLyHocSinh.Model.Entities
             return list;
         }
 
+        public static List<string> GetAllNienKhoa()
+        {
+            List<string> list = new List<string>();
+            string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+            string query = "SELECT DISTINCT NienKhoa FROM HOSOHOCSINH";
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(reader["NienKhoa"].ToString());
+                    }
+                }
+            }
+            return list;
+        }
+
+
         public static void UpdateHocSinh(HocSinh hocSinh)
         {
             string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
