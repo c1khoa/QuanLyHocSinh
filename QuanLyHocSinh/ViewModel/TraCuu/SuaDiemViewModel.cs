@@ -11,7 +11,7 @@ using System.Configuration;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
-    public class SuaDiemViewModel : INotifyPropertyChanged
+    public class SuaDiemViewModel : BaseViewModel
     {
         private string _maHS;
         public string MaHS
@@ -130,9 +130,8 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
 
         public ObservableCollection<string> DanhSachNamHoc { get; } =
             new ObservableCollection<string>(DiemDAL.GetAllNamHoc());
-
-        public ObservableCollection<int> DanhSachHocKy { get; } =
-            new ObservableCollection<int>(DiemDAL.GetAllHocKy());
+        //public ObservableCollection<int> DanhSachHocKy { get; } =
+        //    new ObservableCollection<int>(DiemDAL.GetAllHocKy());
 
         public ICommand SaveCommandDiem { get; }
         public ICommand CancelCommandDiem { get; }
@@ -270,12 +269,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         private void Cancel()
         {
             CloseDialog?.Invoke(false);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

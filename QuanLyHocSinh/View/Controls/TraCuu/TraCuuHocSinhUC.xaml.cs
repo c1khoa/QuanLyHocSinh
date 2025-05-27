@@ -21,7 +21,6 @@ namespace QuanLyHocSinh.View.Controls.TraCuu
         public TraCuuHocSinhUC()
         {
             InitializeComponent();
-            this.DataContext = new TraCuuHocSinhViewModel();
         }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Configuration;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
@@ -239,17 +238,18 @@ public class DiemDAL
             }
         }
     }
-
+    //TÍnh điểm trung bình
     private static float TinhDiemTrungBinh(string diemID, MySqlConnection conn)
     {
-        // Lấy điểm và loại điểm
         string query = @"
-            SELECT ctd.GiaTri, ctd.LoaiDiemID, ld.HeSo
-            FROM CHITIETDIEM ctd
-            JOIN LOAIDIEM ld ON ctd.LoaiDiemID = ld.LoaiDiemID
-            WHERE ctd.DiemID = @DiemID";
+        SELECT ctd.GiaTri, ctd.LoaiDiemID, ld.HeSo
+        FROM CHITIETDIEM ctd
+        JOIN LOAIDIEM ld ON ctd.LoaiDiemID = ld.LoaiDiemID
+        WHERE ctd.DiemID = @DiemID";
+
         float tongDiem = 0;
         float tongHeSo = 0;
+
         using (var cmd = new MySqlCommand(query, conn))
         {
             cmd.Parameters.AddWithValue("@DiemID", diemID);
@@ -257,12 +257,14 @@ public class DiemDAL
             {
                 while (reader.Read())
                 {
-                    float giaTri = float.Parse(reader["GiaTri"].ToString());
-                    float heSo = float.Parse(reader["HeSo"].ToString());
-                    if (giaTri >= 0)
+                    if (float.TryParse(reader["GiaTri"].ToString(), out float giaTri) &&
+                        float.TryParse(reader["HeSo"].ToString(), out float heSo))
                     {
-                        tongDiem += giaTri * heSo;
-                        tongHeSo += heSo;
+                        if (giaTri >= 0)
+                        {
+                            tongDiem += giaTri * heSo;
+                            tongHeSo += heSo;
+                        }
                     }
                 }
             }

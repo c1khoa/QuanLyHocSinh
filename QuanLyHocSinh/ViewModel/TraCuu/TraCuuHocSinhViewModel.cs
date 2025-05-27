@@ -11,8 +11,8 @@ using QuanLyHocSinh.View.Dialogs;
 using System.Configuration;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
-{   
-    public class TraCuuHocSinhViewModel : INotifyPropertyChanged
+{
+    public class TraCuuHocSinhViewModel : BaseViewModel
     {
         //Danh sách học sinh
         private ObservableCollection<HocSinh> _danhSachHocSinh;
@@ -64,14 +64,14 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             get => _danhSachLop;
             set { _danhSachLop = value; OnPropertyChanged(nameof(DanhSachLop)); }
         }
-        
+
         //Danh sách giới tính
         private ObservableCollection<string> _danhSachGioiTinh;
         public ObservableCollection<string> DanhSachGioiTinh
         {
             get => _danhSachGioiTinh;
             set { _danhSachGioiTinh = value; OnPropertyChanged(nameof(DanhSachGioiTinh)); }
-        }  
+        }
 
         //Danh sách niên khóa
         private ObservableCollection<string> _danhSachNienKhoa;
@@ -87,14 +87,16 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             get => _selectedHocSinh;
             set { _selectedHocSinh = value; OnPropertyChanged(nameof(SelectedHocSinh)); }
         }
-        
+
         //Lệnh edit và filter
         public ICommand EditCommand { get; }
         public ICommand FilterCommand { get; }
 
         //Khởi tạo ViewModel
-        public TraCuuHocSinhViewModel()
+        private MainViewModel _mainVM;
+        public TraCuuHocSinhViewModel(MainViewModel mainVM)
         {
+            _mainVM = mainVM;
             _allHocSinh = new ObservableCollection<HocSinh>(HocSinhDAL.GetAllHocSinh());
             DanhSachHocSinh = new ObservableCollection<HocSinh>(_allHocSinh);
 
@@ -120,8 +122,9 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             SelectedLop = "Tất cả";
             SelectedGioiTinh = "Tất cả";
             SelectedNienKhoa = "Tất cả";
+            _mainVM = mainVM;
         }
-        
+
         //Lọc học sinh theo tên và lớp
         private void Filter()
         {
@@ -148,10 +151,5 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }
