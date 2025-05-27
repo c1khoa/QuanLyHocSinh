@@ -22,8 +22,6 @@ using QuanLyHocSinh.ViewModel.BaoCao;
 using System.Windows.Controls;
 using QuanLyHocSinh.Model.Entities;
 
-
-
 namespace QuanLyHocSinh.ViewModel
 {
     public class MainViewModel : BaseViewModel
@@ -68,7 +66,6 @@ namespace QuanLyHocSinh.ViewModel
         //public string VaiTro => CurrentUser != null ? CurrentUser.VaiTro.ToString() : string.Empty;
 
         public bool Isloaded { get; set; } = false;
-
         public ICommand LoadedWindowCommand { get; set; }
         // Các commend điều hướng
         public ICommand ShowTrangChuCommand  { get; set; }
@@ -100,7 +97,6 @@ namespace QuanLyHocSinh.ViewModel
             ShowTongKetNamHocCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TongKetNamHocViewModel(this));
             ShowQuyDinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuyDinhMainViewModel(this));
         }
-
         protected bool SetProperty<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null)
         {
             if (!Equals(field, newValue))

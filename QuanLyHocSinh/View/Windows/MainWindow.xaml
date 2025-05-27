@@ -220,7 +220,6 @@
                                 <ListViewItem Content="Điểm học sinh"
                                           Margin="20 0 0 0"/>
                             </Button>
-
                         </ListView>
                     </Expander>
 

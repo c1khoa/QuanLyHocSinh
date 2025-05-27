@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace QuanLyHocSinh.View.Windows
 {
-    /// <summary>
-    /// Interaction logic for DangNhap.xaml
-    /// </summary>
     public partial class LoginWindow : Window
     {   
         public LoginWindow()
