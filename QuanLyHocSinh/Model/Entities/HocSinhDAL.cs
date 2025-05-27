@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
 
@@ -11,7 +12,7 @@ namespace QuanLyHocSinh.Model.Entities
         {
             List<HocSinh> list = new List<HocSinh>();
             // Chuỗi kết nối cơ sở dữ liệu
-            string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
             // Truy vấn lấy tất cả thông tin học sinh
             string query = @"
                 SELECT hs.HocSinhID, ho.HoTen, ho.GioiTinh, ho.NgaySinh, ho.Email, ho.DiaChi, 
@@ -76,7 +77,7 @@ namespace QuanLyHocSinh.Model.Entities
 
         public static void UpdateHocSinh(HocSinh hocSinh)
         {
-            string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=khanghy1102;Pwd=khanghy1102;SslMode=none;";
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
             string query = @"UPDATE HOSO h
                              JOIN HOSOHOCSINH hhs ON h.HoSoID = hhs.HoSoID
                              SET h.HoTen = @HoTen, h.GioiTinh = @GioiTinh, h.NgaySinh = @NgaySinh, h.Email = @Email, h.DiaChi = @DiaChi,
