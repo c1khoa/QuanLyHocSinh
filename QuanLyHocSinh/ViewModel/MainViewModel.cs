@@ -35,7 +35,7 @@ namespace QuanLyHocSinh.ViewModel
         public TongKetMonViewModel TongKetMonVM { get; set; }
         public TongKetNamHocViewModel TongKetNamHocVM { get; set; }
         public QuyDinhMainViewModel QuyDinhVM { get; set; }
-        public User CurrentUser { get; set; }
+
 
         private BaseViewModel _currentView;
         public BaseViewModel CurrentView
@@ -52,23 +52,64 @@ namespace QuanLyHocSinh.ViewModel
         }
 
         private User _currentUser;
-        //public User user
-        //{
-        //    get => _currentUser;
-        //    set
-        //    { 
-        //        _currentUser = value;
-        //        OnPropertyChanged(nameof(VaiTro)); // nếu bạn có property VaiTro lấy từ CurrentUser
-        //    }
-        //}
+                public User CurrentUser
+        {
+            get => _currentUser;
+            set
+            {
+                if (_currentUser != value)
+                {
+                    _currentUser = value;
+                    OnPropertyChanged(nameof(CurrentUser));
+                    OnPropertyChanged(nameof(VaiTro));
+
+                    var roleName = _currentUser?.VaiTro?.TenVaiTro?.Trim() ?? "null";
+                    IsGiaoVuVisible = string.Equals(roleName, "Giáo vụ", StringComparison.OrdinalIgnoreCase);
+                    IsNotHocSinhVisible = _currentUser != null && !string.Equals(roleName, "Học sinh", StringComparison.OrdinalIgnoreCase);
+                    IsNotGiaoVuVisible = _currentUser != null && !string.Equals(roleName, "Giáo vụ", StringComparison.OrdinalIgnoreCase);
+                }
+            }
+        }
+
+        private bool _isGiaoVuVisible;
+        public bool IsGiaoVuVisible
+        {
+            get => _isGiaoVuVisible;
+            set
+            {
+                _isGiaoVuVisible = value;
+                OnPropertyChanged(nameof(IsGiaoVuVisible));
+            }
+        }
+
+        private bool _isNotHocSinhVisible;
+        public bool IsNotHocSinhVisible
+        {
+            get => _isNotHocSinhVisible;
+            set
+            {
+                _isNotHocSinhVisible = value;
+                OnPropertyChanged(nameof(IsNotHocSinhVisible));
+            }
+        }
+        private bool _isNotGiaoVuVisible;
+        public bool IsNotGiaoVuVisible
+        {
+            get => _isNotGiaoVuVisible;
+            set
+            {
+                _isNotGiaoVuVisible = value;
+                OnPropertyChanged(nameof(IsNotGiaoVuVisible));
+            }
+        }
 
 
-        //public string VaiTro => CurrentUser != null ? CurrentUser.VaiTro.ToString() : string.Empty;
 
         public bool Isloaded { get; set; } = false;
         public ICommand LoadedWindowCommand { get; set; }
         // Các commend điều hướng
         public ICommand ShowTrangChuCommand  { get; set; }
+        public ICommand ShowTaiKhoanCaNhanCommand { get; set; }
         public ICommand ShowQuanLyTaiKhoanCommand { get; set; }
         public ICommand ShowThongTinHocSinhCommand { get; set; }
         public ICommand ShowThongTinGiaoVienCommand { get; set; }
@@ -79,7 +120,6 @@ namespace QuanLyHocSinh.ViewModel
         // Mọi thứ xử lý nằm trong này
         public MainViewModel()
         {
-
             // Gán view mặc định là Trang chủ
             CurrentView = new TrangChuViewModel(this); // Trang chủ là UserControl mặc định ví dụ
 
@@ -90,6 +130,7 @@ namespace QuanLyHocSinh.ViewModel
                 CurrentView = new TrangChuViewModel(this);
             });
             ShowQuanLyTaiKhoanCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuanLyTaiKhoanMainViewModel(this));
+            ShowTaiKhoanCaNhanCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuanLyTaiKhoanCaNhanViewModel(this));
             ShowThongTinHocSinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuHocSinhViewModel(this));
             ShowThongTinGiaoVienCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuGiaoVienViewModel(this));   
             ShowDiemHocSinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuDiemHocSinhViewModel(this));

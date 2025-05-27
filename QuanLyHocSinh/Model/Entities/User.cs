@@ -8,7 +8,7 @@ namespace QuanLyHocSinh.Model.Entities
 {
     public class User
     {
-        public int Id { get; set; }
+        public string UserID { get; set; }
         public string TenDangNhap { get; set; }
         public string MatKhau { get; set; }
 

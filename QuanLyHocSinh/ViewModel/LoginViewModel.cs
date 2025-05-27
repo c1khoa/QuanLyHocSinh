@@ -11,6 +11,8 @@ using System.Windows;
 using System.Windows.Input;
 using QuanLyHocSinh.View.Windows;
 using QuanLyHocSinh.Model.Entities;
+using System.Configuration;
+using MySql.Data.MySqlClient;
 
 namespace QuanLyHocSinh.ViewModel
 {
@@ -67,66 +69,84 @@ namespace QuanLyHocSinh.ViewModel
         }
 
 
-        //private void Login(object parameter)
-        //{
-        //    using (var context = new AppDbContext())
-        //    {
-        //        var user = context.Users
-        //                          .Include(u => u.VaiTro)
-        //                          .FirstOrDefault(u =>
-        //                              u.TenDangNhap == Username &&
-        //                              u.MatKhau == Password &&
-        //                              u.VaiTro.TenVaiTro == SelectedRole);
-
-        //        if (user != null)
-        //        {
-        //            // Khởi tạo MainViewModel với CurrentUser
-        //            var mainVM = new MainViewModel
-        //            {
-        //                CurrentUser = user
-        //            };
-
-        //            // Mở MainWindow
-        //            var mainWindow = new MainWindow
-        //            {
-        //                DataContext = mainVM
-        //            };
-        //            mainWindow.Show();
-
-        //            // Đóng LoginWindow hiện tại
-        //            foreach (Window window in Application.Current.Windows)
-        //            {
-        //                if (window is LoginWindow)
-        //                {
-        //                    window.Close();
-        //                    break;
-        //                }
-        //            }
-        //        }
-        //        else
-        //        {
-        //            MessageBox.Show("Sai thông tin đăng nhập!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
-        //        }
-        //    }
-        //}
-
         private void Login(object parameter)
         {
-            if (Username == "admin" && Password == "123456" && SelectedRole == "Giáo vụ")
-            {
-                var user = new User
-                {
-                    TenDangNhap = Username,
-                    VaiTro = new VaiTro { TenVaiTro = SelectedRole }
-                };
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
 
-                LoginSuccess?.Invoke(this, user);
-            }
-            else
+            string query = @"
+        SELECT nd.UserID, nd.TenDangNhap, nd.MatKhau, vt.TenVaiTro
+        FROM USERS nd
+        JOIN VAITRO vt ON nd.VaiTroID = vt.VaiTroID
+        WHERE nd.TenDangNhap = @Username AND nd.MatKhau = @Password AND vt.TenVaiTro = @Role
+    ";
+
+            using (var conn = new MySqlConnection(connectionString))
             {
-                MessageBox.Show("Sai thông tin đăng nhập!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                conn.Open();
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Username", Username);
+                    cmd.Parameters.AddWithValue("@Password", Password);
+                    cmd.Parameters.AddWithValue("@Role", SelectedRole);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            // Tạo đối tượng người dùng (nếu có class User)
+                            var user = new User
+                            {
+                                UserID = reader["UserID"].ToString(),
+                                TenDangNhap = reader["TenDangNhap"].ToString(),
+                                MatKhau = reader["MatKhau"].ToString(),
+                                VaiTro = new VaiTro
+                                {
+                                    TenVaiTro = reader["TenVaiTro"].ToString()
+                                }
+                            };
+
+                            // Mở MainWindow
+                            var mainVM = new MainViewModel { CurrentUser = user };
+                            var mainWindow = new MainWindow { DataContext = mainVM };
+                            mainWindow.Show();
+
+                            // Đóng LoginWindow hiện tại
+                            foreach (Window window in Application.Current.Windows)
+                            {
+                                if (window is LoginWindow)
+                                {
+                                    window.Close();
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Sai thông tin đăng nhập!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
             }
         }
+
+
+        //private void Login(object parameter)
+        //{
+        //    if (Username == "admin" && Password == "123456" && SelectedRole == "Giáo vụ")
+        //    {
+        //        var user = new User
+        //        {
+        //            TenDangNhap = Username,
+        //            VaiTro = new VaiTro { TenVaiTro = SelectedRole }
+        //        };
+
+        //        LoginSuccess?.Invoke(this, user);
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show("Sai thông tin đăng nhập!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+        //    }
+        //}
 
 
 

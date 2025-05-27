@@ -13,6 +13,14 @@
              Name="ucTraCuuHocSinh"
              mc:Ignorable="d"
              MinHeight="600" MinWidth="800">
+<UserControl.Resources>
+    <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/MainResource.xaml"/>
+        </ResourceDictionary.MergedDictionaries>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </ResourceDictionary>
+</UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -92,11 +100,13 @@
                 <DataGridTextColumn Header="Địa chỉ" Binding="{Binding DiaChi}" Width="*" />
                 <DataGridTextColumn Header="Lớp" Binding="{Binding TenLop}" Width="*" />
                 <DataGridTextColumn Header="Niên khóa" Binding="{Binding NienKhoa}" Width="*" />
-                <DataGridTemplateColumn Header="Chức năng" Width="*">
+                <DataGridTemplateColumn Header="Chức năng" 
+                                        Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource MaterialDesignFlatButton}"
                                     Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                    Visibility="{Binding DataContext.IsGiaoVuVisible, ElementName=main, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     ToolTip="Sửa thông tin học sinh">
                                 <materialDesign:PackIcon Kind="Pencil" Foreground="#0078D7"/>
                             </Button>
