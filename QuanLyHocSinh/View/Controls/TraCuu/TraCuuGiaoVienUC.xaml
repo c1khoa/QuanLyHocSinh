@@ -5,21 +5,24 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.TraCuu"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             Background="White"
+             FontSize="13"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="800">   
+             MinHeight="600" MinWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/MainResource.xaml"/>
+                <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Background="White" >
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="6*"/>
         </Grid.RowDefinitions>
+        
         <!-- Tiêu đề -->
         <TextBlock Text="DANH SÁCH GIÁO VIÊN"
                    FontSize="24"
@@ -28,6 +31,7 @@
                    HorizontalAlignment="Center"
                    Margin="10 10 0 10"
                    Grid.Row="0"/>
+                   
         <!-- Thanh tìm kiếm, lọc -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -36,6 +40,7 @@
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
+            
             <Grid Grid.Column="0" Background="#f5f6f7" Margin="10" materialDesign:ButtonAssist.CornerRadius="10">
                 <TextBox x:Name="txtSearch"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
@@ -50,6 +55,7 @@
                                          VerticalAlignment="Center"
                                          HorizontalAlignment="Right"/>
             </Grid>
+            
             <StackPanel Grid.Column="1" Margin="10" VerticalAlignment="Center">
                 <TextBlock Text="Giới tính" FontSize="13"/>
                 <ComboBox materialDesign:HintAssist.Hint="Giới tính"
@@ -58,6 +64,7 @@
                           ItemsSource="{Binding DanhSachGioiTinh}"
                           SelectedItem="{Binding SelectedGioiTinh, Mode=TwoWay}"/>
             </StackPanel>
+            
             <StackPanel Grid.Column="2" Margin="10" VerticalAlignment="Center">
                 <TextBlock Text="Lớp" FontSize="13"/>
                 <ComboBox materialDesign:HintAssist.Hint="Lớp"
@@ -66,6 +73,7 @@
                           ItemsSource="{Binding DanhSachLop}"
                           SelectedItem="{Binding SelectedLop, Mode=TwoWay}"/>
             </StackPanel>
+            
             <StackPanel Grid.Column="3" Margin="10" VerticalAlignment="Center">
                 <TextBlock Text="Bộ môn" FontSize="13"/>
                 <ComboBox materialDesign:HintAssist.Hint="Bộ môn"
@@ -75,27 +83,42 @@
                           SelectedItem="{Binding SelectedBoMon, Mode=TwoWay}"/>
             </StackPanel>
         </Grid>
+        
         <!-- Danh sách giáo viên -->
         <DataGrid Grid.Row="2"
                   ItemsSource="{Binding DanhSachGiaoVien}"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  Margin="10"
-                  RowHeight="50"
-                  ColumnHeaderHeight="40"
-                  HeadersVisibility="Column"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch"
+                  Style="{StaticResource CommonDataGridStyle}"
                   SelectedItem="{Binding SelectedGiaoVien, Mode=TwoWay}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Mã GV" Binding="{Binding MaGV}" Width="*" />
-                <DataGridTextColumn Header="Họ và Tên" Binding="{Binding HoTen}" Width="1.5*" />
-                <DataGridTextColumn Header="Ngày sinh" Binding="{Binding NgaySinh}" Width="*" />
-                <DataGridTextColumn Header="Giới tính" Binding="{Binding GioiTinh}" Width="0.5*" />
-                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="1.5*" />
-                <DataGridTextColumn Header="Địa chỉ" Binding="{Binding DiaChi}" Width="*" />
-                <DataGridTextColumn Header="Lớp dạy" Binding="{Binding LopDayID}" Width="*" />
-                <DataGridTextColumn Header="Bộ môn" Binding="{Binding BoMon}" Width="*" />
+                <DataGridTextColumn Header="Mã GV" 
+                                  Binding="{Binding MaGV}" 
+                                  Width="*" 
+                                  ElementStyle="{StaticResource CenterAlignStyle}"/>
+                <DataGridTextColumn Header="Họ và Tên" 
+                                  Binding="{Binding HoTen}" 
+                                  Width="1.5*"/>
+                <DataGridTextColumn Header="Ngày sinh" 
+                                  Binding="{Binding NgaySinh, StringFormat=dd/MM/yyyy}" 
+                                  Width="*"
+                                  ElementStyle="{StaticResource CenterAlignStyle}"/>
+                <DataGridTextColumn Header="Giới tính" 
+                                  Binding="{Binding GioiTinh}" 
+                                  Width="0.5*"
+                                  ElementStyle="{StaticResource CenterAlignStyle}"/>
+                <DataGridTextColumn Header="Email" 
+                                  Binding="{Binding Email}" 
+                                  Width="1.5*"/>
+                <DataGridTextColumn Header="Địa chỉ" 
+                                  Binding="{Binding DiaChi}" 
+                                  Width="*"/>
+                <DataGridTextColumn Header="Lớp dạy" 
+                                  Binding="{Binding LopDayID}" 
+                                  Width="*" 
+                                  ElementStyle="{StaticResource CenterAlignStyle}"/>
+                <DataGridTextColumn Header="Bộ môn" 
+                                  Binding="{Binding BoMon}" 
+                                  Width="*" 
+                                  ElementStyle="{StaticResource CenterAlignStyle}"/>
                 <DataGridTemplateColumn Header="Chức năng" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>

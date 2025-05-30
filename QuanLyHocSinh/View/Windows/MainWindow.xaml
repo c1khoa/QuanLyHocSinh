@@ -24,7 +24,6 @@
        ResizeMode="NoResize"
        WindowStyle="None"
        WindowStartupLocation="CenterScreen" 
-       DataContext="{StaticResource MainVM}"
        Name="main"
        Title="Quản lý học sinh">
     <!-- DataContext="{DynamicResource MainVM}" -->
@@ -140,7 +139,7 @@
                     </ListViewItem>
 
                     <ListViewItem Background="Transparent">
-                                <!--="{Binding VaiTro, 
+                        <!--="{Binding VaiTro, 
                                 Converter={StaticResource RoleToVisibilityConverter},
                                 ConverterParameter=&quot;Giáo Vụ&quot;}"-->
                         <Button Command="{Binding ShowQuanLyTaiKhoanCommand}"
@@ -169,58 +168,39 @@
                     <Expander Background="Transparent">
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="DatabaseSearch"
-                                                        VerticalAlignment="Stretch"/>
-                                <TextBlock Text="Tra cứu"
-                                              Margin="10 0 0 0"/>
+                                <materialDesign:PackIcon Kind="DatabaseSearch"/>
+                                <TextBlock Text="Tra cứu" Margin="10 0 0 0" FontSize="20"/>
                             </StackPanel>
                         </Expander.Header>
-                        <ListView>
+                        <StackPanel>
                             <Button Command="{Binding ShowThongTinHocSinhCommand}"
                                     Background="Transparent" 
                                     BorderThickness="0" 
                                     Padding="0"
                                     Foreground="Black"
-                                    FontWeight="Regular">
-                                <Button.Triggers>
-                                    <EventTrigger RoutedEvent="Button.Click">
-                                        <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
-                                    </EventTrigger>
-                                </Button.Triggers>
-                                <ListViewItem Content="Thông tin học sinh"
-                                          Margin="20 0 0 0"/>
+                                    FontWeight="Regular"
+                                    HorizontalContentAlignment="Left">
+                                <TextBlock Text="Thông tin học sinh" Margin="40 0 0 0" FontSize="16"/>
                             </Button>
-
                             <Button Command="{Binding ShowThongTinGiaoVienCommand}"
                                     Background="Transparent" 
                                     BorderThickness="0" 
                                     Padding="0"
                                     Foreground="Black"
-                                    FontWeight="Regular">
-                                <Button.Triggers>
-                                    <EventTrigger RoutedEvent="Button.Click">
-                                        <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
-                                    </EventTrigger>
-                                </Button.Triggers>
-                                <ListViewItem Content="Thông tin giáo viên"
-                                          Margin="20 0 0 0"/>
+                                    FontWeight="Regular"
+                                    HorizontalContentAlignment="Left">
+                                <TextBlock Text="Thông tin giáo viên" Margin="40 0 0 0" FontSize="16"/>
                             </Button>
-
                             <Button Command="{Binding ShowDiemHocSinhCommand}"
                                     Background="Transparent" 
                                     BorderThickness="0" 
                                     Padding="0"
                                     Foreground="Black"
-                                    FontWeight="Regular">
-                                <Button.Triggers>
-                                    <EventTrigger RoutedEvent="Button.Click">
-                                        <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
-                                    </EventTrigger>
-                                </Button.Triggers>
-                                <ListViewItem Content="Điểm học sinh"
-                                          Margin="20 0 0 0"/>
+                                    FontWeight="Regular"
+                                    HorizontalContentAlignment="Left">
+                                <TextBlock Text="Điểm học sinh" Margin="40 0 0 0" FontSize="16"/>
                             </Button>
-                        </ListView>
+                        </StackPanel>
                     </Expander>
 
                     <Expander Background="Transparent">
@@ -229,39 +209,29 @@
                                 <materialDesign:PackIcon Kind="ChartBarStacked"
                                                          VerticalAlignment="Stretch"/>
                                 <TextBlock Text="Báo cáo"
-                                           Margin="10 0 0 0"/>
+                                           Margin="10 0 0 0" FontSize="20"/>
                             </StackPanel>
                         </Expander.Header>
-                        <ListView>
+                        <StackPanel>
                             <Button Command="{Binding ShowTongKetMonCommand}"
                                     Background="Transparent" 
                                     BorderThickness="0" 
                                     Padding="0"
                                     Foreground="Black"
-                                    FontWeight="Regular">
-                                <Button.Triggers>
-                                    <EventTrigger RoutedEvent="Button.Click">
-                                        <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
-                                    </EventTrigger>
-                                </Button.Triggers>
-                                <ListViewItem Content="Tổng kết môn"
-                                              Margin="20 0 0 0"/>
+                                    FontWeight="Regular"
+                                    HorizontalContentAlignment="Left">
+                                <TextBlock Text="Tổng kết môn" Margin="40 0 0 0" FontSize="16"/>
                             </Button>
-                            <Button Command="{Binding ShowTongKetNamHocCommand}"
+                            <Button 
                                     Background="Transparent" 
-                                    BorderThickness="0" 
+                                    BorderThickness="0"
                                     Padding="0"
                                     Foreground="Black"
-                                    FontWeight="Regular">
-                                <Button.Triggers>
-                                    <EventTrigger RoutedEvent="Button.Click">
-                                        <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
-                                    </EventTrigger>
-                                </Button.Triggers>
-                                <ListViewItem Content="Tổng kết năm học"
-                                              Margin="20 0 0 0"/>
+                                    FontWeight="Regular"
+                                    HorizontalContentAlignment="Left">
+                                <TextBlock Text="Tổng kết năm học" Margin="40 0 0 0" FontSize="16"/>
                             </Button>
-                        </ListView>
+                        </StackPanel>
                     </Expander>
 
                     <ListViewItem Background="Transparent">
@@ -293,7 +263,11 @@
             </Grid>
 
             <Grid Panel.ZIndex="0">
-                <ContentControl Content="{Binding CurrentView}"/>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="167*"/>
+                    <RowDefinition Height="401*"/>
+                </Grid.RowDefinitions>
+                <ContentControl Content="{Binding CurrentView}" Grid.RowSpan="2"/>
             </Grid>
 
         </Grid>
