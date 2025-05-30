@@ -173,7 +173,7 @@
                             </StackPanel>
                         </Expander.Header>
                         <StackPanel HorizontalAlignment="Left">
-
+                            
                             <Button Command="{Binding ShowDiemHocSinhCommand}"
                                     Background="Transparent" 
                                     BorderThickness="0" 
@@ -190,8 +190,7 @@
                                 </Button.Triggers>
                             </Button>
 
-                      
-                        <StackPanel>
+                    
                         
                             <Button Command="{Binding ShowThongTinHocSinhCommand}"
                                     Visibility="{Binding IsNotHocSinhVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
@@ -276,7 +275,7 @@
                                     </EventTrigger>
                                 </Button.Triggers>
                             </Button>
-                            <Button 
+                            <Button Command="{Binding ShowTongKetNamCommand}"
                                     Background="Transparent" 
                                     BorderThickness="0"
                                     Padding="0"

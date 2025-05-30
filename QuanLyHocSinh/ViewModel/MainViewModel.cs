@@ -143,6 +143,8 @@ namespace QuanLyHocSinh.ViewModel
         public ICommand ShowThongTinGiaoVienCommand { get; set; }
         public ICommand ShowDiemHocSinhCommand { get; set; }
         public ICommand ShowTongKetMonCommand { get; set; }
+
+        public ICommand ShowTongKetNamCommand { get; set; }
         public ICommand ShowQuyDinhCommand { get; set; }
 
         // Command chọn vai trò mở LoginWindow
@@ -177,6 +179,7 @@ namespace QuanLyHocSinh.ViewModel
             ShowThongTinGiaoVienCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuGiaoVienViewModel(this));
             ShowDiemHocSinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuDiemHocSinhViewModel(this));
             ShowTongKetMonCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TongKetMonViewModel(this));
+            ShowTongKetNamCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TongKetNamViewModel(this));
             ShowQuyDinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuyDinhMainViewModel(this));
 
             // Command xử lý chọn role để mở LoginWindow

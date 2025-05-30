@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.ViewModel.BaoCao
 {
-    class TongKetNamViewModel
+    public class TongKetNamViewModel : BaseViewModel
     {
+        private MainViewModel _mainVM;
+        public TongKetNamViewModel(MainViewModel mainVM)
+        {
+            _mainVM = mainVM;
+        }
     }
 }
