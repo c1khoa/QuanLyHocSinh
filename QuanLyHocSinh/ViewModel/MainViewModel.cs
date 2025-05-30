@@ -30,7 +30,6 @@ namespace QuanLyHocSinh.ViewModel
         public TraCuuGiaoVienViewModel GiaoVienVM { get; set; }
         public TraCuuDiemHocSinhViewModel DiemHocSinhVM { get; set; }
         public TongKetMonViewModel TongKetMonVM { get; set; }
-        public TongKetNamHocViewModel TongKetNamHocVM { get; set; }
         public QuyDinhMainViewModel QuyDinhVM { get; set; }
 
         private BaseViewModel _currentView;
@@ -45,6 +44,7 @@ namespace QuanLyHocSinh.ViewModel
                 if (_currentView != value)
                 {
                     _currentView = value;
+                    System.Diagnostics.Debug.WriteLine("CurrentView changed to: " + value?.GetType().Name);
                     OnPropertyChanged(nameof(CurrentView));
                 }
             }
@@ -143,7 +143,6 @@ namespace QuanLyHocSinh.ViewModel
         public ICommand ShowThongTinGiaoVienCommand { get; set; }
         public ICommand ShowDiemHocSinhCommand { get; set; }
         public ICommand ShowTongKetMonCommand { get; set; }
-        public ICommand ShowTongKetNamHocCommand { get; set; }
         public ICommand ShowQuyDinhCommand { get; set; }
 
         // Command chọn vai trò mở LoginWindow
@@ -178,7 +177,6 @@ namespace QuanLyHocSinh.ViewModel
             ShowThongTinGiaoVienCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuGiaoVienViewModel(this));
             ShowDiemHocSinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuDiemHocSinhViewModel(this));
             ShowTongKetMonCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TongKetMonViewModel(this));
-            ShowTongKetNamHocCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TongKetNamHocViewModel(this));
             ShowQuyDinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuyDinhMainViewModel(this));
 
             // Command xử lý chọn role để mở LoginWindow

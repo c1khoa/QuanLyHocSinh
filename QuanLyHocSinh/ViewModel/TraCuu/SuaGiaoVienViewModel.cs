@@ -88,10 +88,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             BoMon = giaoVien.BoMon;
 
             DanhSachLop = new ObservableCollection<string>(
-                GiaoVienDAL.GetAllGiaoVien()
-                    .Select(gv => gv.LopDayID)
-                    .Distinct()
-                    .OrderBy(lh => lh)
+                GiaoVienDAL.GetAllLop()
             );
 
             DanhSachBoMon = new ObservableCollection<string>(

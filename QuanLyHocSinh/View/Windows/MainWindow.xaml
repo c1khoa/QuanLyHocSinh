@@ -22,8 +22,10 @@
        ResizeMode="NoResize"
        WindowStyle="None"
        WindowStartupLocation="CenterScreen" 
+
        DataContext="{StaticResource MainVM}"
        x:Name="main"
+
        Title="Quản lý học sinh">
     <!-- DataContext="{DynamicResource MainVM}" -->
     <Window.Resources>
@@ -166,10 +168,8 @@
                     <Expander Background="Transparent" Margin="10 0 0 0">
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="DatabaseSearch"
-                                                        VerticalAlignment="Stretch"/>
-                                <TextBlock Text="Tra cứu"
-                                              Margin="10 0 0 0"/>
+                                <materialDesign:PackIcon Kind="DatabaseSearch"/>
+                                <TextBlock Text="Tra cứu" Margin="10 0 0 0" FontSize="20"/>
                             </StackPanel>
                         </Expander.Header>
                         <StackPanel HorizontalAlignment="Left">
@@ -190,6 +190,9 @@
                                 </Button.Triggers>
                             </Button>
 
+                      
+                        <StackPanel>
+                        
                             <Button Command="{Binding ShowThongTinHocSinhCommand}"
                                     Visibility="{Binding IsNotHocSinhVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     Background="Transparent" 
@@ -254,7 +257,7 @@
                                 <materialDesign:PackIcon Kind="ChartBarStacked"
                                                          VerticalAlignment="Stretch"/>
                                 <TextBlock Text="Báo cáo"
-                                           Margin="10 0 0 0"/>
+                                           Margin="10 0 0 0" FontSize="20"/>
                             </StackPanel>
                         </Expander.Header>
                         <StackPanel HorizontalAlignment="Left">
@@ -273,9 +276,9 @@
                                     </EventTrigger>
                                 </Button.Triggers>
                             </Button>
-                            <Button Command="{Binding ShowTongKetNamHocCommand}"
+                            <Button 
                                     Background="Transparent" 
-                                    BorderThickness="0" 
+                                    BorderThickness="0"
                                     Padding="0"
                                     Foreground="Black"
                                     FontWeight="Regular"
@@ -314,7 +317,11 @@
             </Grid>
 
             <Grid Panel.ZIndex="0">
-                <ContentControl Content="{Binding CurrentView}"/>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="167*"/>
+                    <RowDefinition Height="401*"/>
+                </Grid.RowDefinitions>
+                <ContentControl Content="{Binding CurrentView}" Grid.RowSpan="2"/>
             </Grid>
 
         </Grid>

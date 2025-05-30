@@ -47,6 +47,26 @@ public class GiaoVienDAL
         return list;
     }
 
+    public static List<string> GetAllLop()
+        {
+            List<string> list = new List<string>();
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+            string query = "SELECT TenLop FROM LOP ORDER BY TenLop";
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(reader["TenLop"]?.ToString() ?? "");
+                    }
+                }
+            }
+            return list;
+        }
+
     //Cập nhật thông tin giáo viên
     public static void UpdateGiaoVien(GiaoVien giaoVien)
     {

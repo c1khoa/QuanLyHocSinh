@@ -81,15 +81,12 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             GioiTinh = hocSinh.GioiTinh;
             NgaySinh = hocSinh.NgaySinh;
             Email = hocSinh.Email;
-            DiaChi = hocSinh.DiaChi;
-            TenLop = hocSinh.TenLop;
+            DiaChi = hocSinh.DiaChi;            TenLop = hocSinh.TenLop;
             NienKhoa = hocSinh.NienKhoa;
 
+            // Lấy tất cả lớp từ database, không chỉ lớp có học sinh
             DanhSachLop = new ObservableCollection<string>(
-                HocSinhDAL.GetAllHocSinh()
-                    .Select(hs => hs.TenLop)
-                    .Distinct()
-                    .OrderBy(l => l)
+                HocSinhDAL.GetAllLop()
             );
 
             SaveCommand = new RelayCommand(Save);

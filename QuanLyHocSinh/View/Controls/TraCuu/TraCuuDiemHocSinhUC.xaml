@@ -5,18 +5,21 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.TraCuu"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             Background="White"
+             FontSize="13"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="800">
+             MinHeight="600" MinWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
                 <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/MainResource.xaml"/>
                 </ResourceDictionary.MergedDictionaries>
                 <local:DiemToDisplayStringConverter x:Key="DiemToDisplayStringConverter"/>
                 <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Background="White">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
@@ -53,67 +56,48 @@
             </Grid>
             <StackPanel Grid.Column="1" Margin="10" VerticalAlignment="Center">
                 <TextBlock Text="Lớp" FontSize="13"/>
-            <ComboBox Grid.Column="1"
-                      materialDesign:HintAssist.Hint="Lớp"
-                      IsEditable="False"
-                      Margin="10"
-                      FontSize="13"
-                      ItemsSource="{Binding DanhSachLop}"
-                      SelectedItem="{Binding SelectedLop, Mode=TwoWay}">
-            </ComboBox>
+                <ComboBox materialDesign:HintAssist.Hint="Lớp"
+                          IsEditable="False"
+                          FontSize="13"
+                          ItemsSource="{Binding DanhSachLop}"
+                          SelectedItem="{Binding SelectedLop, Mode=TwoWay}"/>
             </StackPanel>
             <StackPanel Grid.Column="2" Margin="10" VerticalAlignment="Center">
                 <TextBlock Text="Môn học" FontSize="13"/>
-            <ComboBox Grid.Column="2"
-                      materialDesign:HintAssist.Hint="Môn học"
-                      IsEditable="False"
-                      Margin="10"
-                      FontSize="13"
-                      ItemsSource="{Binding DanhSachMonHoc}"
-                      SelectedItem="{Binding SelectedMonHoc, Mode=TwoWay}">
-            </ComboBox>
+                <ComboBox materialDesign:HintAssist.Hint="Môn học"
+                          IsEditable="False"
+                          FontSize="13"
+                          ItemsSource="{Binding DanhSachMonHoc}"
+                          SelectedItem="{Binding SelectedMonHoc, Mode=TwoWay}"/>
             </StackPanel>
             <StackPanel Grid.Column="3" Margin="10" VerticalAlignment="Center">
                 <TextBlock Text="Năm học" FontSize="13"/>
-            <ComboBox Grid.Column="3"
-                      materialDesign:HintAssist.Hint="Năm học"
-                      IsEditable="False"
-                      Margin="10"
-                      FontSize="13"
-                      ItemsSource="{Binding DanhSachNamHoc}"
-                      SelectedItem="{Binding SelectedNamHoc, Mode=TwoWay}">
-            </ComboBox>
+                <ComboBox materialDesign:HintAssist.Hint="Năm học"
+                          IsEditable="False"
+                          FontSize="13"
+                          ItemsSource="{Binding DanhSachNamHoc}"
+                          SelectedItem="{Binding SelectedNamHoc, Mode=TwoWay}"/>
             </StackPanel>
             <StackPanel Grid.Column="4" Margin="10" VerticalAlignment="Center">
                 <TextBlock Text="Học kỳ" FontSize="13"/>
-            <ComboBox Grid.Column="4"
-                      materialDesign:HintAssist.Hint="Học kỳ"
-                      IsEditable="False"
-                      Margin="10"
-                      FontSize="13"
-                      ItemsSource="{Binding DanhSachHocKy}"
-                      SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}">
-            </ComboBox>
+                <ComboBox materialDesign:HintAssist.Hint="Học kỳ"
+                          IsEditable="False"
+                          FontSize="13"
+                          ItemsSource="{Binding DanhSachHocKy}"
+                          SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}"/>
             </StackPanel>
         </Grid>
         <DataGrid Grid.Row="2"
                   ItemsSource="{Binding DanhSachDiem}"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  Margin="10"
-                  RowHeight="50"
-                  ColumnHeaderHeight="40"
-                  HeadersVisibility="Column"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch"
+                  Style="{StaticResource CommonDataGridStyle}"
                   SelectedItem="{Binding SelectedDiem, Mode=TwoWay}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Mã HS" Binding="{Binding MaHS}" Width="*"/>
+                <DataGridTextColumn Header="Mã HS" Binding="{Binding MaHS}" Width="*" ElementStyle="{StaticResource CenterAlignStyle}"/>
                 <DataGridTextColumn Header="Họ tên" Binding="{Binding HoTen}" Width="1.5*"/>
-                <DataGridTextColumn Header="Lớp" Binding="{Binding Lop}" Width="*"/>
-                <DataGridTextColumn Header="Môn học" Binding="{Binding MonHoc}" Width="*"/>
-                <DataGridTextColumn Header="Năm học" Binding="{Binding NamHocID}" Width="*"/>
-                <DataGridTextColumn Header="Học kỳ" Binding="{Binding HocKy}" Width="0.5*"/>
+                <DataGridTextColumn Header="Lớp" Binding="{Binding Lop}" Width="*" ElementStyle="{StaticResource CenterAlignStyle}"/>
+                <DataGridTextColumn Header="Môn học" Binding="{Binding MonHoc}" Width="*" ElementStyle="{StaticResource CenterAlignStyle}"/>
+                <DataGridTextColumn Header="Năm học" Binding="{Binding NamHocID}" Width="*" ElementStyle="{StaticResource CenterAlignStyle}"/>
+                <DataGridTextColumn Header="Học kỳ" Binding="{Binding HocKy}" Width="0.5*" ElementStyle="{StaticResource CenterAlignStyle}"/>
                 <DataGridTextColumn Header="Điểm miệng" Binding="{Binding DiemMieng, Converter={StaticResource DiemToDisplayStringConverter}}" Width="*"/>
                 <DataGridTextColumn Header="Điểm 15 phút" Binding="{Binding Diem15p, Converter={StaticResource DiemToDisplayStringConverter}}" Width="*"/>
                 <DataGridTextColumn Header="Điểm 1 tiết" Binding="{Binding Diem1Tiet, Converter={StaticResource DiemToDisplayStringConverter}}" Width="*"/>

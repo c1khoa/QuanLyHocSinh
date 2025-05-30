@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace QuanLyHocSinh.View.Controls.BaoCao
 {
     /// <summary>
-    /// Interaction logic for TongKetNamHoc.xaml
+    /// Interaction logic for TongKetNamUC.xaml
     /// </summary>
-    public partial class TongKetNamHocUC : UserControl
+    public partial class TongKetNamUC : UserControl
     {
-        public TongKetNamHocUC()
+        public TongKetNamUC()
         {
             InitializeComponent();
         }
