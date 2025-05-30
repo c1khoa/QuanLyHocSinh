@@ -32,9 +32,6 @@
     <Compile Update="View\Controls\BaoCao\TongKetMonUC.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="View\Controls\BaoCao\TongKetNamHocUC.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Update="View\Controls\TraCuu\TraCuuGiaoVienUC.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -83,8 +83,8 @@
             <viewbc:TongKetMonUC />
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type vmBaoCao:TongKetNamHocViewModel}">
-            <viewbc:TongKetNamHocUC />
+        <DataTemplate DataType="{x:Type vmBaoCao:TongKetNamViewModel}">
+            <viewbc:TongKetNamUC />
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vmQuyDinh:QuyDinhMainViewModel}">
