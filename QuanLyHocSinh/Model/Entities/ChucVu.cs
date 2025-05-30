@@ -6,7 +6,14 @@ using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.Model.Entities
 {
-    class ChucVu
+    public class ChucVu
     {
+        public string ChucVuID { get; set; }
+        public string TenChucVu { get; set; }
+        public string MoTa { get; set; }
+        public string VaiTroID { get; set; } // Khóa ngoại
+
+        // Navigation property (tùy chọn)
+        public VaiTro VaiTro { get; set; }
     }
 }
