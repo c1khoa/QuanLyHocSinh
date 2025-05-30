@@ -13,6 +13,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Images\admin_logo.png" />
+    <None Remove="Images\student_logo.png" />
+    <None Remove="Images\teacher_logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="EntityFramework" Version="6.2.0" />
     <PackageReference Include="MaterialDesignColors" Version="5.2.1" />
@@ -28,6 +34,14 @@
 
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\admin_logo.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\student_logo.png" />
+    <Resource Include="Images\teacher_logo.png" />
   </ItemGroup>
 
 </Project>

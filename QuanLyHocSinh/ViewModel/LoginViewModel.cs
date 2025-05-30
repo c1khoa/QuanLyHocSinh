@@ -1,27 +1,32 @@
-﻿using System;
+﻿// Namespace hệ thống
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using QuanLyHocSinh.View.Windows;
-using QuanLyHocSinh.Model.Entities;
-using System.Configuration;
+
+// Thư viện bên thứ ba
 using MySql.Data.MySqlClient;
+
+// Namespace nội bộ (project)
+using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.View.Converters;
+using QuanLyHocSinh.View.Windows;
 
 namespace QuanLyHocSinh.ViewModel
 {
     public class LoginViewModel : BaseViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        // Sự kiện thông báo đăng nhập thành công
         public event EventHandler<User> LoginSuccess;
-        public ICommand LoginExitCommand { get; set; }
 
+        // Các thuộc tính bind với View
         private string _username;
         private string _password;
         private string _selectedRole;
@@ -44,23 +49,33 @@ namespace QuanLyHocSinh.ViewModel
             set { _selectedRole = value; OnPropertyChanged(); }
         }
 
+        // Danh sách các vai trò có thể đăng nhập
         public ObservableCollection<string> Roles { get; set; }
 
+        // Các ICommand để bind với nút trong giao diện
         public ICommand LoginCommand { get; set; }
         public ICommand ExitCommand { get; set; }
+        public ICommand LoginExitCommand { get; set; }
 
         public LoginViewModel()
         {
+            // Khởi tạo danh sách vai trò
             Roles = new ObservableCollection<string> { "Giáo vụ", "Giáo viên", "Học sinh" };
+
+            // Lệnh đăng nhập
             LoginCommand = new RelayCommand<object>(
-                (p) => CanLogin(null),
-                (p) => Login(null)
+                (p) => CanLogin(p),
+                (p) => Login(p)
             );
+
+            // Lệnh thoát ứng dụng
             LoginExitCommand = new RelayCommand<object>(
-                (p) => true,              // Luôn luôn có thể bấm
-                (p) => Application.Current.Shutdown()  // Thực thi thoát app
+                (p) => true,
+                (p) => Application.Current.Shutdown()
             );
         }
+
+        // Kiểm tra điều kiện có thể đăng nhập hay chưa
         private bool CanLogin(object parameter)
         {
             return !string.IsNullOrEmpty(Username) &&
@@ -68,17 +83,19 @@ namespace QuanLyHocSinh.ViewModel
                    !string.IsNullOrEmpty(SelectedRole);
         }
 
-
-        private void Login(object parameter)
+        // Hàm xử lý đăng nhập
+        private async void Login(object parameter)
         {
             string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
 
             string query = @"
-        SELECT nd.UserID, nd.TenDangNhap, nd.MatKhau, vt.TenVaiTro
-        FROM USERS nd
-        JOIN VAITRO vt ON nd.VaiTroID = vt.VaiTroID
-        WHERE nd.TenDangNhap = @Username AND nd.MatKhau = @Password AND vt.TenVaiTro = @Role
-    ";
+                SELECT nd.UserID, nd.TenDangNhap, nd.MatKhau, vt.TenVaiTro
+                FROM USERS nd
+                JOIN VAITRO vt ON nd.VaiTroID = vt.VaiTroID
+                WHERE nd.TenDangNhap = @Username 
+                  AND nd.MatKhau = @Password 
+                  AND vt.TenVaiTro = @Role
+            ";
 
             using (var conn = new MySqlConnection(connectionString))
             {
@@ -93,7 +110,7 @@ namespace QuanLyHocSinh.ViewModel
                     {
                         if (reader.Read())
                         {
-                            // Tạo đối tượng người dùng (nếu có class User)
+                            // Tạo đối tượng người dùng từ dữ liệu DB
                             var user = new User
                             {
                                 UserID = reader["UserID"].ToString(),
@@ -105,19 +122,28 @@ namespace QuanLyHocSinh.ViewModel
                                 }
                             };
 
-                            // Mở MainWindow
+                            // Tạo và hiển thị MainWindow
                             var mainVM = new MainViewModel { CurrentUser = user };
                             var mainWindow = new MainWindow { DataContext = mainVM };
-                            mainWindow.Show();
 
-                            // Đóng LoginWindow hiện tại
+                            await WindowAnimationHelper.FadeInAsync(mainWindow);
+
+                            // Tìm LoginWindow đang mở
+                            LoginWindow loginWindow = null;
                             foreach (Window window in Application.Current.Windows)
                             {
-                                if (window is LoginWindow)
+                                if (window is LoginWindow lw)
                                 {
-                                    window.Close();
+                                    loginWindow = lw;
                                     break;
                                 }
+                            }
+
+                            // Đóng LoginWindow sau khi fade out
+                            if (loginWindow != null)
+                            {
+                                await WindowAnimationHelper.FadeOutAsync(loginWindow);
+                                loginWindow.Close();
                             }
                         }
                         else
@@ -128,31 +154,5 @@ namespace QuanLyHocSinh.ViewModel
                 }
             }
         }
-
-
-        //private void Login(object parameter)
-        //{
-        //    if (Username == "admin" && Password == "123456" && SelectedRole == "Giáo vụ")
-        //    {
-        //        var user = new User
-        //        {
-        //            TenDangNhap = Username,
-        //            VaiTro = new VaiTro { TenVaiTro = SelectedRole }
-        //        };
-
-        //        LoginSuccess?.Invoke(this, user);
-        //    }
-        //    else
-        //    {
-        //        MessageBox.Show("Sai thông tin đăng nhập!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
-        //    }
-        //}
-
-
-
-
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
-

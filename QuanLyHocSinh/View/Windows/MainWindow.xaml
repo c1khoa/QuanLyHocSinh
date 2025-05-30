@@ -9,8 +9,6 @@
 
        Width="800"
        Height="600"
-       MinWidth="400"
-       MinHeight="300"
        
        xmlns:uc="clr-namespace:QuanLyHocSinh.View.Controls"
        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:viewmodel="clr-namespace:QuanLyHocSinh.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
@@ -32,6 +30,15 @@
     <!-- DataContext="{DynamicResource MainVM}" -->
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontWeight" Value="Regular"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Margin" Value="20 10 0 10"/>
+        </Style>
     </Window.Resources>
 
 
@@ -121,63 +128,67 @@
                         </Button>
                     </ListViewItem>
 
-                    <ListViewItem Background="Transparent">
-                        <Button Command="{Binding ShowTrangChuCommand}"
-                                Background="Transparent" 
-                                BorderThickness="0" 
-                                Padding="0"
-                                Foreground="Black"
-                                FontWeight="Regular">
-                            <Button.Triggers>
-                                <EventTrigger RoutedEvent="Button.Click">
-                                    <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
-                                </EventTrigger>
-                            </Button.Triggers>
-                            <StackPanel Orientation="Horizontal" 
+                    <Button Command="{Binding ShowTrangChuCommand}"
+                            Style="{StaticResource MenuButtonStyle}">
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="Button.Click">
+                                <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                            </EventTrigger>
+                        </Button.Triggers>
+                        <StackPanel Orientation="Horizontal" 
                                         Margin="15,0,0,0">
-                                <materialDesign:PackIcon Kind="Home" 
+                            <materialDesign:PackIcon Kind="Home" 
                                                          VerticalAlignment="Stretch"/>
-                                <TextBlock Text="Trang Chủ" 
+                            <TextBlock Text="Trang Chủ" 
                                            Margin="10 0 0 0" 
                                            FontWeight="Regular"
                                            FontSize="20"/>
-                            </StackPanel>
-                        </Button>
-                    </ListViewItem>
+                        </StackPanel>
+                    </Button>
 
-                    <ListViewItem Background="Transparent">
-                        <Button Command="{Binding ShowTaiKhoanCaNhanCommand}"
+                    <Button Command="{Binding ShowTaiKhoanCaNhanCommand}"
                                 Visibility="{Binding IsNotGiaoVuVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                Background="Transparent" 
-                                BorderThickness="0" 
-                                Padding="0"
-                                Foreground="Black"
-                                FontWeight="Regular">
-                            <Button.Triggers>
-                                <EventTrigger RoutedEvent="Button.Click">
-                                    <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
-                                </EventTrigger>
-                            </Button.Triggers>
-                            <StackPanel Orientation="Horizontal" 
+                                Style="{StaticResource MenuButtonStyle}">
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="Button.Click">
+                                <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                            </EventTrigger>
+                        </Button.Triggers>
+                        <StackPanel Orientation="Horizontal" 
                                         Margin="15,0,0,0">
-                                <materialDesign:PackIcon Kind="Account" 
+                            <materialDesign:PackIcon Kind="Account" 
                                                          VerticalAlignment="Stretch"/>
-                                <TextBlock Text="Tài khoản cá nhân" 
+                            <TextBlock Text="Tài khoản cá nhân" 
                                            Margin="10 0 0 0" 
                                            FontWeight="Regular"
                                            FontSize="20"/>
-                            </StackPanel>
-                        </Button>
-                    </ListViewItem>
+                        </StackPanel>
+                    </Button>
 
-
-                    <Expander Background="Transparent">
+                    <Expander Background="Transparent" Margin="10 0 0 0">
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="DatabaseSearch"/>
                                 <TextBlock Text="Tra cứu" Margin="10 0 0 0" FontSize="20"/>
                             </StackPanel>
                         </Expander.Header>
+                        <StackPanel HorizontalAlignment="Left">
+
+                            <Button Command="{Binding ShowDiemHocSinhCommand}"
+                                    Background="Transparent" 
+                                    BorderThickness="0" 
+                                    Padding="0"
+                                    Foreground="Black"
+                                    FontWeight="Regular"
+                                    Content="Điểm học sinh"
+                                    HorizontalAlignment="Left"
+                                    Margin="50 10 0 10">
+                                <Button.Triggers>
+                                    <EventTrigger RoutedEvent="Button.Click">
+                                        <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                    </EventTrigger>
+                                </Button.Triggers>
+                            </Button>
 
                       
                         <StackPanel>
@@ -189,18 +200,14 @@
                                     Padding="0"
                                     Foreground="Black"
                                     FontWeight="Regular"
-                                    HorizontalContentAlignment="Left">
-                                <TextBlock Text="Thông tin giáo viên" Margin="40 0 0 0" FontSize="16"/>
-                            </Button>
-                            <Button Command="{Binding ShowDiemHocSinhCommand}"
-                                    FontWeight="Regular">
+                                    Content="Thông tin học sinh"
+                                    HorizontalAlignment="Left"
+                                    Margin="50 10 0 10">
                                 <Button.Triggers>
                                     <EventTrigger RoutedEvent="Button.Click">
                                         <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
                                     </EventTrigger>
                                 </Button.Triggers>
-                                <ListViewItem Content="Thông tin học sinh"
-                                          Margin="20 0 0 0"/>
                             </Button>
 
                             <Button Command="{Binding ShowThongTinGiaoVienCommand}"
@@ -210,49 +217,40 @@
                                     Padding="0"
                                     Foreground="Black"
                                     FontWeight="Regular"
-                                    HorizontalContentAlignment="Left">
-                                <TextBlock Text="Điểm học sinh" Margin="40 0 0 0" FontSize="16"/>
-                            </Button>
-                        </StackPanel>
-                                    FontWeight="Regular">
+                                    Content="Thông tin giáo viên"
+                                    HorizontalAlignment="Left"
+                                    Margin="50 10 0 10">
                                 <Button.Triggers>
                                     <EventTrigger RoutedEvent="Button.Click">
                                         <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
                                     </EventTrigger>
                                 </Button.Triggers>
-                                <ListViewItem Content="Thông tin giáo viên"
-                                          Margin="20 0 0 0"/>
                             </Button>
 
-                        </ListView>
+                        </StackPanel>
                     </Expander>
 
-                    <ListViewItem Background="Transparent">
-                        <Button Command="{Binding ShowQuanLyTaiKhoanCommand}"
-                                Visibility="{Binding IsGiaoVuVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                Background="Transparent" 
-                                BorderThickness="0" 
-                                Padding="0"
-                                Foreground="Black"
-                                FontWeight="Regular">
-                            <Button.Triggers>
-                                <EventTrigger RoutedEvent="Button.Click">
-                                    <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
-                                </EventTrigger>
-                            </Button.Triggers>
-                            <StackPanel Orientation="Horizontal" 
+                    <Button Command="{Binding ShowQuanLyTaiKhoanCommand}"
+                            Visibility="{Binding IsGiaoVuVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            Style="{StaticResource MenuButtonStyle}">
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="Button.Click">
+                                <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                            </EventTrigger>
+                        </Button.Triggers>
+                        <StackPanel Orientation="Horizontal" 
                                         Margin="15,0,0,0">
-                                <materialDesign:PackIcon Kind="AccountMultiple" 
+                            <materialDesign:PackIcon Kind="AccountMultiple" 
                                                          VerticalAlignment="Stretch"/>
-                                <TextBlock Text="Quản lý tài khoản" 
+                            <TextBlock Text="Quản lý tài khoản" 
                                            Margin="10 0 0 0" 
                                            FontWeight="Regular"
                                            FontSize="20"/>
-                            </StackPanel>
-                        </Button>
-                    </ListViewItem>
+                        </StackPanel>
+                    </Button>
 
                     <Expander Background="Transparent"
+                              Margin="10 0 0 0"
                               Visibility="{Binding IsNotHocSinhVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
@@ -262,15 +260,21 @@
                                            Margin="10 0 0 0" FontSize="20"/>
                             </StackPanel>
                         </Expander.Header>
-                        <StackPanel>
+                        <StackPanel HorizontalAlignment="Left">
                             <Button Command="{Binding ShowTongKetMonCommand}"
                                     Background="Transparent" 
                                     BorderThickness="0" 
                                     Padding="0"
+                                    HorizontalAlignment="Left"
                                     Foreground="Black"
                                     FontWeight="Regular"
-                                    HorizontalContentAlignment="Left">
-                                <TextBlock Text="Tổng kết môn" Margin="40 0 0 0" FontSize="16"/>
+                                    Content="Tổng kết môn"
+                                    Margin="50 10 0 10">
+                                <Button.Triggers>
+                                    <EventTrigger RoutedEvent="Button.Click">
+                                        <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                    </EventTrigger>
+                                </Button.Triggers>
                             </Button>
                             <Button 
                                     Background="Transparent" 
@@ -278,39 +282,38 @@
                                     Padding="0"
                                     Foreground="Black"
                                     FontWeight="Regular"
-                                    HorizontalContentAlignment="Left">
-                                <TextBlock Text="Tổng kết năm học" Margin="40 0 0 0" FontSize="16"/>
+                                    HorizontalAlignment="Stretch"
+                                    Content="Tổng kết năm học"
+                                    Margin="50 10 0 10">
+                                <Button.Triggers>
+                                    <EventTrigger RoutedEvent="Button.Click">
+                                        <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                    </EventTrigger>
+                                </Button.Triggers>
                             </Button>
                         </StackPanel>
                     </Expander>
 
-                    <ListViewItem Background="Transparent"
-                                  Visibility="{Binding IsGiaoVuVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <Button Command="{Binding ShowQuyDinhCommand}"
-                                Background="Transparent" 
-                                BorderThickness="0" 
-                                Padding="0"
-                                Foreground="Black"
-                                FontWeight="Regular">
-                            <Button.Triggers>
-                                <EventTrigger RoutedEvent="Button.Click">
-                                    <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
-                                </EventTrigger>
-                            </Button.Triggers>
-                            <StackPanel Orientation="Horizontal" 
+                    <Button Command="{Binding ShowQuyDinhCommand}"
+                            Visibility="{Binding IsGiaoVuVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            Style="{StaticResource MenuButtonStyle}">
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="Button.Click">
+                                <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                            </EventTrigger>
+                        </Button.Triggers>
+                        <StackPanel Orientation="Horizontal" 
                                         Margin="15,0,0,0">
-                                <materialDesign:PackIcon Kind="Pound" 
+                            <materialDesign:PackIcon Kind="Pound" 
                                                          VerticalAlignment="Stretch"/>
-                                <TextBlock Text="Quy định" 
+                            <TextBlock Text="Quy định" 
                                            Margin="10 0 0 0" 
                                            FontWeight="Regular"
                                            FontSize="20"/>
-                            </StackPanel>
-                        </Button>
-                    </ListViewItem>
+                        </StackPanel>
+                    </Button>
 
                 </StackPanel>
-
             </Grid>
 
             <Grid Panel.ZIndex="0">

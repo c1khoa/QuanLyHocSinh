@@ -53,20 +53,11 @@
                 <Grid Grid.Row="0" 
                       HorizontalAlignment="Center" 
                       VerticalAlignment="Center">
-                    
-                    <ComboBox SelectedValue="{Binding SelectedRole, Mode=TwoWay}"
-                              SelectedValuePath="Content"
-                              materialDesign:HintAssist.Hint="Vai trò"
-                              BorderThickness="0"
-                              IsEditable="False"
-                              Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-                              Margin="10"
-                              FontSize="20">            
-                        <ComboBoxItem Content="Giáo vụ"/>
-                        <ComboBoxItem Content="Giáo viên"/>
-                        <ComboBoxItem Content="Học sinh"/>
-                    </ComboBox>
 
+                    <TextBlock Name="selectedRoleComboBox"
+                               Text="{Binding SelectedRole}"
+                               FontSize="20"
+                               Margin="10" />
                 </Grid>
 
                 <Grid Grid.Row="1" 
@@ -88,11 +79,7 @@
                 <Grid Grid.Row="3" 
                       VerticalAlignment="Center" 
                       Margin="100, 0, 100, 0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0">
+                    <Grid>
                         <Button Command="{Binding LoginCommand}" 
                                 CommandParameter="{Binding ElementName=passwordfield, Path=Password}"
                                 Style="{StaticResource MaterialDesignRaisedLightButton}"
@@ -100,20 +87,8 @@
                                 FontSize="13"
                                 MinWidth="50"
                                 Height="48"
-                                Content="Đăng nhập">
-                        </Button>
-                    </Grid>
-                    <Grid Grid.Column="1">
-                        <Button Command="{Binding LoginExitCommand}"
-                                Style="{StaticResource MaterialDesignRaisedLightButton}"
-                                ToolTip="Resource name: MaterialDesignRaisedLightButton"
-                                FontWeight="Bold"
-                                FontSize="13"
-                                MinWidth="50"
-                                Height="48"
-                                BorderBrush="#EF9A9A"
-                                Background="#EF9A9A"
-                                Content="Thoát">
+                                Content="Đăng nhập"
+                                Margin="30 0 30 0">
                         </Button>
                     </Grid>
                 </Grid>

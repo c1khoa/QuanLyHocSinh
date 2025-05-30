@@ -17,6 +17,9 @@
     <Compile Update="View\Controls\TraCuu\TraCuuDiemHocSinhUC.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="View\Windows\BeginWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="View\Windows\LoginWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
