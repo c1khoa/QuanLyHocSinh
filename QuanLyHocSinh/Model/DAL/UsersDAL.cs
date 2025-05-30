@@ -12,11 +12,22 @@ namespace QuanLyHocSinh.Model.Entities
         {
             List<User> users = new List<User>();
             string query = @"
-                SELECT u.UserID, u.TenDangNhap, u.MatKhau, u.VaiTroID,
-                       vt.TenVaiTro
+                SELECT
+                    u.UserID, u.TenDangNhap, u.MatKhau, u.VaiTroID,
+                    vt.TenVaiTro,
+                    -- Lấy HoTen từ HOSO thông qua HocSinh hoặc GiaoVien
+                    COALESCE(hso_hs.HoTen, hso_gv.HoTen) AS HoTenCuaUser
                 FROM USERS u
-                JOIN VAITRO vt ON u.VaiTroID = vt.VaiTroID";
-
+                JOIN VAITRO vt ON u.VaiTroID = vt.VaiTroID
+                -- LEFT JOIN để liên kết qua HocSinh -> HoSo
+                LEFT JOIN HOCSINH hs ON u.UserID = hs.UserID
+                LEFT JOIN HOSOHOCSINH hshs ON hs.HocSinhID = hshs.HocSinhID
+                LEFT JOIN HOSO hso_hs ON hshs.HoSoID = hso_hs.HoSoID
+                -- LEFT JOIN để liên kết qua GiaoVien -> HoSo
+                LEFT JOIN GIAOVIEN gv ON u.UserID = gv.UserID
+                LEFT JOIN HOSOGIAOVIEN hsgv ON gv.GiaoVienID = hsgv.GiaoVienID
+                LEFT JOIN HOSO hso_gv ON hsgv.HoSoID = hso_gv.HoSoID;
+            ";
             using (MySqlConnection conn = GetConnection()) 
             {
                 try
@@ -33,10 +44,11 @@ namespace QuanLyHocSinh.Model.Entities
                                     UserID = reader["UserID"].ToString(),
                                     TenDangNhap = reader["TenDangNhap"].ToString(),
                                     MatKhau = reader["MatKhau"].ToString(),
-                                    VaiTroID = Convert.ToInt32(reader["VaiTroID"]),
+                                    VaiTroID = reader["VaiTroID"].ToString(),
+                                    HoTen = reader.IsDBNull(reader.GetOrdinal("HoTenCuaUser")) ? null : reader["HoTenCuaUser"].ToString(),
                                     VaiTro = new VaiTro
                                     {
-                                        VaiTroID = Convert.ToInt32(reader["VaiTroID"]),
+                                        VaiTroID = reader["VaiTroID"].ToString(),
                                         TenVaiTro = reader["TenVaiTro"].ToString(),
                                     }
                                 };
@@ -68,7 +80,7 @@ namespace QuanLyHocSinh.Model.Entities
             // Loại bỏ kiểm tra user.UserID ở đây, vì nó sẽ được sinh tự động
             if (string.IsNullOrWhiteSpace(user.TenDangNhap) ||
                 string.IsNullOrWhiteSpace(user.MatKhau) ||
-                user.VaiTroID == null)
+                string.IsNullOrWhiteSpace(user.VaiTroID))
             {
                 throw new ArgumentException("Các trường TenDangNhap, MatKhau, VaiTroID không được để trống.");
             }
@@ -187,7 +199,7 @@ public async Task UpdateUserAsync(User user)
             }
             if (string.IsNullOrWhiteSpace(user.TenDangNhap) ||
                 string.IsNullOrWhiteSpace(user.MatKhau) || // Mật khẩu có thể không được cập nhật nếu không thay đổi
-                user.VaiTroID == null)
+                string.IsNullOrWhiteSpace(user.VaiTroID))
             {
                 throw new ArgumentException("Các trường TenDangNhap, MatKhau, VaiTroID không được để trống.");
             }
@@ -317,10 +329,10 @@ public async Task UpdateUserAsync(User user)
                                     UserID = reader["UserID"].ToString(),
                                     TenDangNhap = reader["TenDangNhap"].ToString(),
                                     MatKhau = reader["MatKhau"].ToString(),
-                                    VaiTroID = Convert.ToInt32(reader["VaiTroID"]),
+                                    VaiTroID = reader["VaiTroID"].ToString(),
                                     VaiTro = new VaiTro
                                     {
-                                        VaiTroID = Convert.ToInt32(reader["VaiTroID"]),
+                                        VaiTroID = reader["VaiTroID"].ToString(),
                                         TenVaiTro = reader["TenVaiTro"].ToString(),
                                     }
                                 };
@@ -369,10 +381,10 @@ public async Task UpdateUserAsync(User user)
                                     UserID = reader["UserID"].ToString(),
                                     TenDangNhap = reader["TenDangNhap"].ToString(),
                                     MatKhau = reader["MatKhau"].ToString(),
-                                    VaiTroID = Convert.ToInt32(reader["VaiTroID"]),
+                                    VaiTroID = reader["VaiTroID"].ToString(),
                                     VaiTro = new VaiTro
                                     {
-                                        VaiTroID = Convert.ToInt32(reader["VaiTroID"]),
+                                        VaiTroID = reader["VaiTroID"].ToString(),
                                         TenVaiTro = reader["TenVaiTro"].ToString(),
                                     }
                                 };

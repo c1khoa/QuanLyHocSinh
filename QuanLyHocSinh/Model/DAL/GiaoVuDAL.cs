@@ -40,7 +40,7 @@ namespace QuanLyHocSinh.Model.Entities
                                 UserID = reader["UserID"].ToString(),
                                 TenDangNhap = reader["TenDangNhap"].ToString(),
                                 MatKhau = reader["MatKhau"].ToString(),
-                                VaiTroID = Convert.ToInt32(reader["VaiTroID"]),
+                                 VaiTroID = reader["VaiTroID"].ToString(),
                                 }
                             };
                             giaoVus.Add(gv);
