@@ -14,8 +14,9 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
                 <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/MainResource.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-            <local:DiemToDisplayStringConverter x:Key="DiemToDisplayStringConverter"/>
+                </ResourceDictionary.MergedDictionaries>
+                <local:DiemToDisplayStringConverter x:Key="DiemToDisplayStringConverter"/>
+                <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -102,11 +103,13 @@
                 <DataGridTextColumn Header="Điểm 1 tiết" Binding="{Binding Diem1Tiet, Converter={StaticResource DiemToDisplayStringConverter}}" Width="*"/>
                 <DataGridTextColumn Header="Điểm thi" Binding="{Binding DiemThi, Converter={StaticResource DiemToDisplayStringConverter}}" Width="*"/>
                 <DataGridTextColumn Header="Điểm TB" Binding="{Binding DiemTB, Converter={StaticResource DiemToDisplayStringConverter}}" Width="*"/>
-                <DataGridTemplateColumn Header="Chức năng" Width="*">
+                <DataGridTemplateColumn Header="Chức năng"
+                                        Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource MaterialDesignFlatButton}"
                                     Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                    Visibility="{Binding DataContext.IsNotHocSinhVisible, ElementName=main, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     ToolTip="Sửa điểm">
                                 <materialDesign:PackIcon Kind="Pencil" Foreground="#0078D7"/>
                             </Button>

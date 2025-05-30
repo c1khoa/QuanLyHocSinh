@@ -14,6 +14,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -123,6 +124,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    Visibility="{Binding DataContext.IsGiaoVuVisible, ElementName=main, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                     ToolTip="Sửa thông tin giáo viên">
                                 <materialDesign:PackIcon Kind="Pencil" Foreground="#0078D7"/>

@@ -9,13 +9,15 @@
              FontSize="13"
              mc:Ignorable="d"
              MinHeight="600" MinWidth="800">
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
+
+<UserControl.Resources>
+    <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/MainResource.xaml"/>
+        </ResourceDictionary.MergedDictionaries>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </ResourceDictionary>
+</UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -139,6 +141,26 @@
                                     <materialDesign:PackIcon Kind="Pencil" Width="22" Height="22" Foreground="#0078D7" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Button>
                             </StackPanel>
+
+                <DataGridTextColumn Header="Mã HS" Binding="{Binding HocSinhID}" Width="*"/>
+                <DataGridTextColumn Header="Họ tên" Binding="{Binding HoTen}" Width="1.5*" />
+                <DataGridTextColumn Header="Giới tính" Binding="{Binding GioiTinh}" Width="*" />
+                <DataGridTextColumn Header="Ngày sinh" Binding="{Binding NgaySinh, StringFormat=dd/MM/yyyy}" Width="*" />
+                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="2*" />
+                <DataGridTextColumn Header="Địa chỉ" Binding="{Binding DiaChi}" Width="*" />
+                <DataGridTextColumn Header="Lớp" Binding="{Binding TenLop}" Width="*" />
+                <DataGridTextColumn Header="Niên khóa" Binding="{Binding NienKhoa}" Width="*" />
+                <DataGridTemplateColumn Header="Chức năng" 
+                                        Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                    Visibility="{Binding DataContext.IsGiaoVuVisible, ElementName=main, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    ToolTip="Sửa thông tin học sinh">
+                                <materialDesign:PackIcon Kind="Pencil" Foreground="#0078D7"/>
+                            </Button>
+
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
