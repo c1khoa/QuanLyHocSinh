@@ -1,29 +1,86 @@
-﻿using QuanLyHocSinh.Model.Entities;
-using QuanLyHocSinh.View.Controls.QuanLyTaiKhoan;
-using System;
-using System.Collections.Generic;
+using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.Service;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 {
     public class QuanLyTaiKhoanMainViewModel : BaseViewModel
     {
-        private MainViewModel _mainVM;
+        private readonly MainViewModel _mainVM;
 
-        public ICommand ShowThemTaiKhoanCommand { get; set; }
+        public ObservableCollection<User> DanhSachTaiKhoan { get; }
+        public ICommand ShowThemTaiKhoanCommand { get; }
+        public ICommand ReloadCommand { get; }
 
         public QuanLyTaiKhoanMainViewModel(MainViewModel mainVM)
         {
-            _mainVM = mainVM;
+            _mainVM = mainVM ?? throw new ArgumentNullException(nameof(mainVM));
+            DanhSachTaiKhoan = new ObservableCollection<User>();
 
-            ShowThemTaiKhoanCommand = new RelayCommand<object>((p) => true, (p) =>
+            LoadDanhSachTaiKhoan();
+
+            ShowThemTaiKhoanCommand = new RelayCommand(
+                execute: () => ShowThemTaiKhoan()
+            );
+
+            ReloadCommand = new RelayCommand(
+                execute: () => LoadDanhSachTaiKhoan()
+            );
+        }
+
+        private void ShowThemTaiKhoan()
+        {
+            try
             {
-                _mainVM.CurrentView = new QuanLyTaiKhoanThemViewModel(_mainVM);
-            });
+                // Sửa: Truyền mainVM vào constructor
+                var themVM = new QuanLyTaiKhoanThemViewModel(_mainVM);
+
+                themVM.AccountAddedSuccessfully += (userMoi) =>
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        DanhSachTaiKhoan.Insert(0, userMoi);
+                    });
+                };
+
+                // Thêm xử lý khi hủy bỏ
+                themVM.CancelRequested += () =>
+                {
+                    _mainVM.CurrentView = this; // Quay lại view hiện tại
+                };
+
+                _mainVM.CurrentView = themVM;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi mở form thêm tài khoản: {ex.Message}");
+            }
+        }
+
+        private void LoadDanhSachTaiKhoan()
+        {
+            try
+            {
+                DanhSachTaiKhoan.Clear();
+                var danhSach = UserService.LayDanhSachTaiKhoan();
+
+                if (danhSach != null)
+                {
+                    foreach (var user in danhSach)
+                    {
+                        if (user != null)
+                        {
+                            DanhSachTaiKhoan.Add(user);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi tải danh sách tài khoản: {ex.Message}");
+            }
         }
     }
 }
