@@ -1,43 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.View.Converters;
+using QuanLyHocSinh.View.Windows;
+using QuanLyHocSinh.ViewModel.BaoCao;
+using QuanLyHocSinh.ViewModel.QuanLyTaiKhoan;
+using QuanLyHocSinh.ViewModel.QuyDinh;
+using QuanLyHocSinh.ViewModel.TraCuu;
+using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using QuanLyHocSinh.View.Controls.BaoCao;
-using QuanLyHocSinh.View.Controls;
-using QuanLyHocSinh.View.Windows;
-using QuanLyHocSinh.View.Controls.TraCuu;
-using QuanLyHocSinh.View.Controls.QuanLyTaiKhoan;
-using QuanLyHocSinh.View.Controls.QuyDinh;
-using System.Collections.ObjectModel;
-using QuanLyHocSinh.ViewModel.QuanLyTaiKhoan;
-using QuanLyHocSinh.ViewModel.TraCuu;
-using QuanLyHocSinh.ViewModel.QuyDinh;
-using QuanLyHocSinh.ViewModel.BaoCao;
-using System.Windows.Controls;
-using QuanLyHocSinh.Model.Entities;
 
 namespace QuanLyHocSinh.ViewModel
 {
     public class MainViewModel : BaseViewModel
     {
-        // Các ViewModel con
-        public TrangChuViewModel TrangChuVM { get; set; }
-        public QuanLyTaiKhoanMainViewModel TaiKhoanVM { get; set; }
-        public TraCuuHocSinhViewModel HocSinhVM { get; set; }
-        public TraCuuGiaoVienViewModel GiaoVienVM { get; set; }
-        public TraCuuDiemHocSinhViewModel DiemHocSinhVM { get; set; }
-        public TongKetMonViewModel TongKetMonVM { get; set; }
-        public TongKetNamHocViewModel TongKetNamHocVM { get; set; }
-        public QuyDinhMainViewModel QuyDinhVM { get; set; }
+        #region Fields & Properties
 
-
-        private BaseViewModel _currentView;
+        private BaseViewModel _currentView = null!;
         public BaseViewModel CurrentView
         {
             get => _currentView;
@@ -46,13 +27,14 @@ namespace QuanLyHocSinh.ViewModel
                 if (_currentView != value)
                 {
                     _currentView = value;
+                    System.Diagnostics.Debug.WriteLine($"CurrentView changed to: {value?.GetType().Name}");
                     OnPropertyChanged(nameof(CurrentView));
                 }
             }
         }
 
-        private User _currentUser;
-                public User CurrentUser
+        private User? _currentUser;
+        public User? CurrentUser
         {
             get => _currentUser;
             set
@@ -61,13 +43,26 @@ namespace QuanLyHocSinh.ViewModel
                 {
                     _currentUser = value;
                     OnPropertyChanged(nameof(CurrentUser));
-                    OnPropertyChanged(nameof(VaiTro));
 
                     var roleName = _currentUser?.VaiTro?.TenVaiTro?.Trim() ?? "null";
+
                     IsGiaoVuVisible = string.Equals(roleName, "Giáo vụ", StringComparison.OrdinalIgnoreCase);
-                    IsNotHocSinhVisible = _currentUser != null && !string.Equals(roleName, "Học sinh", StringComparison.OrdinalIgnoreCase);
-                    IsNotGiaoVuVisible = _currentUser != null && !string.Equals(roleName, "Giáo vụ", StringComparison.OrdinalIgnoreCase);
+                    IsNotHocSinhVisible = _currentUser != null &&
+                        !string.Equals(roleName, "Học sinh", StringComparison.OrdinalIgnoreCase);
+                    IsNotGiaoVuVisible = _currentUser != null &&
+                        !string.Equals(roleName, "Giáo vụ", StringComparison.OrdinalIgnoreCase);
                 }
+            }
+        }
+
+        private string _selectedRole = string.Empty;
+        public string SelectedRole
+        {
+            get => _selectedRole;
+            set
+            {
+                _selectedRole = value;
+                OnPropertyChanged();
             }
         }
 
@@ -77,8 +72,11 @@ namespace QuanLyHocSinh.ViewModel
             get => _isGiaoVuVisible;
             set
             {
-                _isGiaoVuVisible = value;
-                OnPropertyChanged(nameof(IsGiaoVuVisible));
+                if (_isGiaoVuVisible != value)
+                {
+                    _isGiaoVuVisible = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -88,69 +86,206 @@ namespace QuanLyHocSinh.ViewModel
             get => _isNotHocSinhVisible;
             set
             {
-                _isNotHocSinhVisible = value;
-                OnPropertyChanged(nameof(IsNotHocSinhVisible));
+                if (_isNotHocSinhVisible != value)
+                {
+                    _isNotHocSinhVisible = value;
+                    OnPropertyChanged();
+                }
             }
         }
+
         private bool _isNotGiaoVuVisible;
         public bool IsNotGiaoVuVisible
         {
             get => _isNotGiaoVuVisible;
             set
             {
-                _isNotGiaoVuVisible = value;
-                OnPropertyChanged(nameof(IsNotGiaoVuVisible));
+                if (_isNotGiaoVuVisible != value)
+                {
+                    _isNotGiaoVuVisible = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
+        public bool IsLoaded { get; set; }
 
+        public ObservableCollection<BeginViewModel> Roles { get; }
 
-        public bool Isloaded { get; set; } = false;
-        public ICommand LoadedWindowCommand { get; set; }
-        // Các commend điều hướng
-        public ICommand ShowTrangChuCommand  { get; set; }
-        public ICommand ShowTaiKhoanCaNhanCommand { get; set; }
-        public ICommand ShowQuanLyTaiKhoanCommand { get; set; }
-        public ICommand ShowThongTinHocSinhCommand { get; set; }
-        public ICommand ShowThongTinGiaoVienCommand { get; set; }
-        public ICommand ShowDiemHocSinhCommand { get; set; }
-        public ICommand ShowTongKetMonCommand { get; set; }
-        public ICommand ShowTongKetNamHocCommand { get; set; }
-        public ICommand ShowQuyDinhCommand { get; set; }
-        // Mọi thứ xử lý nằm trong này
+        public BeginViewModel StudentRole { get; }
+        public BeginViewModel TeacherRole { get; }
+        public BeginViewModel AdminRole { get; }
+
+        #endregion
+
+        #region Commands
+
+        public ICommand ShowTrangChuCommand { get; }
+        public ICommand ShowTaiKhoanCaNhanCommand { get; }
+        public ICommand ShowQuanLyTaiKhoanCommand { get; }
+        public ICommand ShowThongTinHocSinhCommand { get; }
+        public ICommand ShowThongTinGiaoVienCommand { get; }
+        public ICommand ShowDiemHocSinhCommand { get; }
+        public ICommand ShowTongKetMonCommand { get; }
+        public ICommand ShowTongKetNamCommand { get; }
+        public ICommand ShowQuyDinhCommand { get; }
+        public ICommand SelectRoleCommand { get; }
+
+        #endregion
+
+        #region Constructor
+
         public MainViewModel()
         {
-            // Gán view mặc định là Trang chủ
-            CurrentView = new TrangChuViewModel(this); // Trang chủ là UserControl mặc định ví dụ
+            // Initialize roles
+            StudentRole = new BeginViewModel(
+                "pack://application:,,,/QuanLyHocSinh;component/Images/student_logo.png",
+                "Học sinh");
 
-            // Lệnh điều hướng
+            TeacherRole = new BeginViewModel(
+                "pack://application:,,,/QuanLyHocSinh;component/Images/teacher_logo.png",
+                "Giáo viên");
 
-            ShowTrangChuCommand = new RelayCommand<object>((p) => true, (p) =>
+            AdminRole = new BeginViewModel(
+                "pack://application:,,,/QuanLyHocSinh;component/Images/admin_logo.png",
+                "Giáo Vụ");
+
+            Roles = new ObservableCollection<BeginViewModel>
+            {
+                StudentRole,
+                TeacherRole,
+                AdminRole
+            };
+
+            // Initialize CurrentView
+            CurrentView = new TrangChuViewModel(this);
+
+            // Initialize commands
+            ShowTrangChuCommand = new RelayCommand<object>(
+                _ => true,
+                _ => CurrentView = new TrangChuViewModel(this));
+
+            ShowQuanLyTaiKhoanCommand = new RelayCommand<object>(
+                _ => true,
+                _ => CurrentView = new QuanLyTaiKhoanMainViewModel(this));
+
+            ShowTaiKhoanCaNhanCommand = new RelayCommand<object>(
+                _ => true,
+                _ => CurrentView = new QuanLyTaiKhoanCaNhanViewModel(this));
+
+            ShowThongTinHocSinhCommand = new RelayCommand<object>(
+                _ => true,
+                _ => CurrentView = new TraCuuHocSinhViewModel(this));
+
+            ShowThongTinGiaoVienCommand = new RelayCommand<object>(
+                _ => true,
+                _ => CurrentView = new TraCuuGiaoVienViewModel(this));
+
+            ShowDiemHocSinhCommand = new RelayCommand<object>(
+                _ => true,
+                _ => CurrentView = new TraCuuDiemHocSinhViewModel(this));
+
+            ShowTongKetMonCommand = new RelayCommand<object>(
+                _ => true,
+                _ => CurrentView = new TongKetMonViewModel(this));
+
+            ShowTongKetNamCommand = new RelayCommand<object>(
+                _ => true,
+                _ => CurrentView = new TongKetNamViewModel(this));
+
+            ShowQuyDinhCommand = new RelayCommand<object>(
+                _ => true,
+                _ => CurrentView = new QuyDinhMainViewModel(this));
+
+            SelectRoleCommand = new RelayCommand<object>(
+                parameter => parameter is BeginViewModel,
+                parameter =>
+                {
+                    if (parameter is BeginViewModel selectedRole)
+                    {
+                        OpenLoginWindow(selectedRole.RoleName);
+                    }
+                });
+        }
+
+        #endregion
+
+        #region Navigation Methods
+
+        // Bổ sung phương thức điều hướng quay lại
+        private Stack<BaseViewModel> _navigationStack = new Stack<BaseViewModel>();
+
+        public void NavigateTo(BaseViewModel viewModel)
+        {
+            _navigationStack.Push(CurrentView);
+            CurrentView = viewModel;
+        }
+
+        public void NavigateBack()
+        {
+            if (_navigationStack.Count > 0)
+            {
+                CurrentView = _navigationStack.Pop();
+            }
+            else
             {
                 CurrentView = new TrangChuViewModel(this);
-            });
-            ShowQuanLyTaiKhoanCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuanLyTaiKhoanMainViewModel(this));
-            ShowTaiKhoanCaNhanCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuanLyTaiKhoanCaNhanViewModel(this));
-            ShowThongTinHocSinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuHocSinhViewModel(this));
-            ShowThongTinGiaoVienCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuGiaoVienViewModel(this));   
-            ShowDiemHocSinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuDiemHocSinhViewModel(this));
-            ShowTongKetMonCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TongKetMonViewModel(this));
-            ShowTongKetNamHocCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TongKetNamHocViewModel(this));
-            ShowQuyDinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuyDinhMainViewModel(this));
+            }
         }
-        protected bool SetProperty<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null)
+        #endregion
+
+        #region Methods
+
+        private void OpenLoginWindow(string roleName)
         {
-            if (!Equals(field, newValue))
+            var loginVM = new LoginViewModel
             {
-                field = newValue;
-                OnPropertyChanged(propertyName);
-                return true;
+                SelectedRole = roleName
+            };
+
+            var loginWindow = new LoginWindow
+            {
+                DataContext = loginVM
+            };
+
+            loginWindow.Loaded += (_, _) => WindowAnimationHelper.FadeIn(loginWindow);
+            loginWindow.Show();
+
+            // Close BeginWindow if exists
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window is BeginWindow beginWindow)
+                {
+                    WindowAnimationHelper.FadeOut(beginWindow);
+                    break;
+                }
             }
 
-            return false;
+            // Handle login success
+            loginVM.LoginSuccess += (_, user) =>
+            {
+                if (Application.Current.Resources["MainVM"] is MainViewModel mainVM)
+                {
+                    mainVM.CurrentUser = user;
+                    mainVM.CurrentView = new TrangChuViewModel(mainVM);
+
+                    var mainWindow = new MainWindow();
+                    mainWindow.Show();
+
+                    loginWindow.Close();
+                }
+            };
         }
 
+        protected bool SetProperty<T>(ref T field, T newValue, [CallerMemberName] string propertyName = "")
+        {
+            if (Equals(field, newValue)) return false;
 
+            field = newValue;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+
+        #endregion
     }
 }
-
