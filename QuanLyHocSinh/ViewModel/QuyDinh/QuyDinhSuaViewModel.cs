@@ -1,7 +1,7 @@
-﻿using QuanLyHocSinh.Model.Entities; // Đảm bảo dòng này có
+﻿using QuanLyHocSinh.Model.Entities; 
 using System.Windows.Input;
-using QuanLyHocSinh.ViewModel; // Thêm dòng này để sử dụng BaseViewModel và RelayCommand
-using System.Windows; // Thêm để sử dụng MessageBox
+using QuanLyHocSinh.ViewModel; 
+using System.Windows; 
 
 namespace QuanLyHocSinh.ViewModel
 {
@@ -9,16 +9,13 @@ namespace QuanLyHocSinh.ViewModel
     {
         private MainViewModel _mainVM;
 
-        // ĐÃ SỬA: Chỉ rõ namespace đầy đủ cho _currentQuyDinh
-        private QuanLyHocSinh.Model.Entities.QuyDinh _currentQuyDinh; // Giữ tham chiếu đến đối tượng gốc
+        private QuanLyHocSinh.Model.Entities.QuyDinh _currentQuyDinh; 
 
-        // ĐÃ SỬA: Chỉ rõ namespace đầy đủ cho tham số quyDinh trong constructor
         public QuyDinhSuaViewModel(MainViewModel mainVM, QuanLyHocSinh.Model.Entities.QuyDinh quyDinh)
         {
             _mainVM = mainVM;
             _currentQuyDinh = quyDinh;
 
-            // Khởi tạo các thuộc tính ViewModel từ đối tượng QuyDinh
             Title = quyDinh.Title;
             Description = quyDinh.Description;
 
@@ -57,7 +54,6 @@ namespace QuanLyHocSinh.ViewModel
             _currentQuyDinh.Title = Title;
             _currentQuyDinh.Description = Description;
 
-            // TODO: Nếu có gọi lưu về DB thì làm ở đây
             MessageBox.Show("Lưu thay đổi thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
             Back(); // Gọi Back sau khi lưu
         }
