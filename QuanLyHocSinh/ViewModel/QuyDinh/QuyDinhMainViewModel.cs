@@ -2,8 +2,8 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using QuanLyHocSinh.ViewModel; // Thêm dòng này để sử dụng BaseViewModel và RelayCommand
-using System.Windows; // Thêm để sử dụng MessageBox
+using QuanLyHocSinh.ViewModel; 
+using System.Windows;
 
 // Đặt alias để tránh nhầm giữa namespace và class
 using QuyDinhModel = QuanLyHocSinh.Model.Entities.QuyDinh;
@@ -25,7 +25,7 @@ namespace QuanLyHocSinh.ViewModel.QuyDinh
             EditCommand = new RelayCommand(XemChiTiet, () => SelectedQuyDinh != null);
             ClearCommand = new RelayCommand(LamMoi); // canExecute mặc định là true
 
-            // Load dữ liệu ban đầu (ví dụ)
+   
             LoadQuyDinhData();
         }
 
@@ -85,8 +85,6 @@ namespace QuanLyHocSinh.ViewModel.QuyDinh
 
         private void LoadQuyDinhData()
         {
-            // Đây là nơi bạn sẽ tải dữ liệu quy định từ cơ sở dữ liệu
-            // Hiện tại, chỉ thêm dữ liệu giả định
             ListQuyDinh.Add(new QuyDinhModel { QuyDinhID = "QD000001", Title = "Quy định tuổi học sinh", Description = "Quy định về độ tuổi tối thiểu và tối đa của học sinh." });
             ListQuyDinh.Add(new QuyDinhModel { QuyDinhID = "QD000002", Title = "Quy định sĩ số lớp", Description = "Quy định số lượng học sinh tối đa trong một lớp học." });
             ListQuyDinh.Add(new QuyDinhModel { QuyDinhID = "QD000003", Title = "Quy định điểm đạt", Description = "Điểm trung bình tối thiểu để đạt môn học." });
@@ -96,7 +94,6 @@ namespace QuanLyHocSinh.ViewModel.QuyDinh
         {
             if (string.IsNullOrWhiteSpace(Title) || string.IsNullOrWhiteSpace(Description))
             {
-                // Có thể hiển thị thông báo lỗi cho người dùng
                 MessageBox.Show("Vui lòng nhập đầy đủ Tiêu đề và Mô tả.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -136,7 +133,7 @@ namespace QuanLyHocSinh.ViewModel.QuyDinh
                     ListQuyDinh[index] = SelectedQuyDinh;
                 }
 
-                // TODO: Gọi hàm lưu cập nhật vào cơ sở dữ liệu ở đây
+        
                 MessageBox.Show("Cập nhật quy định thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
