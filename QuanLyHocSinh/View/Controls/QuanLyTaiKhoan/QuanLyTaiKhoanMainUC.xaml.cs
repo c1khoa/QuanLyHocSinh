@@ -10,6 +10,10 @@ namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
         public QuanLyTaiKhoanMainUC(MainViewModel mainVM)
         {
             InitializeComponent();
+
+            if (mainVM == null)
+                throw new ArgumentNullException(nameof(mainVM));
+
             DataContext = new QuanLyTaiKhoanMainViewModel(mainVM);
         }
     }
