@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="QuanLyHocSinh.View.Controls.QuyDinh.QuyDinhMainUC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.QuyDinh"
+             xmlns:viewModel="clr-namespace:QuanLyHocSinh.ViewModel.QuyDinh"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance viewModel:QuyDinhMainViewModel}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Quản Lý Quy Định"
+                   Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                   HorizontalAlignment="Center" Margin="0,0,0,10"/>
+
+        <Border Grid.Row="1" Margin="0,10" Padding="15" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5">
+            <StackPanel>
+                <Grid Margin="0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Tiêu đề:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBox Grid.Column="1" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignTextBox}"
+                             materialDesign:HintAssist.Hint="Nhập tiêu đề quy định"/>
+                </Grid>
+
+                <Grid Margin="0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Mô tả:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBox Grid.Column="1" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             materialDesign:HintAssist.Hint="Nhập mô tả chi tiết"
+                             TextWrapping="Wrap" AcceptsReturn="True" MinHeight="60"/>
+                </Grid>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                    <Button Content="Thêm" Command="{Binding AddCommand}"
+                            Style="{StaticResource MaterialDesignRaisedAccentButton}" Margin="5,0"/>
+                    <Button Content="Cập Nhật" Command="{Binding UpdateCommand}"
+                            Style="{StaticResource MaterialDesignRaisedAccentButton}" Margin="5,0"/>
+                    <Button Content="Làm Mới" Command="{Binding ClearCommand}"
+                            Style="{StaticResource MaterialDesignOutlinedButton}" Margin="5,0"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <DataGrid Grid.Row="2" ItemsSource="{Binding ListQuyDinh}"
+                  SelectedItem="{Binding SelectedQuyDinh, Mode=TwoWay}"
+                  AutoGenerateColumns="False" IsReadOnly="True" Margin="0,10,0,0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding QuyDinhID}" Width="Auto"/>
+                <DataGridTextColumn Header="Tiêu đề" Binding="{Binding Title}" Width="*"/>
+                <DataGridTextColumn Header="Mô tả" Binding="{Binding Description}" Width="2*"/>
+                <DataGridTemplateColumn Header="Thao tác" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="Chi tiết" Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
+                                    Style="{StaticResource MaterialDesignFlatButton}" Margin="0,0,5,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

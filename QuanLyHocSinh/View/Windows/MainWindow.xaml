@@ -1,0 +1,338 @@
+﻿ ﻿<Window x:Class="QuanLyHocSinh.View.Windows.MainWindow"
+       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+       xmlns:local="clr-namespace:QuanLyHocSinh.View.Windows"
+       mc:Ignorable="d"
+       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+
+       Width="800"
+       Height="600"
+       MinWidth="400"
+       MinHeight="300"
+       
+       xmlns:uc="clr-namespace:QuanLyHocSinh.View.Controls"
+       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:viewmodel="clr-namespace:QuanLyHocSinh.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
+       TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+       TextElement.FontWeight="Regular"
+       TextElement.FontSize="20"
+       TextOptions.TextFormattingMode="Ideal"
+       TextOptions.TextRenderingMode="Auto"
+       Background="White"
+       FontFamily="{DynamicResource MaterialDesignFont}"
+       ResizeMode="NoResize"
+       WindowStyle="None"
+       WindowStartupLocation="CenterScreen" 
+       DataContext="{StaticResource MainVM}"
+       x:Name="main"
+       Title="Quản lý học sinh">
+    <!-- DataContext="{DynamicResource MainVM}" -->
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+
+
+    <i:Interaction.Triggers>
+
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedWindowCommand}"/>
+        </i:EventTrigger>
+
+    </i:Interaction.Triggers>
+
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="ButtonBase.Click" 
+                     SourceName="ButtonClose">
+            <BeginStoryboard x:Name="CloseMenu_BeginStoryboard" 
+                            Storyboard="{StaticResource CloseMenu}"/>
+        </EventTrigger>
+        <EventTrigger RoutedEvent="ButtonBase.Click" 
+                     SourceName="ButtonOpen">
+            <BeginStoryboard x:Name="OpenMenu_BeginStoryboard"
+                             Storyboard="{StaticResource OpenMenu}"/>
+        </EventTrigger>
+    </Window.Triggers>
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <uc:ControlBarUC Tag="{Binding Title, ElementName=main}"></uc:ControlBarUC>
+        </Grid>
+
+        <Grid Grid.Row="1">
+
+            <Grid x:Name="GridBackground" 
+                 Background="#55313131" 
+                 Opacity="0">
+            </Grid>
+
+            <Button x:Name="ButtonOpen" 
+                   HorizontalAlignment="Left" 
+                   VerticalAlignment="Top" 
+                   Background="{x:Null}" 
+                   BorderBrush="{x:Null}"
+                   Padding="0"
+                   Width="30"
+                   Height="30"
+                    Panel.ZIndex="2">
+                <materialDesign:PackIcon Kind="Menu" Foreground="#FF313131"/>
+            </Button>
+
+            <Grid x:Name="GridMenu"
+                     HorizontalAlignment="Left"
+                     Width="300"
+                     Margin="-300 0 0 0"
+                     Background="#D0F0FD"
+                     RenderTransformOrigin="0.5, 0.5"
+                     Panel.ZIndex="2">
+                <Grid.RenderTransform>
+                    <TransformGroup>
+                        <TranslateTransform/>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform/>
+                    </TransformGroup>
+                </Grid.RenderTransform>
+                <StackPanel>
+                    <ListViewItem Background="Transparent">
+                        <Button x:Name="ButtonClose"
+                                Background="Transparent" 
+                                BorderThickness="0"
+                                Padding="0">
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="0,0,0,0">
+                                <materialDesign:PackIcon Kind="ArrowLeft"
+                                                         VerticalAlignment="Center"
+                                                         Foreground="Black"
+                                                         FontWeight="Regular"/>
+                                <TextBlock Text="Tùy chọn"
+                                           Margin="10 0 0 0"                                             
+                                           Foreground="Black"
+                                           FontWeight="Regular"
+                                           FontSize="20"/>
+                            </StackPanel>
+                        </Button>
+                    </ListViewItem>
+
+                    <ListViewItem Background="Transparent">
+                        <Button Command="{Binding ShowTrangChuCommand}"
+                                Background="Transparent" 
+                                BorderThickness="0" 
+                                Padding="0"
+                                Foreground="Black"
+                                FontWeight="Regular">
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.Click">
+                                    <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                </EventTrigger>
+                            </Button.Triggers>
+                            <StackPanel Orientation="Horizontal" 
+                                        Margin="15,0,0,0">
+                                <materialDesign:PackIcon Kind="Home" 
+                                                         VerticalAlignment="Stretch"/>
+                                <TextBlock Text="Trang Chủ" 
+                                           Margin="10 0 0 0" 
+                                           FontWeight="Regular"
+                                           FontSize="20"/>
+                            </StackPanel>
+                        </Button>
+                    </ListViewItem>
+
+                    <ListViewItem Background="Transparent">
+                        <Button Command="{Binding ShowTaiKhoanCaNhanCommand}"
+                                Visibility="{Binding IsNotGiaoVuVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                Background="Transparent" 
+                                BorderThickness="0" 
+                                Padding="0"
+                                Foreground="Black"
+                                FontWeight="Regular">
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.Click">
+                                    <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                </EventTrigger>
+                            </Button.Triggers>
+                            <StackPanel Orientation="Horizontal" 
+                                        Margin="15,0,0,0">
+                                <materialDesign:PackIcon Kind="Account" 
+                                                         VerticalAlignment="Stretch"/>
+                                <TextBlock Text="Tài khoản cá nhân" 
+                                           Margin="10 0 0 0" 
+                                           FontWeight="Regular"
+                                           FontSize="20"/>
+                            </StackPanel>
+                        </Button>
+                    </ListViewItem>
+
+
+                    <Expander Background="Transparent">
+                        <Expander.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="DatabaseSearch"
+                                                        VerticalAlignment="Stretch"/>
+                                <TextBlock Text="Tra cứu"
+                                              Margin="10 0 0 0"/>
+                            </StackPanel>
+                        </Expander.Header>
+                        <ListView>
+
+                            <Button Command="{Binding ShowDiemHocSinhCommand}"
+                                    Background="Transparent" 
+                                    BorderThickness="0" 
+                                    Padding="0"
+                                    Foreground="Black"
+                                    FontWeight="Regular">
+                                <Button.Triggers>
+                                    <EventTrigger RoutedEvent="Button.Click">
+                                        <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                    </EventTrigger>
+                                </Button.Triggers>
+                                <ListViewItem Content="Điểm học sinh"
+                                          Margin="20 0 0 0"/>
+                            </Button>
+
+                            <Button Command="{Binding ShowThongTinHocSinhCommand}"
+                                    Visibility="{Binding IsNotHocSinhVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    Background="Transparent" 
+                                    BorderThickness="0" 
+                                    Padding="0"
+                                    Foreground="Black"
+                                    FontWeight="Regular">
+                                <Button.Triggers>
+                                    <EventTrigger RoutedEvent="Button.Click">
+                                        <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                    </EventTrigger>
+                                </Button.Triggers>
+                                <ListViewItem Content="Thông tin học sinh"
+                                          Margin="20 0 0 0"/>
+                            </Button>
+
+                            <Button Command="{Binding ShowThongTinGiaoVienCommand}"
+                                    Visibility="{Binding IsGiaoVuVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    Background="Transparent" 
+                                    BorderThickness="0" 
+                                    Padding="0"
+                                    Foreground="Black"
+                                    FontWeight="Regular">
+                                <Button.Triggers>
+                                    <EventTrigger RoutedEvent="Button.Click">
+                                        <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                    </EventTrigger>
+                                </Button.Triggers>
+                                <ListViewItem Content="Thông tin giáo viên"
+                                          Margin="20 0 0 0"/>
+                            </Button>
+
+                        </ListView>
+                    </Expander>
+
+                    <ListViewItem Background="Transparent">
+                        <Button Command="{Binding ShowQuanLyTaiKhoanCommand}"
+                                Visibility="{Binding IsGiaoVuVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                Background="Transparent" 
+                                BorderThickness="0" 
+                                Padding="0"
+                                Foreground="Black"
+                                FontWeight="Regular">
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.Click">
+                                    <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                </EventTrigger>
+                            </Button.Triggers>
+                            <StackPanel Orientation="Horizontal" 
+                                        Margin="15,0,0,0">
+                                <materialDesign:PackIcon Kind="AccountMultiple" 
+                                                         VerticalAlignment="Stretch"/>
+                                <TextBlock Text="Quản lý tài khoản" 
+                                           Margin="10 0 0 0" 
+                                           FontWeight="Regular"
+                                           FontSize="20"/>
+                            </StackPanel>
+                        </Button>
+                    </ListViewItem>
+
+                    <Expander Background="Transparent"
+                              Visibility="{Binding IsNotHocSinhVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Expander.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="ChartBarStacked"
+                                                         VerticalAlignment="Stretch"/>
+                                <TextBlock Text="Báo cáo"
+                                           Margin="10 0 0 0"/>
+                            </StackPanel>
+                        </Expander.Header>
+                        <ListView>
+                            <Button Command="{Binding ShowTongKetMonCommand}"
+                                    Background="Transparent" 
+                                    BorderThickness="0" 
+                                    Padding="0"
+                                    Foreground="Black"
+                                    FontWeight="Regular">
+                                <Button.Triggers>
+                                    <EventTrigger RoutedEvent="Button.Click">
+                                        <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                    </EventTrigger>
+                                </Button.Triggers>
+                                <ListViewItem Content="Tổng kết môn"
+                                              Margin="20 0 0 0"/>
+                            </Button>
+                            <Button Command="{Binding ShowTongKetNamHocCommand}"
+                                    Background="Transparent" 
+                                    BorderThickness="0" 
+                                    Padding="0"
+                                    Foreground="Black"
+                                    FontWeight="Regular">
+                                <Button.Triggers>
+                                    <EventTrigger RoutedEvent="Button.Click">
+                                        <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                    </EventTrigger>
+                                </Button.Triggers>
+                                <ListViewItem Content="Tổng kết năm học"
+                                              Margin="20 0 0 0"/>
+                            </Button>
+                        </ListView>
+                    </Expander>
+
+                    <ListViewItem Background="Transparent"
+                                  Visibility="{Binding IsGiaoVuVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Button Command="{Binding ShowQuyDinhCommand}"
+                                Background="Transparent" 
+                                BorderThickness="0" 
+                                Padding="0"
+                                Foreground="Black"
+                                FontWeight="Regular">
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.Click">
+                                    <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                </EventTrigger>
+                            </Button.Triggers>
+                            <StackPanel Orientation="Horizontal" 
+                                        Margin="15,0,0,0">
+                                <materialDesign:PackIcon Kind="Pound" 
+                                                         VerticalAlignment="Stretch"/>
+                                <TextBlock Text="Quy định" 
+                                           Margin="10 0 0 0" 
+                                           FontWeight="Regular"
+                                           FontSize="20"/>
+                            </StackPanel>
+                        </Button>
+                    </ListViewItem>
+
+                </StackPanel>
+
+            </Grid>
+
+            <Grid Panel.ZIndex="0">
+                <ContentControl Content="{Binding CurrentView}"/>
+            </Grid>
+
+        </Grid>
+    </Grid>
+
+
+</Window>
+
