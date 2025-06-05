@@ -1,5 +1,6 @@
 using QuanLyHocSinh.ViewModel;
 using QuanLyHocSinh.ViewModel.QuanLyTaiKhoan;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -7,54 +8,64 @@ namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
 {
     public partial class QuanLyTaiKhoanThemUC : UserControl
     {
-        private readonly QuanLyTaiKhoanThemViewModel _viewModel;
-
-        public QuanLyTaiKhoanThemUC(QuanLyTaiKhoanThemViewModel viewModel)
+        public QuanLyTaiKhoanThemUC(MainViewModel mainVM)
         {
+            if (mainVM == null)
+            {
+                throw new ArgumentNullException(nameof(mainVM));
+            }
+
             InitializeComponent();
-            _viewModel = viewModel;
-            DataContext = _viewModel;
 
-            _viewModel.CancelRequested += () =>
+            if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                var mainVM = Application.Current.MainWindow?.DataContext as MainViewModel;
-                mainVM?.NavigateBack();
-            };
-
-            _viewModel.AccountAddedSuccessfully += user =>
-            {
-                var mainVM = Application.Current.MainWindow?.DataContext as MainViewModel;
-                mainVM?.NavigateBack();
-            };
-        }
-
-        private void btnShowHidePassword_Checked(object sender, RoutedEventArgs e)
-        {
-            txtUserPassWordVisible.Text = txtUserPassWord.Password;
-            txtUserPassWord.Visibility = Visibility.Collapsed;
-            txtUserPassWordVisible.Visibility = Visibility.Visible;
-        }
-
-        private void btnShowHidePassword_Unchecked(object sender, RoutedEventArgs e)
-        {
-            txtUserPassWord.Password = txtUserPassWordVisible.Text;
-            txtUserPassWordVisible.Visibility = Visibility.Collapsed;
-            txtUserPassWord.Visibility = Visibility.Visible;
-        }
-
-        private void txtUserPassWordVisible_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (_viewModel != null)
-            {
-                _viewModel.MatKhau = txtUserPassWordVisible.Text;
+                DataContext = new QuanLyTaiKhoanThemViewModel(mainVM);
             }
         }
 
-        private void txtUserPassWord_PasswordChanged(object sender, RoutedEventArgs e)
+        public void UpdatePassword()
         {
-            if (_viewModel != null)
+            if (DesignerProperties.GetIsInDesignMode(this))
+                return;
+
+            if (DataContext is QuanLyTaiKhoanThemViewModel viewModel && txtUserPassWord != null)
             {
-                _viewModel.MatKhau = txtUserPassWord.Password;
+                viewModel.MatKhau = txtUserPassWord.Password;
+            }
+        }
+
+        public void txtUserPassWord_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            UpdatePassword();
+        }
+
+        public void btnShowHidePassword_Checked(object sender, RoutedEventArgs e)
+        {
+            if (txtUserPassWord != null && txtUserPassWordVisible != null)
+            {
+                txtUserPassWord.Visibility = Visibility.Collapsed;
+                txtUserPassWordVisible.Visibility = Visibility.Visible;
+                txtUserPassWordVisible.Text = txtUserPassWord.Password;
+            }
+        }
+
+        public void btnShowHidePassword_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (txtUserPassWord != null && txtUserPassWordVisible != null)
+            {
+                txtUserPassWord.Visibility = Visibility.Visible;
+                txtUserPassWordVisible.Visibility = Visibility.Collapsed;
+                txtUserPassWord.Password = txtUserPassWordVisible.Text;
+                UpdatePassword();
+            }
+        }
+
+        public void txtUserPassWordVisible_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (txtUserPassWord != null && txtUserPassWordVisible != null)
+            {
+                txtUserPassWord.Password = txtUserPassWordVisible.Text;
+                UpdatePassword();
             }
         }
     }
