@@ -8,12 +8,15 @@ namespace QuanLyHocSinh.Model.Relationships
 {
     public class PhanQuyen
     {
-        public string PhanQuyenID { get; set; } // CHAR(8), e.g., PQ000001
-        public string QuyenID { get; set; }               
-        public string GiaoVuPhanQuyenID { get; set; }   
-        public string UserDuocPhanQuyenID { get; set; } 
-        public DateTime NgayPhanQuyen { get; set; }
+        public string PhanQuyenID { get; set; } = string.Empty;
 
+        public string QuyenID { get; set; } = string.Empty;
+
+        public string GiaoVuPhanQuyenID { get; set; } = string.Empty;
+
+        public string UserDuocPhanQuyenID { get; set; } = string.Empty;
+
+        public DateTime NgayPhanQuyen { get; set; }
         // Navigation properties
         public virtual Quyen Quyen { get; set; }
         public virtual GiaoVu GiaoVuPhanQuyen { get; set; } 
