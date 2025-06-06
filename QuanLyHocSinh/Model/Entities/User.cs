@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +12,8 @@ namespace QuanLyHocSinh.Model.Entities
         public string TenDangNhap { get; set; }
         public string MatKhau { get; set; }
 
-        public int VaiTroID { get; set; }
+        public string VaiTroID { get; set; }
+        public string HoTen {  get; set; }
 
         public VaiTro VaiTro { get; set; }  // Navigation property
     }

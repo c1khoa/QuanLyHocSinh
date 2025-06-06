@@ -1,4 +1,5 @@
-﻿using System;
+using QuanLyHocSinh.ViewModel.QuyDinh;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using QuanLyHocSinh.ViewModel;
 
 namespace QuanLyHocSinh.View.Controls.QuyDinh
 {
@@ -23,6 +25,19 @@ namespace QuanLyHocSinh.View.Controls.QuyDinh
         public QuyDinhMainUC()
         {
             InitializeComponent();
+            var viewModel = new QuyDinhMainViewModel(MainViewModel.Instance);
+            DataContext = viewModel;
+
+           
+            viewModel.OpenEditViewRequested += (quyDinh) =>
+            {
+                var editView = new QuyDinhSuaUC(quyDinh);
+
+               
+                MainGrid.Children.Add(editView); 
+                Grid.SetRowSpan(editView, 3); 
+            };
+
         }
     }
 }

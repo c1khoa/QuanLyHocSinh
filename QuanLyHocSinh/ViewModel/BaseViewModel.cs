@@ -19,10 +19,6 @@ namespace QuanLyHocSinh.ViewModel
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public static implicit operator BaseViewModel(QuanLyTaiKhoanThemUC v)
-        {
-            throw new NotImplementedException();
-        }
     }
     public class RelayCommand<T> : ICommand
     {

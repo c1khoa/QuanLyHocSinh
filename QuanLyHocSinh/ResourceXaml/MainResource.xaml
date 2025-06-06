@@ -12,6 +12,8 @@
                     xmlns:viewtc="clr-namespace:QuanLyHocSinh.View.Controls.TraCuu"
                     xmlns:viewqd="clr-namespace:QuanLyHocSinh.View.Controls.QuyDinh" 
                     xmlns:local="clr-namespace:QuanLyHocSinh.View.Converters">
+    <local:EyeIconConverter x:Key="EyeIconConverter"/>
+    <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     <local:RoleToVisibilityConverter x:Key="RoleToVisibilityConverter"/>
 
     <Storyboard x:Key="OpenMenu">
@@ -60,7 +62,7 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanThemViewModel}">
-            <viewqltk:QuanLyTaiKhoanThemUC/>
+        <viewqltk:QuanLyTaiKhoanThemUC/> 
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanCaNhanViewModel}">

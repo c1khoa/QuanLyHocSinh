@@ -1,17 +1,18 @@
-﻿using System;
+using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.View.Converters;
+using QuanLyHocSinh.View.Windows;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using QuanLyHocSinh.Model.Entities;
+
 using QuanLyHocSinh.View.Controls;
 using QuanLyHocSinh.View.Controls.BaoCao;
 using QuanLyHocSinh.View.Controls.QuanLyTaiKhoan;
 using QuanLyHocSinh.View.Controls.QuyDinh;
 using QuanLyHocSinh.View.Controls.TraCuu;
-using QuanLyHocSinh.View.Converters;
-using QuanLyHocSinh.View.Windows;
 using QuanLyHocSinh.ViewModel.BaoCao;
 using QuanLyHocSinh.ViewModel.QuanLyTaiKhoan;
 using QuanLyHocSinh.ViewModel.QuyDinh;
@@ -22,6 +23,7 @@ namespace QuanLyHocSinh.ViewModel
     public class MainViewModel : BaseViewModel
     {
         #region Fields & Properties
+
 
         // Các ViewModel con dùng cho điều hướng
         public TrangChuViewModel TrangChuVM { get; set; }
@@ -49,11 +51,9 @@ namespace QuanLyHocSinh.ViewModel
             }
         }
 
-        private User _currentUser;
-        /// <summary>
-        /// Người dùng đang đăng nhập
-        /// </summary>
-        public User CurrentUser
+        // Người dùng hiện tại
+        private User? _currentUser;
+        public User? CurrentUser
         {
             get => _currentUser;
             set
@@ -62,10 +62,10 @@ namespace QuanLyHocSinh.ViewModel
                 {
                     _currentUser = value;
                     OnPropertyChanged(nameof(CurrentUser));
-                    OnPropertyChanged(nameof(VaiTro));
 
                     var roleName = _currentUser?.VaiTro?.TenVaiTro?.Trim() ?? "null";
 
+                    // Cập nhật UI theo vai trò
                     IsGiaoVuVisible = string.Equals(roleName, "Giáo vụ", StringComparison.OrdinalIgnoreCase);
                     IsNotHocSinhVisible = _currentUser != null && !string.Equals(roleName, "Học sinh", StringComparison.OrdinalIgnoreCase);
                     IsNotGiaoVuVisible = _currentUser != null && !string.Equals(roleName, "Giáo vụ", StringComparison.OrdinalIgnoreCase);
@@ -73,15 +73,11 @@ namespace QuanLyHocSinh.ViewModel
             }
         }
 
-        private string _selectedRole;
+        private string _selectedRole = string.Empty;
         public string SelectedRole
         {
             get => _selectedRole;
-            set
-            {
-                _selectedRole = value;
-                OnPropertyChanged();
-            }
+            set => SetProperty(ref _selectedRole, value);
         }
 
         // Các cờ điều khiển hiển thị UI theo vai trò người dùng
@@ -89,41 +85,29 @@ namespace QuanLyHocSinh.ViewModel
         public bool IsGiaoVuVisible
         {
             get => _isGiaoVuVisible;
-            set
-            {
-                _isGiaoVuVisible = value;
-                OnPropertyChanged();
-            }
+            set => SetProperty(ref _isGiaoVuVisible, value);
         }
 
         private bool _isNotHocSinhVisible;
         public bool IsNotHocSinhVisible
         {
             get => _isNotHocSinhVisible;
-            set
-            {
-                _isNotHocSinhVisible = value;
-                OnPropertyChanged();
-            }
+            set => SetProperty(ref _isNotHocSinhVisible, value);
         }
 
         private bool _isNotGiaoVuVisible;
         public bool IsNotGiaoVuVisible
         {
             get => _isNotGiaoVuVisible;
-            set
-            {
-                _isNotGiaoVuVisible = value;
-                OnPropertyChanged();
-            }
+            set => SetProperty(ref _isNotGiaoVuVisible, value);
         }
 
         public bool Isloaded { get; set; } = false;
 
-        // Bộ sưu tập các vai trò để hiển thị lựa chọn
+
+        // Danh sách role dùng để chọn ban đầu
         public ObservableCollection<BeginViewModel> Roles { get; set; }
 
-        // Các role model để chọn
         public BeginViewModel StudentRole { get; set; }
         public BeginViewModel TeacherRole { get; set; }
         public BeginViewModel AdminRole { get; set; }
@@ -133,6 +117,7 @@ namespace QuanLyHocSinh.ViewModel
         #region Commands
 
         public ICommand LoadedWindowCommand { get; set; }
+
 
         // Commands điều hướng các ViewModel
         public ICommand ShowTrangChuCommand { get; set; }
@@ -153,19 +138,14 @@ namespace QuanLyHocSinh.ViewModel
 
         public MainViewModel()
         {
-            // Khởi tạo các vai trò cho lựa chọn
+            // Khởi tạo vai trò để hiển thị lựa chọn
             StudentRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/student_logo.png", "Học sinh");
             TeacherRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/teacher_logo.png", "Giáo viên");
-            AdminRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/admin_logo.png", "Giáo Vụ");
+            AdminRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/admin_logo.png", "Giáo vụ");
 
-            Roles = new ObservableCollection<BeginViewModel>
-            {
-                StudentRole,
-                TeacherRole,
-                AdminRole
-            };
+            Roles = new ObservableCollection<BeginViewModel> { StudentRole, TeacherRole, AdminRole };
 
-            // Gán ViewModel mặc định là Trang Chủ
+            // View mặc định
             CurrentView = new TrangChuViewModel(this);
 
             // Khởi tạo các command điều hướng ViewModel
@@ -180,14 +160,32 @@ namespace QuanLyHocSinh.ViewModel
 
             // Command xử lý chọn role để mở LoginWindow
             SelectRoleCommand = new RelayCommand<object>(
-                (parameter) => true,
-                (parameter) =>
+                parameter => parameter is BeginViewModel,
+                parameter =>
                 {
                     if (parameter is BeginViewModel selectedRole)
-                    {
                         OpenLoginWindow(selectedRole.RoleName);
-                    }
                 });
+        }
+
+        #endregion
+
+        #region Navigation Methods
+
+        private Stack<BaseViewModel> _navigationStack = new Stack<BaseViewModel>();
+
+        public void NavigateTo(BaseViewModel viewModel)
+        {
+            _navigationStack.Push(CurrentView);
+            CurrentView = viewModel;
+        }
+
+        public void NavigateBack()
+        {
+            if (_navigationStack.Count > 0)
+                CurrentView = _navigationStack.Pop();
+            else
+                CurrentView = new TrangChuViewModel(this);
         }
 
         #endregion
@@ -197,28 +195,15 @@ namespace QuanLyHocSinh.ViewModel
         /// <summary>
         /// Mở cửa sổ đăng nhập tương ứng với role được chọn
         /// </summary>
-        /// <param name="roleName">Tên vai trò (Học sinh, Giáo viên, Giáo vụ)</param>
         private void OpenLoginWindow(string roleName)
         {
-            var loginVM = new LoginViewModel
-            {
-                SelectedRole = roleName
-            };
+            var loginVM = new LoginViewModel { SelectedRole = roleName };
+            var loginWindow = new LoginWindow { DataContext = loginVM };
 
-            var loginWindow = new LoginWindow
-            {
-                DataContext = loginVM
-            };
-
-            // Hiệu ứng FadeIn khi loginWindow được load
-            loginWindow.Loaded += (s, e) =>
-            {
-                WindowAnimationHelper.FadeIn(loginWindow);
-            };
-
+            loginWindow.Loaded += (_, _) => WindowAnimationHelper.FadeIn(loginWindow);
             loginWindow.Show();
 
-            // Thu nhỏ và đóng BeginWindow (nếu có)
+            // Đóng BeginWindow (nếu có)
             foreach (Window window in Application.Current.Windows)
             {
                 if (window is BeginWindow beginWindow)
@@ -228,37 +213,31 @@ namespace QuanLyHocSinh.ViewModel
                 }
             }
 
-            // Xử lý sự kiện đăng nhập thành công
-            loginVM.LoginSuccess += (s, user) =>
+            // Khi đăng nhập thành công
+            loginVM.LoginSuccess += (_, user) =>
             {
-                // Lấy MainVM từ Resources của ứng dụng
                 if (Application.Current.Resources["MainVM"] is MainViewModel mainVM)
                 {
                     mainVM.CurrentUser = user;
                     mainVM.CurrentView = new TrangChuViewModel(mainVM);
 
-                    // Mở MainWindow
                     var mainWindow = new MainWindow();
                     mainWindow.Show();
 
-                    // Đóng loginWindow
                     loginWindow.Close();
                 }
             };
         }
 
         /// <summary>
-        /// Hỗ trợ gọi OnPropertyChanged
+        /// Hỗ trợ cập nhật property và thông báo thay đổi
         /// </summary>
-        protected bool SetProperty<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null)
+        protected bool SetProperty<T>(ref T field, T newValue, [CallerMemberName] string propertyName = "")
         {
-            if (!Equals(field, newValue))
-            {
-                field = newValue;
-                OnPropertyChanged(propertyName);
-                return true;
-            }
-            return false;
+            if (Equals(field, newValue)) return false;
+            field = newValue;
+            OnPropertyChanged(propertyName);
+            return true;
         }
 
         #endregion
