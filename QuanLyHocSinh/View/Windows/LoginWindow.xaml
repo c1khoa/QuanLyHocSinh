@@ -67,15 +67,40 @@
                              materialDesign:HintAssist.Hint="Tên đăng nhập"
                              Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
                 </Grid>
-                <Grid Grid.Row="2" 
-                      VerticalAlignment="Center" 
-                      Margin="100, 0, 100, 0">
-                    <PasswordBox x:Name="passwordfield"
+                <Grid Grid.Row="2" Margin="100,0,50,0" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- PasswordBox -->
+                    <PasswordBox x:Name="passwordBox"
+                                 Grid.Column="0"
+                                 Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
                                  materialDesign:HintAssist.Hint="Mật khẩu"
-                                 Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" 
                                  helpers:PasswordHelper.BindPassword="True"
-                                 helpers:PasswordHelper.BoundPassword="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                 helpers:PasswordHelper.BoundPassword="{Binding Password, Mode=TwoWay}"
+                                 Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter},ConverterParameter=True}" />
+
+                    <!-- TextBox để hiện mật khẩu -->
+                    <TextBox x:Name="plainTextPasswordBox"
+                             Grid.Column="0"
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             materialDesign:HintAssist.Hint="Mật khẩu"
+                             Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}"
+                             Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <!-- ToggleButton hiện/ẩn -->
+                    <ToggleButton Grid.Column="1"
+                                  VerticalAlignment="Center"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  IsChecked="{Binding IsPasswordVisible, Mode=TwoWay}"
+                                  ToolTip="Hiện/Ẩn mật khẩu">
+                    </ToggleButton>
                 </Grid>
+
+
                 <Grid Grid.Row="3" 
                       VerticalAlignment="Center" 
                       Margin="100, 0, 100, 0">
