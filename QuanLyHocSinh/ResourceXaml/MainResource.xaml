@@ -62,7 +62,7 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanThemViewModel}">
-            <viewqltk:QuanLyTaiKhoanThemUC/>
+        <viewqltk:QuanLyTaiKhoanThemUC/> 
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanCaNhanViewModel}">

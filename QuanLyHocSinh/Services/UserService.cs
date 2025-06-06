@@ -2,12 +2,13 @@ using QuanLyHocSinh.Model.Entities;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System;
+using System.Configuration;
 
 namespace QuanLyHocSinh.Service
 {
     public static class UserService
     {
-        private static readonly string connectionString = "server=localhost;user=root;password=221005;database=quanlyhocsinh;";
+        public static string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
 
         // Lấy danh sách tài khoản từ DB
         public static List<User> LayDanhSachTaiKhoan()

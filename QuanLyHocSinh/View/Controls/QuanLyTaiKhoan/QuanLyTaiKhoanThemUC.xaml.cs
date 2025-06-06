@@ -1,29 +1,22 @@
-
 using QuanLyHocSinh.ViewModel;
 using QuanLyHocSinh.ViewModel.QuanLyTaiKhoan;
 using System.ComponentModel;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using MySql.Data.MySqlClient;
+using System.Configuration;
+
 namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
 {
     public partial class QuanLyTaiKhoanThemUC : UserControl
     {
+        // Chuỗi kết nối MySQL - thay your_password, your_database tương ứng
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
 
-        private string connectionString = "server=localhost;user=root;password=your_password;database=your_database;";
+        // Sự kiện báo đã thêm tài khoản thành công, để ViewModel hoặc MainWindow bắt
         public event EventHandler AccountAddedSuccessfully;
+
         public QuanLyTaiKhoanThemUC(MainViewModel mainVM)
         {
             if (mainVM == null)
@@ -33,13 +26,15 @@ namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
 
             InitializeComponent();
 
+            // Chỉ thiết lập DataContext khi không phải đang ở chế độ thiết kế (Designer)
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
                 DataContext = new QuanLyTaiKhoanThemViewModel(mainVM);
             }
         }
 
-        public void UpdatePassword()
+        // Cập nhật mật khẩu từ PasswordBox vào ViewModel mỗi khi mật khẩu thay đổi
+        private void UpdatePassword()
         {
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
@@ -50,51 +45,65 @@ namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
             }
         }
 
-        public void txtUserPassWord_PasswordChanged(object sender, RoutedEventArgs e)
+        // Bắt sự kiện khi PasswordBox bị thay đổi mật khẩu, cập nhật ViewModel
+        private void txtUserPassWord_PasswordChanged(object sender, RoutedEventArgs e)
         {
+            // Đồng bộ mật khẩu khi đang ở chế độ hiện text mật khẩu
+            if (txtUserPassWordVisible.Visibility == Visibility.Visible)
+            {
+                txtUserPassWordVisible.Text = txtUserPassWord.Password;
+            }
             UpdatePassword();
         }
 
-        public void btnShowHidePassword_Checked(object sender, RoutedEventArgs e)
+        // Sự kiện Checked của checkbox (hoặc toggle button) để hiển thị mật khẩu dạng text
+        private void btnShowHidePassword_Checked(object sender, RoutedEventArgs e)
         {
-            if (txtUserPassWord != null && txtUserPassWordVisible != null)
-            {
-                txtUserPassWord.Visibility = Visibility.Collapsed;
-                txtUserPassWordVisible.Visibility = Visibility.Visible;
-                txtUserPassWordVisible.Text = txtUserPassWord.Password;
-            }
+            // Thay đổi icon mắt thành "EyeOff" (ẩn mật khẩu)
+            EyeIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.EyeOff;
+
+            // Hiển thị TextBox (hiện mật khẩu dạng text)
+            txtUserPassWordVisible.Visibility = Visibility.Visible;
+            txtUserPassWord.Visibility = Visibility.Collapsed;
+
+            // Đồng bộ mật khẩu từ PasswordBox sang TextBox
+            txtUserPassWordVisible.Text = txtUserPassWord.Password;
         }
 
-        public void btnShowHidePassword_Unchecked(object sender, RoutedEventArgs e)
+        // Sự kiện Unchecked của checkbox để ẩn mật khẩu (hiển thị dấu chấm)
+        private void btnShowHidePassword_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (txtUserPassWord != null && txtUserPassWordVisible != null)
+            // Thay đổi icon mắt thành "Eye" (hiện mật khẩu)
+            EyeIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.Eye;
+
+            // Ẩn TextBox, hiển thị PasswordBox
+            txtUserPassWordVisible.Visibility = Visibility.Collapsed;
+            txtUserPassWord.Visibility = Visibility.Visible;
+
+            // Đồng bộ mật khẩu từ TextBox sang PasswordBox
+            txtUserPassWord.Password = txtUserPassWordVisible.Text;
+        }
+
+        // Khi TextBox hiển thị mật khẩu được thay đổi nội dung
+        private void txtUserPassWordVisible_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (txtUserPassWordVisible.Visibility == Visibility.Visible)
             {
-                txtUserPassWord.Visibility = Visibility.Visible;
-                txtUserPassWordVisible.Visibility = Visibility.Collapsed;
+                // Cập nhật mật khẩu trong PasswordBox theo TextBox
                 txtUserPassWord.Password = txtUserPassWordVisible.Text;
-                UpdatePassword();
             }
         }
 
-        public void txtUserPassWordVisible_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (txtUserPassWord != null && txtUserPassWordVisible != null)
-            {
-                txtUserPassWord.Password = txtUserPassWordVisible.Text;
-                UpdatePassword();
-            }
-        }
-
+        // Xử lý sự kiện khi người dùng click nút thêm tài khoản
         private void ADD_ACCOUNT(object sender, RoutedEventArgs e)
         {
-
             string userId = txtUserID.Text.Trim();
             string hoTen = txtUserName.Text.Trim();
             string tenDangNhap = txtUserLogin.Text.Trim();
             string matKhau = txtUserPassWord.Password;
             string vaiTro = (txtUserFunction.SelectedItem as ComboBoxItem)?.Content.ToString();
 
-
+            // Kiểm tra nhập liệu bắt buộc
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(hoTen) ||
                 string.IsNullOrEmpty(tenDangNhap) || string.IsNullOrEmpty(matKhau) ||
                 string.IsNullOrEmpty(vaiTro))
@@ -109,11 +118,13 @@ namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
                 {
                     conn.Open();
 
+                    // Câu lệnh INSERT tài khoản mới
                     string query = "INSERT INTO users (UserID, HoTen, TenDangNhap, MatKhau, VaiTro) " +
                                    "VALUES (@UserID, @HoTen, @TenDangNhap, @MatKhau, @VaiTro)";
 
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
+                        // Truyền tham số để tránh SQL Injection
                         cmd.Parameters.AddWithValue("@UserID", userId);
                         cmd.Parameters.AddWithValue("@HoTen", hoTen);
                         cmd.Parameters.AddWithValue("@TenDangNhap", tenDangNhap);
@@ -121,11 +132,15 @@ namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
                         cmd.Parameters.AddWithValue("@VaiTro", vaiTro);
 
                         int result = cmd.ExecuteNonQuery();
+
                         if (result > 0)
                         {
                             MessageBox.Show("Thêm tài khoản thành công!", "Thành công", MessageBoxButton.OK, MessageBoxImage.Information);
 
+                            // Kích hoạt sự kiện báo đã thêm thành công
                             AccountAddedSuccessfully?.Invoke(this, EventArgs.Empty);
+
+                            // Xóa trắng form nhập liệu
                             ClearForm();
                         }
                         else
@@ -140,6 +155,8 @@ namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
                 MessageBox.Show("Lỗi khi kết nối cơ sở dữ liệu:\n" + ex.Message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        // Xóa trắng form sau khi thêm tài khoản thành công
         private void ClearForm()
         {
             txtUserID.Text = "";
@@ -147,42 +164,6 @@ namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
             txtUserLogin.Text = "";
             txtUserPassWord.Password = "";
             txtUserFunction.SelectedIndex = -1;
-        }
-        private void btnShowHidePassword_Checked(object sender, RoutedEventArgs e)
-        {
-       
-            EyeIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.EyeOff;
-
-            txtUserPassWordVisible.Visibility = Visibility.Visible;
-            txtUserPassWord.Visibility = Visibility.Collapsed;
-
-            txtUserPassWordVisible.Text = txtUserPassWord.Password;
-        }
-
-        private void btnShowHidePassword_Unchecked(object sender, RoutedEventArgs e)
-        {
-            EyeIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.Eye;
-
-            txtUserPassWordVisible.Visibility = Visibility.Collapsed;
-            txtUserPassWord.Visibility = Visibility.Visible;
-
-            txtUserPassWord.Password = txtUserPassWordVisible.Text;
-        }
-        private void txtUserPassWordVisible_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            if (txtUserPassWordVisible.Visibility == Visibility.Visible)
-            {
-                txtUserPassWord.Password = txtUserPassWordVisible.Text;
-            }
-        }
-
-
-        private void txtUserPassWord_PasswordChanged(object sender, RoutedEventArgs e)
-        {
-            if (txtUserPassWordVisible.Visibility == Visibility.Visible)
-            {
-                txtUserPassWordVisible.Text = txtUserPassWord.Password;
-            }
         }
     }
 }
