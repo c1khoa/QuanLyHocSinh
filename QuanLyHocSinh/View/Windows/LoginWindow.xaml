@@ -173,7 +173,7 @@
 
                 <Border Style="{StaticResource ImageBorderStyle}" 
                             Grid.Row="3" 
-                                Background="#F08080"
+                            Background="#F08080"
                       VerticalAlignment="Bottom" 
                       Margin="80 0 80 10">
                     <Button Command="{Binding LoginExitCommand}" 

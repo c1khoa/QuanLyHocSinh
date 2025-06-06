@@ -115,7 +115,7 @@ namespace QuanLyHocSinh.ViewModel
         #endregion
 
         #region Commands
-
+        public ICommand LoginExitCommand { get; set; }
         public ICommand LoadedWindowCommand { get; set; }
 
 
@@ -144,6 +144,32 @@ namespace QuanLyHocSinh.ViewModel
             AdminRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/admin_logo.png", "Giáo vụ");
 
             Roles = new ObservableCollection<BeginViewModel> { StudentRole, TeacherRole, AdminRole };
+            LoginExitCommand = new RelayCommand<object>(
+    (p) => true,
+    (p) =>
+    {
+        // Tìm MainWindow hiện tại (có thể đặt tên class là MainWindow)
+        Window mainWindow = null;
+        foreach (Window window in Application.Current.Windows)
+        {
+            if (window is MainWindow mw)
+            {
+                mainWindow = mw;
+                break;
+            }
+        }
+
+        // Mở BeginWindow trước khi đóng MainWindow
+        var beginWindow = new BeginWindow();
+        beginWindow.Show();
+
+        // Nếu có animation chuyển tiếp, gọi trước khi đóng
+        _ = WindowAnimationHelper.FadeInAsync(beginWindow);
+
+        // Đóng MainWindow
+        mainWindow?.Close();
+    });
+
 
             // View mặc định
             CurrentView = new TrangChuViewModel(this);
