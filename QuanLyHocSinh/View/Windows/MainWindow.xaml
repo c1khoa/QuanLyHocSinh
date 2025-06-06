@@ -189,7 +189,6 @@
                         <StackPanel HorizontalAlignment="Left">
                             
                             <Button Command="{Binding ShowThongTinHocSinhCommand}"
-                                    Visibility="{Binding IsNotHocSinhVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     Background="Transparent" 
                                     BorderThickness="0" 
                                     Padding="0"

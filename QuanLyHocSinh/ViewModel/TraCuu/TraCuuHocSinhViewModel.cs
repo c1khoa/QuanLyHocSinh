@@ -9,6 +9,7 @@ using System.Windows.Input;
 using QuanLyHocSinh.Model.Entities;
 using QuanLyHocSinh.View.Dialogs;
 using System.Configuration;
+using QuanLyHocSinh.ViewModel;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
