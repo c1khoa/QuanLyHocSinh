@@ -16,21 +16,16 @@ namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
 
         // Sự kiện báo đã thêm tài khoản thành công, để ViewModel hoặc MainWindow bắt
         public event EventHandler AccountAddedSuccessfully;
+        public QuanLyTaiKhoanThemUC() : this(null) { }
 
         public QuanLyTaiKhoanThemUC(MainViewModel mainVM)
         {
-            if (mainVM == null)
-            {
-                throw new ArgumentNullException(nameof(mainVM));
-            }
+            if (mainVM != null)
+                DataContext = new QuanLyTaiKhoanThemViewModel(mainVM);
+            else
+                DataContext = new QuanLyTaiKhoanThemViewModel(new MainViewModel()); // hoặc xử lý null phù hợp
 
             InitializeComponent();
-
-            // Chỉ thiết lập DataContext khi không phải đang ở chế độ thiết kế (Designer)
-            if (!DesignerProperties.GetIsInDesignMode(this))
-            {
-                DataContext = new QuanLyTaiKhoanThemViewModel(mainVM);
-            }
         }
 
         // Cập nhật mật khẩu từ PasswordBox vào ViewModel mỗi khi mật khẩu thay đổi

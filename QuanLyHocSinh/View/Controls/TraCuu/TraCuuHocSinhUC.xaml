@@ -131,10 +131,12 @@
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                     <Button Style="{StaticResource MaterialDesignToolButton}"
+
                                             Background="Transparent" BorderThickness="0"
                                             Width="32" Height="32" Padding="0"
                                             Command="{Binding DataContext.XemBangDiemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                             CommandParameter="{Binding}"
+                                            Visibility="{Binding DataContext.IsNotHocSinhVisible, ElementName=main, Converter={StaticResource BooleanToVisibilityConverter}}"
                                             ToolTip="Xem bảng điểm">
                                         <materialDesign:PackIcon Kind="Eye" Width="22" Height="22" Foreground="#1976D2" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                     </Button>
@@ -142,6 +144,7 @@
                                             Background="Transparent" BorderThickness="0"
                                             Width="32" Height="32" Padding="0" Margin="8,0,0,0"
                                             Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            Visibility="{Binding DataContext.IsNotHocSinhVisible, ElementName=main, Converter={StaticResource BooleanToVisibilityConverter}}"
                                             ToolTip="Sửa thông tin học sinh">
                                         <materialDesign:PackIcon Kind="Pencil" Width="22" Height="22" Foreground="#0078D7" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                     </Button>
