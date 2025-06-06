@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,17 +12,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using QuanLyHocSinh.ViewModel.BaoCao;
+using QuanLyHocSinh.View.Dialogs;
 
 namespace QuanLyHocSinh.View.Controls.BaoCao
 {
-    /// <summary>
-    /// Interaction logic for TongKetNamUC.xaml
-    /// </summary>
     public partial class TongKetNamUC : UserControl
     {
         public TongKetNamUC()
         {
             InitializeComponent();
+            this.DataContext = new TongKetNamViewModel(null); // Truyền MainViewModel nếu cần
         }
     }
 }

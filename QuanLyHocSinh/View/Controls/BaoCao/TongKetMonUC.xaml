@@ -82,7 +82,14 @@
         <!-- Bảng dữ liệu -->
         <DataGrid Grid.Row="2" 
                   ItemsSource="{Binding DanhSachTongKetMon}" 
-                  Style="{StaticResource CommonDataGridStyle}">
+                  Style="{StaticResource CommonDataGridStyle}"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ScrollViewer.CanContentScroll="True"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
+                  EnableRowVirtualization="True"
+                  EnableColumnVirtualization="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="STT" 
                                   Binding="{Binding STT}" 

@@ -77,10 +77,6 @@
             <viewtc:TraCuuGiaoVienUC />
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type vmTraCuu:TraCuuDiemHocSinhViewModel}">
-            <viewtc:TraCuuDiemHocSinhUC />
-        </DataTemplate>
-
         <DataTemplate DataType="{x:Type vmBaoCao:TongKetMonViewModel}">
             <viewbc:TongKetMonUC />
         </DataTemplate>

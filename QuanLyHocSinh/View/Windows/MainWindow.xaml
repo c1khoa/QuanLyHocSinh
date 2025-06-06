@@ -174,24 +174,6 @@
                         </Expander.Header>
                         <StackPanel HorizontalAlignment="Left">
                             
-                            <Button Command="{Binding ShowDiemHocSinhCommand}"
-                                    Background="Transparent" 
-                                    BorderThickness="0" 
-                                    Padding="0"
-                                    Foreground="Black"
-                                    FontWeight="Regular"
-                                    Content="Điểm học sinh"
-                                    HorizontalAlignment="Left"
-                                    Margin="50 10 0 10">
-                                <Button.Triggers>
-                                    <EventTrigger RoutedEvent="Button.Click">
-                                        <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
-                                    </EventTrigger>
-                                </Button.Triggers>
-                            </Button>
-
-                    
-                        
                             <Button Command="{Binding ShowThongTinHocSinhCommand}"
                                     Visibility="{Binding IsNotHocSinhVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     Background="Transparent" 

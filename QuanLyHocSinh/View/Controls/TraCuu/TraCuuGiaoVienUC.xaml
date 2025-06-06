@@ -14,7 +14,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -89,7 +88,14 @@
         <DataGrid Grid.Row="2"
                   ItemsSource="{Binding DanhSachGiaoVien}"
                   Style="{StaticResource CommonDataGridStyle}"
-                  SelectedItem="{Binding SelectedGiaoVien, Mode=TwoWay}">
+                  SelectedItem="{Binding SelectedGiaoVien, Mode=TwoWay}"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ScrollViewer.CanContentScroll="True"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
+                  EnableRowVirtualization="True"
+                  EnableColumnVirtualization="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Mã GV" 
                                   Binding="{Binding MaGV}" 
@@ -124,7 +130,6 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource MaterialDesignFlatButton}"
-                                    Visibility="{Binding DataContext.IsGiaoVuVisible, ElementName=main, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                     ToolTip="Sửa thông tin giáo viên">
                                 <materialDesign:PackIcon Kind="Pencil" Foreground="#0078D7"/>
