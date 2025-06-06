@@ -14,13 +14,12 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Tiêu đề -->
+
         <TextBlock Grid.Row="0" Text="Danh Sách Quy Định" 
                    FontSize="28" FontWeight="Bold" 
                    Foreground="#333"
                    HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
-        <!-- DataGrid danh sách quy định -->
         <DataGrid Grid.Row="1" 
                   ItemsSource="{Binding Regulations}" 
                   SelectedItem="{Binding SelectedRegulation}" 
@@ -61,7 +60,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <!-- Khu vực thêm quy định -->
+    
         <Border Grid.Row="2" Background="White" Padding="15" CornerRadius="10" BorderBrush="#DDD" BorderThickness="1">
             <StackPanel>
                 <TextBlock Text="Thêm Quy Định Mới" FontSize="20" FontWeight="SemiBold" Foreground="#222" Margin="0,0,0,15"/>
