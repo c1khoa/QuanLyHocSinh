@@ -1,9 +1,13 @@
-﻿using System;
+using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.View.Converters;
+using QuanLyHocSinh.View.Windows;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
+
 using QuanLyHocSinh.Model.Entities;
 using QuanLyHocSinh.View.Controls;
 using QuanLyHocSinh.View.Controls.BaoCao;
@@ -17,11 +21,15 @@ using QuanLyHocSinh.ViewModel.QuanLyTaiKhoan;
 using QuanLyHocSinh.ViewModel.QuyDinh;
 using QuanLyHocSinh.ViewModel.TraCuu;
 
+
 namespace QuanLyHocSinh.ViewModel
 {
     public class MainViewModel : BaseViewModel
     {
         #region Fields & Properties
+
+
+        private BaseViewModel _currentView = null!;
 
         // Các ViewModel con dùng cho điều hướng
         public TrangChuViewModel TrangChuVM { get; set; }
@@ -44,17 +52,15 @@ namespace QuanLyHocSinh.ViewModel
                 if (_currentView != value)
                 {
                     _currentView = value;
+                    
                     System.Diagnostics.Debug.WriteLine("CurrentView changed to: " + value?.GetType().Name);
                     OnPropertyChanged(nameof(CurrentView));
                 }
             }
         }
 
-        private User _currentUser;
-        /// <summary>
-        /// Người dùng đang đăng nhập
-        /// </summary>
-        public User CurrentUser
+        private User? _currentUser;
+        public User? CurrentUser
         {
             get => _currentUser;
             set
@@ -63,18 +69,20 @@ namespace QuanLyHocSinh.ViewModel
                 {
                     _currentUser = value;
                     OnPropertyChanged(nameof(CurrentUser));
-                    OnPropertyChanged(nameof(VaiTro));
 
                     var roleName = _currentUser?.VaiTro?.TenVaiTro?.Trim() ?? "null";
 
                     IsGiaoVuVisible = string.Equals(roleName, "Giáo vụ", StringComparison.OrdinalIgnoreCase);
-                    IsNotHocSinhVisible = _currentUser != null && !string.Equals(roleName, "Học sinh", StringComparison.OrdinalIgnoreCase);
-                    IsNotGiaoVuVisible = _currentUser != null && !string.Equals(roleName, "Giáo vụ", StringComparison.OrdinalIgnoreCase);
+                    IsNotHocSinhVisible = _currentUser != null &&
+                        !string.Equals(roleName, "Học sinh", StringComparison.OrdinalIgnoreCase);
+                    IsNotGiaoVuVisible = _currentUser != null &&
+                        !string.Equals(roleName, "Giáo vụ", StringComparison.OrdinalIgnoreCase);
                 }
             }
         }
 
-        private string _selectedRole;
+        private string _selectedRole = string.Empty;
+
         public string SelectedRole
         {
             get => _selectedRole;
@@ -85,15 +93,20 @@ namespace QuanLyHocSinh.ViewModel
             }
         }
 
+
         // Các cờ điều khiển hiển thị UI theo vai trò người dùng
+
         private bool _isGiaoVuVisible;
         public bool IsGiaoVuVisible
         {
             get => _isGiaoVuVisible;
             set
             {
-                _isGiaoVuVisible = value;
-                OnPropertyChanged();
+                if (_isGiaoVuVisible != value)
+                {
+                    _isGiaoVuVisible = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -103,8 +116,12 @@ namespace QuanLyHocSinh.ViewModel
             get => _isNotHocSinhVisible;
             set
             {
-                _isNotHocSinhVisible = value;
-                OnPropertyChanged();
+
+                if (_isNotHocSinhVisible != value)
+                {
+                    _isNotHocSinhVisible = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -114,10 +131,12 @@ namespace QuanLyHocSinh.ViewModel
             get => _isNotGiaoVuVisible;
             set
             {
-                _isNotGiaoVuVisible = value;
-                OnPropertyChanged();
+                if (_isNotGiaoVuVisible != value)
+                {
+                    _isNotGiaoVuVisible = value;
+                    OnPropertyChanged();
+                }
             }
-        }
 
         public bool Isloaded { get; set; } = false;
 
@@ -128,27 +147,21 @@ namespace QuanLyHocSinh.ViewModel
         public BeginViewModel StudentRole { get; set; }
         public BeginViewModel TeacherRole { get; set; }
         public BeginViewModel AdminRole { get; set; }
-
         #endregion
 
         #region Commands
-
         public ICommand LoadedWindowCommand { get; set; }
 
-        // Commands điều hướng các ViewModel
-        public ICommand ShowTrangChuCommand { get; set; }
-        public ICommand ShowTaiKhoanCaNhanCommand { get; set; }
-        public ICommand ShowQuanLyTaiKhoanCommand { get; set; }
-        public ICommand ShowThongTinHocSinhCommand { get; set; }
-        public ICommand ShowThongTinGiaoVienCommand { get; set; }
-        public ICommand ShowDiemHocSinhCommand { get; set; }
-        public ICommand ShowTongKetMonCommand { get; set; }
-
-        public ICommand ShowTongKetNamCommand { get; set; }
-        public ICommand ShowQuyDinhCommand { get; set; }
-
-        // Command chọn vai trò mở LoginWindow
-        public ICommand SelectRoleCommand { get; set; }
+        public ICommand ShowTrangChuCommand { get; }
+        public ICommand ShowTaiKhoanCaNhanCommand { get; }
+        public ICommand ShowQuanLyTaiKhoanCommand { get; }
+        public ICommand ShowThongTinHocSinhCommand { get; }
+        public ICommand ShowThongTinGiaoVienCommand { get; }
+        public ICommand ShowDiemHocSinhCommand { get; }
+        public ICommand ShowTongKetMonCommand { get; }
+        public ICommand ShowTongKetNamCommand { get; }
+        public ICommand ShowQuyDinhCommand { get; }
+        public ICommand SelectRoleCommand { get; }
 
         #endregion
 
@@ -156,7 +169,7 @@ namespace QuanLyHocSinh.ViewModel
 
         public MainViewModel()
         {
-            // Khởi tạo các vai trò cho lựa chọn
+            // Khởi tạo vai trò
             StudentRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/student_logo.png", "Học sinh");
             TeacherRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/teacher_logo.png", "Giáo viên");
             AdminRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/admin_logo.png", "Giáo Vụ");
@@ -168,24 +181,23 @@ namespace QuanLyHocSinh.ViewModel
                 AdminRole
             };
 
-            // Gán ViewModel mặc định là Trang Chủ
+            // View mặc định
             CurrentView = new TrangChuViewModel(this);
 
-            // Khởi tạo các command điều hướng ViewModel
-            ShowTrangChuCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TrangChuViewModel(this));
-            ShowQuanLyTaiKhoanCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuanLyTaiKhoanMainViewModel(this));
-            ShowTaiKhoanCaNhanCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuanLyTaiKhoanCaNhanViewModel(this));
-            ShowThongTinHocSinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuHocSinhViewModel(this));
-            ShowThongTinGiaoVienCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuGiaoVienViewModel(this));
-            ShowDiemHocSinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuDiemHocSinhViewModel(this));
-            ShowTongKetMonCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TongKetMonViewModel(this));
-            ShowTongKetNamCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TongKetNamViewModel(this));
-            ShowQuyDinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuyDinhMainViewModel(this));
+            // Command điều hướng
+            ShowTrangChuCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new TrangChuViewModel(this));
+            ShowQuanLyTaiKhoanCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new QuanLyTaiKhoanMainViewModel(this));
+            ShowTaiKhoanCaNhanCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new QuanLyTaiKhoanCaNhanViewModel(this));
+            ShowThongTinHocSinhCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new TraCuuHocSinhViewModel(this));
+            ShowThongTinGiaoVienCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new TraCuuGiaoVienViewModel(this));
+            ShowDiemHocSinhCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new TraCuuDiemHocSinhViewModel(this));
+            ShowTongKetMonCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new TongKetMonViewModel(this));
+            ShowTongKetNamCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new TongKetNamViewModel(this));
+            ShowQuyDinhCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new QuyDinhMainViewModel(this));
 
-            // Command xử lý chọn role để mở LoginWindow
             SelectRoleCommand = new RelayCommand<object>(
-                (parameter) => true,
-                (parameter) =>
+                parameter => parameter is BeginViewModel,
+                parameter =>
                 {
                     if (parameter is BeginViewModel selectedRole)
                     {
@@ -195,6 +207,31 @@ namespace QuanLyHocSinh.ViewModel
         }
 
         #endregion
+
+        #region Navigation Methods
+
+        private Stack<BaseViewModel> _navigationStack = new Stack<BaseViewModel>();
+
+        public void NavigateTo(BaseViewModel viewModel)
+        {
+            _navigationStack.Push(CurrentView);
+            CurrentView = viewModel;
+        }
+
+        public void NavigateBack()
+        {
+            if (_navigationStack.Count > 0)
+            {
+                CurrentView = _navigationStack.Pop();
+            }
+            else
+            {
+                CurrentView = new TrangChuViewModel(this);
+            }
+        }
+
+        #endregion
+
 
         #region Methods
 
@@ -256,15 +293,52 @@ namespace QuanLyHocSinh.ViewModel
         /// </summary>
         protected bool SetProperty<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null)
         {
-            if (!Equals(field, newValue))
+            var loginVM = new LoginViewModel
             {
-                field = newValue;
-                OnPropertyChanged(propertyName);
-                return true;
+                SelectedRole = roleName
+            };
+
+            var loginWindow = new LoginWindow
+            {
+                DataContext = loginVM
+            };
+
+            loginWindow.Loaded += (_, _) => WindowAnimationHelper.FadeIn(loginWindow);
+            loginWindow.Show();
+
+            // Close BeginWindow if exists
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window is BeginWindow beginWindow)
+                {
+                    WindowAnimationHelper.FadeOut(beginWindow);
+                    break;
+                }
             }
-            return false;
+            // Handle login success
+            loginVM.LoginSuccess += (_, user) =>
+            {
+                if (Application.Current.Resources["MainVM"] is MainViewModel mainVM)
+                {
+                    mainVM.CurrentUser = user;
+                    mainVM.CurrentView = new TrangChuViewModel(mainVM);
+
+                    var mainWindow = new MainWindow();
+                    mainWindow.Show();
+
+                    loginWindow.Close();
+                }
+            };
         }
 
+        protected bool SetProperty<T>(ref T field, T newValue, [CallerMemberName] string propertyName = "")
+        {
+            if (Equals(field, newValue)) return false;
+
+            field = newValue;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
         #endregion
     }
 }
