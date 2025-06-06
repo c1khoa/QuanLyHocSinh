@@ -1,10 +1,6 @@
 using QuanLyHocSinh.Model.Entities;
 using QuanLyHocSinh.View.Converters;
 using QuanLyHocSinh.View.Windows;
-using QuanLyHocSinh.ViewModel.BaoCao;
-using QuanLyHocSinh.ViewModel.QuanLyTaiKhoan;
-using QuanLyHocSinh.ViewModel.QuyDinh;
-using QuanLyHocSinh.ViewModel.TraCuu;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -12,13 +8,42 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 
+using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.View.Controls;
+using QuanLyHocSinh.View.Controls.BaoCao;
+using QuanLyHocSinh.View.Controls.QuanLyTaiKhoan;
+using QuanLyHocSinh.View.Controls.QuyDinh;
+using QuanLyHocSinh.View.Controls.TraCuu;
+using QuanLyHocSinh.View.Converters;
+using QuanLyHocSinh.View.Windows;
+using QuanLyHocSinh.ViewModel.BaoCao;
+using QuanLyHocSinh.ViewModel.QuanLyTaiKhoan;
+using QuanLyHocSinh.ViewModel.QuyDinh;
+using QuanLyHocSinh.ViewModel.TraCuu;
+
+
 namespace QuanLyHocSinh.ViewModel
 {
     public class MainViewModel : BaseViewModel
     {
         #region Fields & Properties
 
+
         private BaseViewModel _currentView = null!;
+
+        // Các ViewModel con dùng cho điều hướng
+        public TrangChuViewModel TrangChuVM { get; set; }
+        public QuanLyTaiKhoanMainViewModel TaiKhoanVM { get; set; }
+        public TraCuuHocSinhViewModel HocSinhVM { get; set; }
+        public TraCuuGiaoVienViewModel GiaoVienVM { get; set; }
+        public TraCuuDiemHocSinhViewModel DiemHocSinhVM { get; set; }
+        public TongKetMonViewModel TongKetMonVM { get; set; }
+        public QuyDinhMainViewModel QuyDinhVM { get; set; }
+
+        private BaseViewModel _currentView;
+        /// <summary>
+        /// ViewModel đang được hiển thị hiện tại
+        /// </summary>
         public BaseViewModel CurrentView
         {
             get => _currentView;
@@ -27,7 +52,8 @@ namespace QuanLyHocSinh.ViewModel
                 if (_currentView != value)
                 {
                     _currentView = value;
-                    System.Diagnostics.Debug.WriteLine($"CurrentView changed to: {value?.GetType().Name}");
+                    
+                    System.Diagnostics.Debug.WriteLine("CurrentView changed to: " + value?.GetType().Name);
                     OnPropertyChanged(nameof(CurrentView));
                 }
             }
@@ -56,6 +82,7 @@ namespace QuanLyHocSinh.ViewModel
         }
 
         private string _selectedRole = string.Empty;
+
         public string SelectedRole
         {
             get => _selectedRole;
@@ -65,6 +92,9 @@ namespace QuanLyHocSinh.ViewModel
                 OnPropertyChanged();
             }
         }
+
+
+        // Các cờ điều khiển hiển thị UI theo vai trò người dùng
 
         private bool _isGiaoVuVisible;
         public bool IsGiaoVuVisible
@@ -86,6 +116,7 @@ namespace QuanLyHocSinh.ViewModel
             get => _isNotHocSinhVisible;
             set
             {
+
                 if (_isNotHocSinhVisible != value)
                 {
                     _isNotHocSinhVisible = value;
@@ -106,21 +137,22 @@ namespace QuanLyHocSinh.ViewModel
                     OnPropertyChanged();
                 }
             }
-        }
 
-        public bool IsLoaded { get; set; }
+        public bool Isloaded { get; set; } = false;
 
-        public ObservableCollection<BeginViewModel> Roles { get; }
+        // Bộ sưu tập các vai trò để hiển thị lựa chọn
+        public ObservableCollection<BeginViewModel> Roles { get; set; }
 
-        public BeginViewModel StudentRole { get; }
-        public BeginViewModel TeacherRole { get; }
-        public BeginViewModel AdminRole { get; }
-
+        // Các role model để chọn
+        public BeginViewModel StudentRole { get; set; }
+        public BeginViewModel TeacherRole { get; set; }
+        public BeginViewModel AdminRole { get; set; }
         #endregion
 
         #region Commands
+        public ICommand LoadedWindowCommand { get; set; }
 
-        public ICommand ShowTrangChuCommand { get;  }
+        public ICommand ShowTrangChuCommand { get; }
         public ICommand ShowTaiKhoanCaNhanCommand { get; }
         public ICommand ShowQuanLyTaiKhoanCommand { get; }
         public ICommand ShowThongTinHocSinhCommand { get; }
@@ -137,18 +169,10 @@ namespace QuanLyHocSinh.ViewModel
 
         public MainViewModel()
         {
-            // Initialize roles
-            StudentRole = new BeginViewModel(
-                "pack://application:,,,/QuanLyHocSinh;component/Images/student_logo.png",
-                "Học sinh");
-
-            TeacherRole = new BeginViewModel(
-                "pack://application:,,,/QuanLyHocSinh;component/Images/teacher_logo.png",
-                "Giáo viên");
-
-            AdminRole = new BeginViewModel(
-                "pack://application:,,,/QuanLyHocSinh;component/Images/admin_logo.png",
-                "Giáo Vụ");
+            // Khởi tạo vai trò
+            StudentRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/student_logo.png", "Học sinh");
+            TeacherRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/teacher_logo.png", "Giáo viên");
+            AdminRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/admin_logo.png", "Giáo Vụ");
 
             Roles = new ObservableCollection<BeginViewModel>
             {
@@ -157,45 +181,19 @@ namespace QuanLyHocSinh.ViewModel
                 AdminRole
             };
 
-            // Initialize CurrentView
+            // View mặc định
             CurrentView = new TrangChuViewModel(this);
 
-            // Initialize commands
-            ShowTrangChuCommand = new RelayCommand<object>(
-                _ => true,
-                _ => CurrentView = new TrangChuViewModel(this));
-
-            ShowQuanLyTaiKhoanCommand = new RelayCommand<object>(
-                _ => true,
-                _ => CurrentView = new QuanLyTaiKhoanMainViewModel(this));
-
-            ShowTaiKhoanCaNhanCommand = new RelayCommand<object>(
-                _ => true,
-                _ => CurrentView = new QuanLyTaiKhoanCaNhanViewModel(this));
-
-            ShowThongTinHocSinhCommand = new RelayCommand<object>(
-                _ => true,
-                _ => CurrentView = new TraCuuHocSinhViewModel(this));
-
-            ShowThongTinGiaoVienCommand = new RelayCommand<object>(
-                _ => true,
-                _ => CurrentView = new TraCuuGiaoVienViewModel(this));
-
-            ShowDiemHocSinhCommand = new RelayCommand<object>(
-                _ => true,
-                _ => CurrentView = new TraCuuDiemHocSinhViewModel(this));
-
-            ShowTongKetMonCommand = new RelayCommand<object>(
-                _ => true,
-                _ => CurrentView = new TongKetMonViewModel(this));
-
-            ShowTongKetNamCommand = new RelayCommand<object>(
-                _ => true,
-                _ => CurrentView = new TongKetNamViewModel(this));
-
-            ShowQuyDinhCommand = new RelayCommand<object>(
-                _ => true,
-                _ => CurrentView = new QuyDinhMainViewModel(this));
+            // Command điều hướng
+            ShowTrangChuCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new TrangChuViewModel(this));
+            ShowQuanLyTaiKhoanCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new QuanLyTaiKhoanMainViewModel(this));
+            ShowTaiKhoanCaNhanCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new QuanLyTaiKhoanCaNhanViewModel(this));
+            ShowThongTinHocSinhCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new TraCuuHocSinhViewModel(this));
+            ShowThongTinGiaoVienCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new TraCuuGiaoVienViewModel(this));
+            ShowDiemHocSinhCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new TraCuuDiemHocSinhViewModel(this));
+            ShowTongKetMonCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new TongKetMonViewModel(this));
+            ShowTongKetNamCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new TongKetNamViewModel(this));
+            ShowQuyDinhCommand = new RelayCommand<object>(_ => true, _ => CurrentView = new QuyDinhMainViewModel(this));
 
             SelectRoleCommand = new RelayCommand<object>(
                 parameter => parameter is BeginViewModel,
@@ -212,7 +210,6 @@ namespace QuanLyHocSinh.ViewModel
 
         #region Navigation Methods
 
-        // Bổ sung phương thức điều hướng quay lại
         private Stack<BaseViewModel> _navigationStack = new Stack<BaseViewModel>();
 
         public void NavigateTo(BaseViewModel viewModel)
@@ -232,11 +229,69 @@ namespace QuanLyHocSinh.ViewModel
                 CurrentView = new TrangChuViewModel(this);
             }
         }
+
         #endregion
+
 
         #region Methods
 
+        /// <summary>
+        /// Mở cửa sổ đăng nhập tương ứng với role được chọn
+        /// </summary>
+        /// <param name="roleName">Tên vai trò (Học sinh, Giáo viên, Giáo vụ)</param>
         private void OpenLoginWindow(string roleName)
+        {
+            var loginVM = new LoginViewModel
+            {
+                SelectedRole = roleName
+            };
+
+            var loginWindow = new LoginWindow
+            {
+                DataContext = loginVM
+            };
+
+            // Hiệu ứng FadeIn khi loginWindow được load
+            loginWindow.Loaded += (s, e) =>
+            {
+                WindowAnimationHelper.FadeIn(loginWindow);
+            };
+
+            loginWindow.Show();
+
+            // Thu nhỏ và đóng BeginWindow (nếu có)
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window is BeginWindow beginWindow)
+                {
+                    WindowAnimationHelper.FadeOut(beginWindow);
+                    break;
+                }
+            }
+
+            // Xử lý sự kiện đăng nhập thành công
+            loginVM.LoginSuccess += (s, user) =>
+            {
+                // Lấy MainVM từ Resources của ứng dụng
+                if (Application.Current.Resources["MainVM"] is MainViewModel mainVM)
+                {
+                    mainVM.CurrentUser = user;
+                    mainVM.CurrentView = new TrangChuViewModel(mainVM);
+
+                    // Mở MainWindow
+                    var mainWindow = new MainWindow();
+                    mainWindow.Show();
+
+                    // Đóng loginWindow
+                    loginWindow.Close();
+                }
+            };
+        }
+
+        /// <summary>
+        /// Hỗ trợ gọi OnPropertyChanged
+        /// </summary>
+        protected bool SetProperty<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null)
         {
             var loginVM = new LoginViewModel
             {
@@ -260,7 +315,6 @@ namespace QuanLyHocSinh.ViewModel
                     break;
                 }
             }
-
             // Handle login success
             loginVM.LoginSuccess += (_, user) =>
             {
@@ -285,7 +339,6 @@ namespace QuanLyHocSinh.ViewModel
             OnPropertyChanged(propertyName);
             return true;
         }
-
         #endregion
     }
 }

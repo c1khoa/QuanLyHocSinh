@@ -4,7 +4,7 @@ using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
 using System.Configuration;
 
-public class DiemDAL
+public class DiemDAL : BaseDAL
 {
     public static List<Diem> GetAllDiemHocSinh()
     {

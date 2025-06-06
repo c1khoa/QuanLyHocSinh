@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuanLyHocSinh.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,17 +11,17 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace QuanLyHocSinh.View.Controls.BaoCao
+namespace QuanLyHocSinh.View.Windows
 {
     /// <summary>
-    /// Interaction logic for TongKetNamHoc.xaml
+    /// Interaction logic for BeginWindow.xaml
     /// </summary>
-    public partial class TongKetNamHocUC : UserControl
+    public partial class BeginWindow : Window
     {
-        public TongKetNamHocUC()
+
+        public BeginWindow()
         {
             InitializeComponent();
         }

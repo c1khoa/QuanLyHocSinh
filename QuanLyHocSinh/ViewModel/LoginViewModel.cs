@@ -1,90 +1,142 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿// Namespace hệ thống
+using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using System.Configuration;
 using System.Windows;
 using System.Windows.Input;
-using QuanLyHocSinh.View.Windows;
-using QuanLyHocSinh.Model.Entities;
-using System.Configuration;
+
+// Thư viện bên thứ ba
 using MySql.Data.MySqlClient;
+
+// Namespace nội bộ (project)
+using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.View.Converters;
+using QuanLyHocSinh.View.Windows;
 
 namespace QuanLyHocSinh.ViewModel
 {
     public class LoginViewModel : BaseViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        // Sự kiện thông báo đăng nhập thành công (nếu cần dùng)
         public event EventHandler<User> LoginSuccess;
-        public ICommand LoginExitCommand { get; set; }
 
+        // Thuộc tính bind với View: tên đăng nhập
         private string _username;
-        private string _password;
-        private string _selectedRole;
-
         public string Username
         {
             get => _username;
             set { _username = value; OnPropertyChanged(); }
         }
 
+        // Thuộc tính bind mật khẩu (chuỗi plain text)
+        private string _password;
         public string Password
         {
             get => _password;
             set { _password = value; OnPropertyChanged(); }
         }
 
+        // Thuộc tính bind hiện/ẩn mật khẩu (dùng để chuyển đổi Visibility giữa PasswordBox và TextBox)
+        private bool _isPasswordVisible;
+        public bool IsPasswordVisible
+        {
+            get => _isPasswordVisible;
+            set
+            {
+                if (_isPasswordVisible != value)
+                {
+                    _isPasswordVisible = value;
+                    OnPropertyChanged();
+
+                    // Cập nhật lại PasswordText (nếu bind thêm)
+                    OnPropertyChanged(nameof(PasswordText));
+                }
+            }
+        }
+
+        // Thuộc tính dùng để bind TextBox hiện mật khẩu (có thể dùng chung với Password)
+        public string PasswordText
+        {
+            get => Password;
+            set
+            {
+                Password = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // Thuộc tính bind vai trò đăng nhập được chọn
+        private string _selectedRole;
         public string SelectedRole
         {
             get => _selectedRole;
             set { _selectedRole = value; OnPropertyChanged(); }
         }
 
+        // Danh sách các vai trò để lựa chọn trong UI (ComboBox)
         public ObservableCollection<string> Roles { get; set; }
 
+        // ICommand cho nút đăng nhập
         public ICommand LoginCommand { get; set; }
-        public ICommand ExitCommand { get; set; }
 
+        // ICommand cho nút thoát
+        public ICommand LoginExitCommand { get; set; }
+
+        // Constructor
         public LoginViewModel()
         {
+            // Khởi tạo danh sách vai trò
             Roles = new ObservableCollection<string> { "Giáo vụ", "Giáo viên", "Học sinh" };
+
+            // Khởi tạo command đăng nhập, kiểm tra điều kiện
             LoginCommand = new RelayCommand<object>(
-                (p) => CanLogin(null),
-                (p) => Login(null)
+                (p) => CanLogin(p),
+                (p) => Login(p)
             );
+
+            // Command thoát ứng dụng
             LoginExitCommand = new RelayCommand<object>(
-                (p) => true,              // Luôn luôn có thể bấm
-                (p) => Application.Current.Shutdown()  // Thực thi thoát app
+                (p) => true,
+                (p) => Application.Current.Shutdown()
             );
         }
+
+        /// <summary>
+        /// Kiểm tra điều kiện có thể đăng nhập: username, password, role không rỗng
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
         private bool CanLogin(object parameter)
         {
-            return !string.IsNullOrEmpty(Username) &&
-                   !string.IsNullOrEmpty(Password) &&
-                   !string.IsNullOrEmpty(SelectedRole);
+            return !string.IsNullOrEmpty(Username)
+                && !string.IsNullOrEmpty(Password)
+                && !string.IsNullOrEmpty(SelectedRole);
         }
 
-
-        private void Login(object parameter)
+        /// <summary>
+        /// Hàm xử lý đăng nhập bất đồng bộ, kết nối database MySQL kiểm tra thông tin người dùng
+        /// Nếu đúng sẽ mở MainWindow và đóng LoginWindow hiện tại
+        /// </summary>
+        /// <param name="parameter"></param>
+        private async void Login(object parameter)
         {
             string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
 
             string query = @"
-        SELECT nd.UserID, nd.TenDangNhap, nd.MatKhau, vt.TenVaiTro
-        FROM USERS nd
-        JOIN VAITRO vt ON nd.VaiTroID = vt.VaiTroID
-        WHERE nd.TenDangNhap = @Username AND nd.MatKhau = @Password AND vt.TenVaiTro = @Role
-    ";
+                SELECT nd.UserID, nd.TenDangNhap, nd.MatKhau, vt.TenVaiTro
+                FROM USERS nd
+                JOIN VAITRO vt ON nd.VaiTroID = vt.VaiTroID
+                WHERE nd.TenDangNhap = @Username 
+                  AND nd.MatKhau = @Password 
+                  AND vt.TenVaiTro = @Role
+            ";
 
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
                 using (var cmd = new MySqlCommand(query, conn))
                 {
+                    // Truyền tham số query tránh SQL Injection
                     cmd.Parameters.AddWithValue("@Username", Username);
                     cmd.Parameters.AddWithValue("@Password", Password);
                     cmd.Parameters.AddWithValue("@Role", SelectedRole);
@@ -93,7 +145,7 @@ namespace QuanLyHocSinh.ViewModel
                     {
                         if (reader.Read())
                         {
-                            // Tạo đối tượng người dùng (nếu có class User)
+                            // Tạo đối tượng người dùng từ dữ liệu DB
                             var user = new User
                             {
                                 UserID = reader["UserID"].ToString(),
@@ -105,54 +157,39 @@ namespace QuanLyHocSinh.ViewModel
                                 }
                             };
 
-                            // Mở MainWindow
+                            // Khởi tạo MainWindow với ViewModel có CurrentUser
                             var mainVM = new MainViewModel { CurrentUser = user };
                             var mainWindow = new MainWindow { DataContext = mainVM };
-                            mainWindow.Show();
 
-                            // Đóng LoginWindow hiện tại
+                            // Hiển thị mainWindow với animation (nếu có)
+                            await WindowAnimationHelper.FadeInAsync(mainWindow);
+
+                            // Tìm LoginWindow đang mở
+                            LoginWindow loginWindow = null;
                             foreach (Window window in Application.Current.Windows)
                             {
-                                if (window is LoginWindow)
+                                if (window is LoginWindow lw)
                                 {
-                                    window.Close();
+                                    loginWindow = lw;
                                     break;
                                 }
+                            }
+
+                            // Ẩn và đóng LoginWindow sau khi đăng nhập thành công
+                            if (loginWindow != null)
+                            {
+                                await WindowAnimationHelper.FadeOutAsync(loginWindow);
+                                loginWindow.Close();
                             }
                         }
                         else
                         {
+                            // Sai thông tin đăng nhập, hiển thị lỗi
                             MessageBox.Show("Sai thông tin đăng nhập!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
                 }
             }
         }
-
-
-        //private void Login(object parameter)
-        //{
-        //    if (Username == "admin" && Password == "123456" && SelectedRole == "Giáo vụ")
-        //    {
-        //        var user = new User
-        //        {
-        //            TenDangNhap = Username,
-        //            VaiTro = new VaiTro { TenVaiTro = SelectedRole }
-        //        };
-
-        //        LoginSuccess?.Invoke(this, user);
-        //    }
-        //    else
-        //    {
-        //        MessageBox.Show("Sai thông tin đăng nhập!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
-        //    }
-        //}
-
-
-
-
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
-

@@ -17,6 +17,9 @@
     <Compile Update="View\Controls\TraCuu\TraCuuDiemHocSinhUC.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="View\Windows\BeginWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="View\Windows\LoginWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -30,9 +33,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="View\Controls\BaoCao\TongKetMonUC.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="View\Controls\BaoCao\TongKetNamHocUC.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="View\Controls\TraCuu\TraCuuGiaoVienUC.xaml.cs">

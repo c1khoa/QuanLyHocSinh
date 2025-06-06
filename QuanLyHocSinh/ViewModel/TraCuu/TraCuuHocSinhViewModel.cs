@@ -91,6 +91,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         //Lệnh edit và filter
         public ICommand EditCommand { get; }
         public ICommand FilterCommand { get; }
+        public ICommand XemBangDiemCommand { get; }
 
         //Khởi tạo ViewModel
         private MainViewModel _mainVM;
@@ -117,6 +118,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             //Khởi tạo các lệnh
             EditCommand = new RelayCommand(EditHocSinh, () => SelectedHocSinh != null);
             FilterCommand = new RelayCommand(Filter);
+            XemBangDiemCommand = new RelayCommand<HocSinh>(XemBangDiem);
 
             // Mặc định chọn "Tất cả"
             SelectedLop = "Tất cả";
@@ -151,5 +153,15 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             }
         }
 
+        private void XemBangDiem(HocSinh hs)
+        {
+            if (hs == null) return;
+            // Lấy năm học và học kỳ hiện tại từ filter
+            string namHoc = SelectedNienKhoa != null && SelectedNienKhoa != "Tất cả" ? SelectedNienKhoa : null;
+            int? hocKy = null; // Nếu có filter học kỳ, truyền vào đây
+            var dialog = new QuanLyHocSinh.View.Dialogs.BangDiemHocSinh();
+            dialog.DataContext = new QuanLyHocSinh.ViewModel.TraCuu.TraCuuBangDiemHocSinhViewModel(hs, namHoc, hocKy);
+            dialog.ShowDialog();
+        }
     }
 }
