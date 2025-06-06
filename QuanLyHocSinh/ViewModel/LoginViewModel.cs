@@ -70,7 +70,26 @@ namespace QuanLyHocSinh.ViewModel
         public string SelectedRole
         {
             get => _selectedRole;
-            set { _selectedRole = value; OnPropertyChanged(); }
+            set
+            {
+                _selectedRole = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(RoleImagePath)); // để trigger cập nhật ảnh
+            }
+        }
+
+        public string RoleImagePath
+        {
+            get
+            {
+                return SelectedRole?.Trim() switch
+                {
+                    "Học sinh" => "pack://application:,,,/QuanLyHocSinh;component/Images/student_logo.png",
+                    "Giáo viên" => "pack://application:,,,/QuanLyHocSinh;component/Images/teacher_logo.png",
+                    "Giáo vụ" => "pack://application:,,,/QuanLyHocSinh;component/Images/admin_logo.png",
+                    _ => string.Empty
+                };
+            }
         }
 
         // Danh sách các vai trò để lựa chọn trong UI (ComboBox)
@@ -96,15 +115,37 @@ namespace QuanLyHocSinh.ViewModel
 
             // Command thoát ứng dụng
             LoginExitCommand = new RelayCommand<object>(
-                (p) => true,
-                (p) => Application.Current.Shutdown()
-            );
+    (p) => true,
+    (p) =>
+    {
+        // Tìm LoginWindow hiện tại
+        LoginWindow loginWindow = null;
+        foreach (Window window in Application.Current.Windows)
+        {
+            if (window is LoginWindow lw)
+            {
+                loginWindow = lw;
+                break;
+            }
+        }
+
+        // Mở BeginWindow trước khi đóng LoginWindow
+        var beginWindow = new BeginWindow();
+        beginWindow.Show(); // QUAN TRỌNG: phải gọi trước Close()
+
+        // Nếu có animation, có thể dùng async như sau:
+        _ = WindowAnimationHelper.FadeInAsync(beginWindow);
+
+        // Sau đó mới đóng LoginWindow
+        loginWindow?.Close();
+    }
+);
+
         }
 
         /// <summary>
         /// Kiểm tra điều kiện có thể đăng nhập: username, password, role không rỗng
         /// </summary>
-        /// <param name="parameter"></param>
         /// <returns></returns>
         private bool CanLogin(object parameter)
         {
@@ -117,7 +158,6 @@ namespace QuanLyHocSinh.ViewModel
         /// Hàm xử lý đăng nhập bất đồng bộ, kết nối database MySQL kiểm tra thông tin người dùng
         /// Nếu đúng sẽ mở MainWindow và đóng LoginWindow hiện tại
         /// </summary>
-        /// <param name="parameter"></param>
         private async void Login(object parameter)
         {
             string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;

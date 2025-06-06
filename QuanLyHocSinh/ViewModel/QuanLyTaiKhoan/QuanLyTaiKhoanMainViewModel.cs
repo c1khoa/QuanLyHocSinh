@@ -7,9 +7,9 @@ using System.Windows.Input;
 
 namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 {
-    public class QuanLyTaiKhoanMainViewModel : BaseViewModel
+    public partial class QuanLyTaiKhoanMainViewModel : BaseViewModel
     {
-        public readonly MainViewModel _mainVM;
+        public MainViewModel _mainVM;
 
         public ObservableCollection<User> Users { get; } = new ObservableCollection<User>();
         public ICommand ShowThemTaiKhoanCommand { get; }
