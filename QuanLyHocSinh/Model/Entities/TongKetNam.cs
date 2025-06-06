@@ -6,10 +6,6 @@ using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.Model.Entities
 {
-    class NamHoc
-    {
-    }
-
     public class TongKetNamHocItem
     {
         public int STT { get; set; }

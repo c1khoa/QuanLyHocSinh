@@ -142,6 +142,8 @@ namespace QuanLyHocSinh.ViewModel
 
         public ICommand LoadedWindowCommand { get; set; }
 
+        public ICommand LoginExitCommand { get; set; }
+
         // Commands điều hướng các ViewModel
         public ICommand ShowTrangChuCommand { get; set; }
         public ICommand ShowTaiKhoanCaNhanCommand { get; set; }
@@ -166,7 +168,7 @@ namespace QuanLyHocSinh.ViewModel
             // Khởi tạo các vai trò cho lựa chọn
             StudentRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/student_logo.png", "Học sinh");
             TeacherRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/teacher_logo.png", "Giáo viên");
-            AdminRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/admin_logo.png", "Giáo Vụ");
+            AdminRole = new BeginViewModel("pack://application:,,,/QuanLyHocSinh;component/Images/admin_logo.png", "Giáo vụ");
 
             Roles = new ObservableCollection<BeginViewModel>
             {
@@ -174,7 +176,42 @@ namespace QuanLyHocSinh.ViewModel
                 TeacherRole,
                 AdminRole
             };
+            LoginExitCommand = new RelayCommand<object>(
+    (p) => true,
+    (p) =>
+    {
+        // 1. Tìm MainWindow hiện tại
+        // Cách an toàn nhất là tìm trong Application.Current.Windows
+        // Hoặc nếu bạn biết chắc chắn nó là MainWindow.Current (singleton)
+        MainWindow mainWindow = null;
+        foreach (Window window in Application.Current.Windows)
+        {
+            if (window is MainWindow mw) // Kiểm tra xem cửa sổ có phải là MainWindow không
+            {
+                mainWindow = mw;
+                break;
+            }
+        }
 
+        // Đảm bảo MainWindow được tìm thấy
+        if (mainWindow != null)
+        {
+            // 2. Mở BeginWindow
+            var beginWindow = new BeginWindow();
+            beginWindow.Show(); // HIỂN THỊ CỬA SỔ MỚI TRƯỚC
+
+            _ = WindowAnimationHelper.FadeInAsync(beginWindow);
+
+            // 3. Đóng MainWindow
+            mainWindow.Close(); // ĐÓNG CỬA SỔ CŨ SAU KHI CỬA SỔ MỚI ĐÃ HIỂN THỊ
+        }
+        else
+        {
+            // Xử lý trường hợp không tìm thấy MainWindow (ví dụ: ghi log)
+            Console.WriteLine("Không thể đăng xuất");
+        }
+    }
+);
             // Gán ViewModel mặc định là Trang Chủ
             CurrentView = new TrangChuViewModel(this);
 
