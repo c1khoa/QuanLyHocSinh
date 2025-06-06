@@ -5,6 +5,7 @@ using Microsoft.Win32;
 using System.IO;
 using ClosedXML.Excel;
 using System;
+using System.Windows;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
@@ -14,6 +15,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         public string TenLop { get; set; }
         public string NamHoc { get; set; }
         public int HocKy { get; set; }
+        public string HocSinhID { get; set; }
         public ObservableCollection<TongKetMonItem> BangDiemMon { get; set; }
         public ICommand ExportExcelCommand { get; set; }
 
@@ -46,6 +48,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             _hocSinh = hs;
             HoTen = hs.HoTen;
             TenLop = hs.TenLop;
+            HocSinhID = hs.HocSinhID;
             // Lấy danh sách năm học và học kỳ
             DanhSachNamHoc = new ObservableCollection<string>(HocSinhDAL.GetAllNamHoc());
             DanhSachNamHoc.Insert(0, "Chọn");
@@ -63,7 +66,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             {
                 NamHoc = SelectedNamHoc;
                 HocKy = SelectedHocKy.Value;
-                var list = HocSinhDAL.GetBangDiemHocSinh(_hocSinh.HocSinhID, NamHoc, HocKy);
+                var list = HocSinhDAL.GetBangDiemHocSinh(HocSinhID, NamHoc, HocKy);
                 BangDiemMon = new ObservableCollection<TongKetMonItem>(list);
                 IsShowBangDiem = BangDiemMon != null && BangDiemMon.Count > 0;
                 OnPropertyChanged(nameof(BangDiemMon));
@@ -124,10 +127,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                             row++;
                         }
 
-                        // Format
-                        worksheet.Range(1, 1, 4, 2).Style.Font.Bold = true;
-                        worksheet.Range(6, 1, 6, 7).Style.Fill.BackgroundColor = XLColor.LightGray;
-
                         // Tự động điều chỉnh độ rộng cột
                         worksheet.Columns().AdjustToContents();
 
@@ -142,6 +141,50 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             {
                 System.Windows.MessageBox.Show($"Lỗi khi xuất Excel: {ex.Message}", "Lỗi", 
                     System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
+        }
+        private void SaveChanges()
+        {
+            if (!IsShowBangDiem || BangDiemMon == null) return;
+
+            try
+            {
+                foreach (var item in BangDiemMon)
+                {
+                    Diem diem = new Diem
+                    {
+                        MaHS = HocSinhID,
+                        MonHoc = item.MonHoc,
+                        NamHocID = NamHoc,
+                        HocKy = HocKy,
+                        DiemMieng = double.IsNaN(item.DiemMieng) ? -1f : (float)item.DiemMieng,
+                        Diem15p = double.IsNaN(item.Diem15Phut) ? -1f : (float)item.Diem15Phut,
+                        Diem1Tiet = double.IsNaN(item.Diem1Tiet) ? -1f : (float)item.Diem1Tiet,
+                        DiemThi = double.IsNaN(item.DiemThi) ? -1f : (float)item.DiemThi
+                    };
+                    DiemDAL.UpdateDiem(diem);
+                }
+
+                // Cập nhật lại bảng điểm sau khi lưu
+                var list = HocSinhDAL.GetBangDiemHocSinh(HocSinhID, NamHoc, HocKy);
+                BangDiemMon = new ObservableCollection<TongKetMonItem>(list);
+                OnPropertyChanged(nameof(BangDiemMon));
+
+                MessageBox.Show("Lưu thay đổi thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi lưu thay đổi: {ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        public void RefreshBangDiem()
+        {
+            if (!string.IsNullOrEmpty(NamHoc) && HocKy > 0)
+            {
+                var list = HocSinhDAL.GetBangDiemHocSinh(HocSinhID, NamHoc, HocKy);
+                BangDiemMon = new ObservableCollection<TongKetMonItem>(list);
+                IsShowBangDiem = BangDiemMon != null && BangDiemMon.Count > 0;
+                OnPropertyChanged(nameof(BangDiemMon));
             }
         }
     }

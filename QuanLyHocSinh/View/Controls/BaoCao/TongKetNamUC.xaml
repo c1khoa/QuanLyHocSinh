@@ -1,12 +1,214 @@
-<UserControl x:Class="QuanLyHocSinh.View.Controls.BaoCao.TongKetNamUC"
+﻿<UserControl x:Class="QuanLyHocSinh.View.Controls.BaoCao.TongKetNamUC"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls"
+             xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.BaoCao"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:converters="clr-namespace:QuanLyHocSinh.View.Converters"
+             Background="White" 
+             FontSize="13"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+             MinHeight="600" MinWidth="1000">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <converters:NullableDoubleToStringConverter x:Key="NullableDoubleToStringConverter"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Tiêu đề -->
+        <TextBlock Text="BÁO CÁO TỔNG KẾT NĂM HỌC" 
+                   FontSize="24" 
+                   FontWeight="Bold" 
+                   HorizontalAlignment="Center" 
+                   VerticalAlignment="Center"
+                   Margin="10 10 0 10"
+                   Grid.Row="0"/>
+                   
+            <!-- Bộ lọc + các nút chức năng -->
+            <Grid Grid.Row="1" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <StackPanel Margin="10" VerticalAlignment="Center">
+                        <TextBlock Text="Năm học" FontSize="13" Margin="0,0,0,5"/>
+                        <ComboBox materialDesign:HintAssist.Hint="Năm học"
+                                  IsEditable="False"
+                                  FontSize="13"
+                                  Width="120"
+                                  ItemsSource="{Binding DanhSachNamHoc}"
+                                  SelectedItem="{Binding SelectedNamHoc, Mode=TwoWay}"/>
+                    </StackPanel>
+                    <StackPanel Margin="10" VerticalAlignment="Center">
+                        <TextBlock Text="Lớp" FontSize="13" Margin="0,0,0,5"/>
+                        <ComboBox materialDesign:HintAssist.Hint="Lớp"
+                                  IsEditable="False"
+                                  FontSize="13"
+                                  Width="120"
+                                  ItemsSource="{Binding DanhSachLop}"
+                                  SelectedItem="{Binding SelectedLop, Mode=TwoWay}"/>
+                    </StackPanel>
+                    <StackPanel Margin="10" VerticalAlignment="Center">
+                        <TextBlock Text="Học kỳ" FontSize="13" Margin="0,0,0,5"/>
+                        <ComboBox materialDesign:HintAssist.Hint="Học kỳ"
+                                  IsEditable="False"
+                                  FontSize="13"
+                                  Width="120"
+                                  ItemsSource="{Binding DanhSachHocKy}"
+                                  SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}"/>
+                    </StackPanel>  
+                </StackPanel>
+                <!-- Các nút chức năng -->
+                <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Content="Bảng điểm lớp" 
+                                Margin="0,0,10,0" 
+                                Padding="16,8" 
+                                Command="{Binding OpenBangDiemLopCommand}"
+                                Background="#1976D2" 
+                                Foreground="White" 
+                                FontWeight="Bold" 
+                                FontSize="14"/>
+                        <Button Content="Xuất Excel" 
+                                Margin="0,0,10,0"
+                                Padding="16,8" 
+                                Command="{Binding ExportExcelCommand}"
+                                Background="#388E3C" 
+                                Foreground="White" 
+                                FontWeight="Bold" 
+                                FontSize="14"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0">
+                        <TextBlock Text="Tổng số học sinh: " FontWeight="Bold" FontSize="14"/>
+                        <TextBlock Text="{Binding TongHocSinh}" FontSize="14" FontWeight="Bold"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
             
-    </Grid>
+            <!-- Bảng dữ liệu tổng kết năm học -->
+            <DataGrid Grid.Row="2"
+                      ItemsSource="{Binding DanhSachTongKetNamHoc}"
+                      Style="{StaticResource CommonDataGridStyle}"
+                      AutoGenerateColumns="False"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      ScrollViewer.CanContentScroll="True"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling"
+                      EnableRowVirtualization="True"
+                      EnableColumnVirtualization="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="STT" 
+                                      Binding="{Binding STT}" 
+                                      Width="60" 
+                                      ElementStyle="{StaticResource CenterAlignStyle}"/>
+                    <DataGridTextColumn Header="Mã HS" 
+                                      Binding="{Binding HocSinhID}" 
+                                      Width="80" 
+                                      ElementStyle="{StaticResource CenterAlignStyle}"/>
+                    <DataGridTextColumn Header="Họ tên" 
+                                      Binding="{Binding HoTen}" 
+                                      Width="*"/>
+                    <DataGridTextColumn Header="Lớp" 
+                                      Binding="{Binding TenLop}" 
+                                      Width="100" 
+                                      ElementStyle="{StaticResource CenterAlignStyle}"/>
+                    <DataGridTextColumn Header="Điểm TB HK1" 
+                                      Binding="{Binding DiemTBHK1, Converter={StaticResource NullableDoubleToStringConverter}, ConverterParameter='F2'}" 
+                                      Width="100" 
+                                      ElementStyle="{StaticResource CenterAlignStyle}"/>
+                    <DataGridTextColumn Header="Điểm TB HK2" 
+                                      Binding="{Binding DiemTBHK2, Converter={StaticResource NullableDoubleToStringConverter}, ConverterParameter='F2'}" 
+                                      Width="100" 
+                                      ElementStyle="{StaticResource CenterAlignStyle}"/>
+                    <DataGridTextColumn Header="Điểm TB cả năm" 
+                                      Binding="{Binding DiemTBCaNam, Converter={StaticResource NullableDoubleToStringConverter}, ConverterParameter='F2'}" 
+                                      Width="120" 
+                                      ElementStyle="{StaticResource CenterAlignStyle}"/>
+                    <DataGridTextColumn Header="Xếp loại" 
+                                      Binding="{Binding XepLoai}" 
+                                      Width="120" 
+                                      ElementStyle="{StaticResource CenterAlignStyle}"/>
+                    <DataGridTextColumn Header="Kết quả" 
+                                      Binding="{Binding KetQua}" 
+                                      Width="100" 
+                                      ElementStyle="{StaticResource CenterAlignStyle}"/>
+                    <DataGridTemplateColumn Width="100" Header="Thao tác">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Button Style="{StaticResource MaterialDesignToolButton}"
+                                            Command="{Binding DataContext.OpenBangDiemHocSinhCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            ToolTip="Xem chi tiết">
+                                        <materialDesign:PackIcon Kind="AccountDetails" Width="20" Height="20"/>
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+            
+            <!-- Thống kê -->
+            <GroupBox Grid.Row="3" Header="Thống kê" Margin="0,10,0,0">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="5">
+                        <TextBlock Text="Học sinh giỏi:" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding SoLuongGioi}" Margin="0,5,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="0" Grid.Column="1" Margin="5">
+                        <TextBlock Text="Học sinh khá:" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding SoLuongKha}" Margin="0,5,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="0" Grid.Column="2" Margin="5">
+                        <TextBlock Text="Học sinh trung bình:" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding SoLuongTrungBinh}" Margin="0,5,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Grid.Column="0" Margin="5">
+                        <TextBlock Text="Học sinh yếu:" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding SoLuongYeu}" Margin="0,5,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Grid.Column="1" Margin="5">
+                        <TextBlock Text="Học sinh kém:" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding SoLuongKem}" Margin="0,5,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="0" Grid.Column="3" Margin="5">
+                        <TextBlock Text="Đạt:" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding SoLuongDat}" Margin="0,5,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Grid.Column="3" Margin="5">
+                        <TextBlock Text="Không đạt:" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding SoLuongKhongDat}" Margin="0,5,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Grid.Column="2" Margin="5">
+                        <TextBlock Text="Tỉ lệ đạt:" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding TiLeDat, StringFormat={}{0:F2}%}" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+        </Grid>
 </UserControl>

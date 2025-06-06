@@ -28,7 +28,6 @@ namespace QuanLyHocSinh.ViewModel
         public QuanLyTaiKhoanMainViewModel TaiKhoanVM { get; set; }
         public TraCuuHocSinhViewModel HocSinhVM { get; set; }
         public TraCuuGiaoVienViewModel GiaoVienVM { get; set; }
-        public TraCuuDiemHocSinhViewModel DiemHocSinhVM { get; set; }
         public TongKetMonViewModel TongKetMonVM { get; set; }
         public QuyDinhMainViewModel QuyDinhVM { get; set; }
 
@@ -141,9 +140,7 @@ namespace QuanLyHocSinh.ViewModel
         public ICommand ShowQuanLyTaiKhoanCommand { get; set; }
         public ICommand ShowThongTinHocSinhCommand { get; set; }
         public ICommand ShowThongTinGiaoVienCommand { get; set; }
-        public ICommand ShowDiemHocSinhCommand { get; set; }
         public ICommand ShowTongKetMonCommand { get; set; }
-
         public ICommand ShowTongKetNamCommand { get; set; }
         public ICommand ShowQuyDinhCommand { get; set; }
 
@@ -177,7 +174,6 @@ namespace QuanLyHocSinh.ViewModel
             ShowTaiKhoanCaNhanCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuanLyTaiKhoanCaNhanViewModel(this));
             ShowThongTinHocSinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuHocSinhViewModel(this));
             ShowThongTinGiaoVienCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuGiaoVienViewModel(this));
-            ShowDiemHocSinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuDiemHocSinhViewModel(this));
             ShowTongKetMonCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TongKetMonViewModel(this));
             ShowTongKetNamCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TongKetNamViewModel(this));
             ShowQuyDinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuyDinhMainViewModel(this));

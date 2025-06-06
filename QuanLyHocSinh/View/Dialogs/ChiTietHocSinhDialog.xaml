@@ -1,0 +1,105 @@
+<Window x:Class="QuanLyHocSinh.View.Dialogs.ChiTietHocSinhDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Chi tiết học sinh" MinHeight="700" MinWidth="900" ResizeMode="CanResize" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Tiêu đề -->
+        <TextBlock Text="CHI TIẾT HỌC SINH" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,16"/>
+
+        <!-- Thông tin chung -->
+        <GroupBox Grid.Row="1" Header="Thông tin chung" Margin="0,0,0,16">
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Họ tên:" FontWeight="Bold" Grid.Row="0" Grid.Column="0"/>
+                <TextBlock Text="{Binding ThongTinChung.HoTen}" Grid.Row="0" Grid.Column="1"/>
+                <TextBlock Text="Ngày sinh:" FontWeight="Bold" Grid.Row="0" Grid.Column="2"/>
+                <TextBlock Text="{Binding ThongTinChung.NgaySinh, StringFormat=dd/MM/yyyy}" Grid.Row="0" Grid.Column="3"/>
+
+                <TextBlock Text="Lớp:" FontWeight="Bold" Grid.Row="1" Grid.Column="0"/>
+                <TextBlock Text="{Binding ThongTinChung.TenLop}" Grid.Row="1" Grid.Column="1"/>
+                <TextBlock Text="Năm học:" FontWeight="Bold" Grid.Row="1" Grid.Column="2"/>
+                <TextBlock Text="{Binding ThongTinChung.NamHoc}" Grid.Row="1" Grid.Column="3"/>
+            </Grid>
+        </GroupBox>
+
+        <!-- Bảng điểm các môn -->
+        <GroupBox Grid.Row="3" Header="Bảng điểm các môn" Margin="0,0,0,16">
+            <DataGrid ItemsSource="{Binding BangDiemMonHoc}" 
+                      Style="{StaticResource CommonDataGridStyle}" 
+                      AutoGenerateColumns="False"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      ScrollViewer.CanContentScroll="True"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling"
+                      EnableRowVirtualization="True"
+                      EnableColumnVirtualization="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Môn học" Binding="{Binding MonHoc}" Width="*" ElementStyle="{StaticResource CenterAlignStyle}"/>
+                    <DataGridTextColumn Header="Điểm TB HK1" Binding="{Binding DiemTBHK1, StringFormat=F2}" Width="100" ElementStyle="{StaticResource CenterAlignStyle}"/>
+                    <DataGridTextColumn Header="Điểm TB HK2" Binding="{Binding DiemTBHK2, StringFormat=F2}" Width="100" ElementStyle="{StaticResource CenterAlignStyle}"/>
+                    <DataGridTextColumn Header="Điểm TB cả năm" Binding="{Binding DiemTBCaNam, StringFormat=F2}" Width="120" ElementStyle="{StaticResource CenterAlignStyle}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+
+        <!-- Tổng hợp -->
+        <GroupBox Grid.Row="4" Header="Tổng hợp" Margin="0,0,0,16">
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Điểm trung bình chung:" FontWeight="Bold" Grid.Row="0" Grid.Column="0" Margin="0,0,8,8"/>
+                <TextBlock Text="{Binding DiemTrungBinhChung, StringFormat=F2}" Grid.Row="0" Grid.Column="1" Margin="0,0,16,8"/>
+                <TextBlock Text="Xếp loại:" FontWeight="Bold" Grid.Row="0" Grid.Column="2" Margin="0,0,8,8"/>
+                <TextBlock Text="{Binding XepLoai}" Grid.Row="0" Grid.Column="3" Margin="0,0,0,8"/>
+
+                <TextBlock Text="Kết quả cuối năm:" FontWeight="Bold" Grid.Row="1" Grid.Column="2" Margin="0,0,8,0"/>
+                <TextBlock Text="{Binding KetQuaCuoiNam}" Grid.Row="1" Grid.Column="3"/>
+            </Grid>
+        </GroupBox>
+
+        <!-- Nút xuất Excel và đóng -->
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="Xuất Excel" Width="120" Height="32" Margin="0,0,16,0" Command="{Binding ExportExcelCommand}"
+                    Background="#388E3C" Foreground="White" FontWeight="Bold" FontSize="15"/>
+        </StackPanel>
+    </Grid>
+</Window>
