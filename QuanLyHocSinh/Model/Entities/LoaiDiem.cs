@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.Model.Entities
 {
-    class LoaiDiem
+    public class LoaiDiem
     {
+        public string LoaiDiemID { get; set; }
+        public string TenLoaiDiem { get; set; }
+        public string MoTa { get; set; }
+        public float HeSo { get; set; }
     }
 }
