@@ -25,18 +25,18 @@ namespace QuanLyHocSinh.View.Controls.QuyDinh
         public QuyDinhMainUC()
         {
             InitializeComponent();
-            var viewModel = new QuyDinhMainViewModel(MainViewModel.Instance);
-            DataContext = viewModel;
+        var viewModel = new QuyDinhMainViewModel(MainViewModel.Instance);
+        DataContext = viewModel;
 
+        viewModel.OpenEditViewRequested += (quyDinh) => 
+        {
            
-            viewModel.OpenEditViewRequested += (quyDinh) =>
-            {
-                var editView = new QuyDinhSuaUC(quyDinh);
-
-               
-                MainGrid.Children.Add(editView); 
-                Grid.SetRowSpan(editView, 3); 
-            };
+            var editView = new QuyDinhSuaUC(quyDinh);
+            
+          
+            MainGrid.Children.Add(editView);
+            Grid.SetRowSpan(editView, 3); 
+        };
 
         }
     }
