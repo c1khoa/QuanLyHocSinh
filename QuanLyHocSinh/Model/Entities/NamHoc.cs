@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.Model.Entities
 {
-    class NamHoc
+    public class NamHoc
     {
+        public string NamHocID { get; set; }
+        public string MoTa { get; set; }
+        public DateTime BatDau { get; set; }
+        public DateTime KetThuc { get; set; }
     }
 }

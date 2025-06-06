@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.Model.Entities
 {
-    class MonHoc
+    public class MonHoc
     {
+        public string MonHocID { get; set; }
+        public string TenMonHoc { get; set; }
     }
 }
