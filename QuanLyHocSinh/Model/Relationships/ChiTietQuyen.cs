@@ -8,10 +8,13 @@ namespace QuanLyHocSinh.Model.Relationships
 {
     public class ChiTietQuyen
     {
-        public string ChiTietQuyenID { get; set; } // CHAR(8), e.g., CTQ00001
-        public string QuyenID { get; set; } 
-        public string VaiTroID { get; set; } 
-        public string TuongTac { get; set; } // CHAR(8) in DB
+        public string ChiTietQuyenID { get; set; } = string.Empty;
+
+        public string QuyenID { get; set; } = string.Empty;
+
+        public string VaiTroID { get; set; } = string.Empty;
+
+        public string TuongTac { get; set; } = string.Empty;
 
         // Navigation properties
         public virtual Quyen Quyen { get; set; }
