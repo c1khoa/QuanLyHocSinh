@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,25 @@ namespace QuanLyHocSinh.Model.Entities
         public string HoTen {  get; set; }
 
         public VaiTro VaiTro { get; set; }  // Navigation property
+
+        public object Clone()
+        {
+            return new User
+            {
+                UserID = this.UserID,
+                TenDangNhap = this.TenDangNhap,
+                MatKhau = this.MatKhau,
+                VaiTroID = this.VaiTroID,
+                HoTen = this.HoTen,
+                VaiTro = this.VaiTro
+            };
+        }
+    }
+
+    public class QLHocSinhEntities : DbContext
+    {
+        public DbSet<User> Users { get; set; }
+    
     }
 
 }

@@ -1,28 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using QuanLyHocSinh.ViewModel;
+using QuanLyHocSinh.ViewModel.QuanLyTaiKhoan;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
 {
-    /// <summary>
-    /// Interaction logic for QuanLyTaiKhoanCaNhanUC.xaml
-    /// </summary>
     public partial class QuanLyTaiKhoanCaNhanUC : UserControl
     {
-        public QuanLyTaiKhoanCaNhanUC()
+        public QuanLyTaiKhoanCaNhanUC(MainViewModel mainVM)
         {
             InitializeComponent();
+            DataContext = new QuanLyTaiKhoanCaNhanViewModel(mainVM);
         }
     }
 }

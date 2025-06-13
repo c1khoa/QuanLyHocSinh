@@ -16,7 +16,10 @@ namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
 
         // Sự kiện báo đã thêm tài khoản thành công, để ViewModel hoặc MainWindow bắt
         public event EventHandler AccountAddedSuccessfully;
-        public QuanLyTaiKhoanThemUC() : this(null) { }
+        public QuanLyTaiKhoanThemUC()
+        {
+            InitializeComponent();
+        }
 
         public QuanLyTaiKhoanThemUC(MainViewModel mainVM)
         {
@@ -158,6 +161,7 @@ namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
             txtUserName.Text = "";
             txtUserLogin.Text = "";
             txtUserPassWord.Password = "";
+            txtUserPassWordVisible.Text = "";
             txtUserFunction.SelectedIndex = -1;
         }
     }

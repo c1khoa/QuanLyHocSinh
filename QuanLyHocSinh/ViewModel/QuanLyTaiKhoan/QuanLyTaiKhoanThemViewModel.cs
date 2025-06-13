@@ -86,10 +86,12 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             {
                 Roles.Clear();
 
-                // TODO: Thay thế đoạn này bằng gọi dữ liệu từ database (vai trò thật)
-                Roles.Add(new VaiTro { VaiTroID = "ADMIN", TenVaiTro = "Quản trị viên" });
-                Roles.Add(new VaiTro { VaiTroID = "GV", TenVaiTro = "Giáo viên" });
-                Roles.Add(new VaiTro { VaiTroID = "NV", TenVaiTro = "Nhân viên" });
+                // Lấy danh sách vai trò từ database
+                var rolesList = UserService.GetAllRoles();
+                foreach (var role in rolesList)
+                {
+                    Roles.Add(role);
+                }
 
                 // Mặc định chọn vai trò đầu tiên nếu có
                 if (Roles.Any())
@@ -134,16 +136,13 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                     return;
                 }
 
-                // Mã hoá mật khẩu trước khi lưu
-                var hashedPassword = HashPassword(MatKhau);
-
-                // Tạo đối tượng người dùng mới
+                // Tạo đối tượng người dùng mới (không hash mật khẩu)
                 var userMoi = new User
                 {
                     UserID = UserID,
                     HoTen = HoTen,
                     TenDangNhap = TenDangNhap,
-                    MatKhau = hashedPassword,
+                    MatKhau = MatKhau, // Lưu mật khẩu, không hash tại login chưa có xử lí hash
                     VaiTroID = VaiTroID
                 };
 
@@ -153,6 +152,9 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                 if (result)
                 {
                     MessageBox.Show("Thêm tài khoản thành công!", "Thành công", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    // Xóa trắng form
+                    ClearForm();
 
                     // Gửi sự kiện thông báo thành công
                     AccountAddedSuccessfully?.Invoke(userMoi);
@@ -174,6 +176,18 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
         public void ExecuteCancel()
         {
             CancelRequested?.Invoke();
+        }
+
+        /// <summary>
+        /// Xóa trắng form sau khi thêm thành công
+        /// </summary>
+        private void ClearForm()
+        {
+            UserID = string.Empty;
+            HoTen = string.Empty;
+            TenDangNhap = string.Empty;
+            MatKhau = string.Empty;
+            VaiTroID = Roles.Any() ? Roles.First().VaiTroID : string.Empty;
         }
 
         /// <summary>

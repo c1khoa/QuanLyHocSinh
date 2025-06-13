@@ -57,18 +57,71 @@ namespace QuanLyHocSinh.Service
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                string query = @"INSERT INTO USERS (UserID, TenDangNhap, MatKhau, VaiTroID) 
-                         VALUES (@UserID, @TenDangNhap, @MatKhau, @VaiTroID)";
-
-                using (var cmd = new MySqlCommand(query, conn))
+                using (var transaction = conn.BeginTransaction())
                 {
-                    cmd.Parameters.AddWithValue("@UserID", user.UserID ?? Guid.NewGuid().ToString()); // nếu UserID có thể null thì cấp mới
-                    cmd.Parameters.AddWithValue("@TenDangNhap", user.TenDangNhap);
-                    cmd.Parameters.AddWithValue("@MatKhau", user.MatKhau ?? string.Empty);
-                    cmd.Parameters.AddWithValue("@VaiTroID", user.VaiTroID ?? string.Empty);
+                    try
+                    {
+                        // Thêm vào bảng USERS
+                        string userQuery = @"INSERT INTO USERS (UserID, TenDangNhap, MatKhau, VaiTroID) 
+                                 VALUES (@UserID, @TenDangNhap, @MatKhau, @VaiTroID)";
 
-                    int result = cmd.ExecuteNonQuery();
-                    return result > 0;
+                        using (var cmd = new MySqlCommand(userQuery, conn, transaction))
+                        {
+                            string userID = user.UserID ?? Guid.NewGuid().ToString();
+                            cmd.Parameters.AddWithValue("@UserID", userID);
+                            cmd.Parameters.AddWithValue("@TenDangNhap", user.TenDangNhap);
+                            cmd.Parameters.AddWithValue("@MatKhau", user.MatKhau ?? string.Empty);
+                            cmd.Parameters.AddWithValue("@VaiTroID", user.VaiTroID ?? string.Empty);
+
+                            int result = cmd.ExecuteNonQuery();
+                            if (result <= 0)
+                            {
+                                transaction.Rollback();
+                                return false;
+                            }
+
+                            // Thêm vào bảng tương ứng dựa vào vai trò
+                            if (!string.IsNullOrEmpty(user.VaiTroID))
+                            {
+                                string roleQuery = "";
+                                string roleID = "";
+
+                                switch (user.VaiTroID.ToUpper())
+                                {
+                                    case "VT03": // Giáo vụ
+                                        roleQuery = "INSERT INTO GIAOVU (GiaoVuID, UserID) VALUES (@RoleID, @UserID)";
+                                        roleID = "GVU" + userID.Substring(1); // GVU001 từ U001
+                                        break;
+                                    case "VT02": // Giáo viên 
+                                        roleQuery = "INSERT INTO GIAOVIEN (GiaoVienID, UserID) VALUES (@RoleID, @UserID)";
+                                        roleID = "GV" + userID.Substring(1); // GV001 từ U001
+                                        break;
+                                    case "VT01": // Học sinh
+                                        roleQuery = "INSERT INTO HOCSINH (HocSinhID, UserID) VALUES (@RoleID, @UserID)";
+                                        roleID = "HS" + userID.Substring(1); // HS001 từ U001
+                                        break;
+                                }
+
+                                if (!string.IsNullOrEmpty(roleQuery))
+                                {
+                                    using (var roleCmd = new MySqlCommand(roleQuery, conn, transaction))
+                                    {
+                                        roleCmd.Parameters.AddWithValue("@RoleID", roleID);
+                                        roleCmd.Parameters.AddWithValue("@UserID", userID);
+                                        roleCmd.ExecuteNonQuery();
+                                    }
+                                }
+                            }
+                        }
+
+                        transaction.Commit();
+                        return true;
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        return false;
+                    }
                 }
             }
         }
@@ -203,6 +256,105 @@ namespace QuanLyHocSinh.Service
 
             return list;
         }
+        public static void CapNhatThongTinCaNhan(User user)
+        {
+            using (var db = new QuanLyHocSinh.Model.Entities.QLHocSinhEntities()) // Fully qualify the type name
+            {
+                var existing = db.Users.Find(user.UserID);
+                if (existing != null)
+                {
+                    existing.HoTen = user.HoTen;
+                    db.SaveChanges();
+                }
+            }
+        }
+
+        public static void DoiMatKhau(string userId, string newPassword)
+        {
+            using (var db = new QuanLyHocSinh.Model.Entities.QLHocSinhEntities()) // Fully qualify the type name
+            {
+                var user = db.Users.Find(userId);
+                if (user != null)
+                {
+                    user.MatKhau = newPassword;
+                    db.SaveChanges();
+                }
+            }
+        }
+
+        public static void CapNhatTaiKhoan(User user)
+        {
+            using (var db = new QuanLyHocSinh.Model.Entities.QLHocSinhEntities()) // Fully qualify the type name
+            {
+                var existing = db.Users.Find(user.UserID);
+                if (existing != null)
+                {
+                    existing.HoTen = user.HoTen;
+                    existing.TenDangNhap = user.TenDangNhap;
+                    existing.VaiTroID = user.VaiTroID;
+
+                    if (!string.IsNullOrEmpty(user.MatKhau))
+                    {
+                        existing.MatKhau = user.MatKhau;
+                    }
+
+                    db.SaveChanges();
+                }
+            }
+        }
+        public static bool HasRelatedStudents(string userId)
+        {
+            using (var connection = new MySqlConnection(connectionString)) // Fixed: Use 'connectionString' instead of 'ConnectionString'
+            {
+                connection.Open();
+                string query = "SELECT COUNT(*) FROM hocsinh WHERE UserID = @UserID";
+                using (var cmd = new MySqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@UserID", userId);
+                    int count = Convert.ToInt32(cmd.ExecuteScalar());
+                    return count > 0;
+                }
+            }
+        }
+
+        public static void XoaTaiKhoanVaHocSinh(string userId)
+        {
+            using (var connection = new MySqlConnection(connectionString)) // Fixed: Use 'connectionString' instead of 'ConnectionString'
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Xóa học sinh liên quan trước
+                        string deleteStudentsQuery = "DELETE FROM hocsinh WHERE UserID = @UserID";
+                        using (var cmd = new MySqlCommand(deleteStudentsQuery, connection, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@UserID", userId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // Sau đó xóa tài khoản
+                        string deleteUserQuery = "DELETE FROM users WHERE UserID = @UserID";
+                        using (var cmd = new MySqlCommand(deleteUserQuery, connection, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@UserID", userId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
 
     }
 }
+
+
+

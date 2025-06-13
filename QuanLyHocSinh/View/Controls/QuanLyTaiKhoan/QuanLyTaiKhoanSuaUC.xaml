@@ -4,74 +4,94 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.QuanLyTaiKhoan"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodel="clr-namespace:QuanLyHocSinh.ViewModel.QuanLyTaiKhoan" 
+             d:DataContext="{d:DesignInstance Type=viewmodel:QuanLyTaiKhoanSuaViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <Border Margin="70"
-                BorderBrush="#03a9f4"
-                BorderThickness="2"
-                Background="#D0F0FD"
-                CornerRadius="10">
+    <Grid Background="#F4F6F8">
+        <materialDesign:Card Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center" Width="600">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="5*"/>
-                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0">
-                    <TextBlock Text="SỬA TÀI KHOẢN"
-                               FontSize="24"
-                               FontWeight="Bold"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               Margin="10"/>
-                </Grid>
+                <TextBlock Text="Sửa Tài Khoản"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,20"
+                           Foreground="#2C3E50"/>
 
                 <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="180"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0" Margin="10">
-                        <TextBlock Text="Tên đăng nhập:" FontSize="16" Margin="0 0 0 5"/>
-                        <TextBox Name="txtUsername" FontSize="14" Margin="0 0 0 10"/>
+                    <TextBlock Text="User ID:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                    <TextBox Text="{Binding EditedUser.UserID}" IsEnabled="{Binding IsEditableUserID}"
+                             Grid.Row="0" Grid.Column="1"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}" />
 
-                        <TextBlock Text="Mật khẩu:" FontSize="16" Margin="0 0 0 5"/>
-                        <PasswordBox Name="pwdPassword" FontSize="14" Margin="0 0 0 10"/>
+                    <TextBlock Text="Họ và tên:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                    <TextBox Text="{Binding EditedUser.HoTen, UpdateSourceTrigger=PropertyChanged}"
+                             Grid.Row="1" Grid.Column="1"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}" />
 
-                        <TextBlock Text="Xác nhận mật khẩu:" FontSize="16" Margin="0 0 0 5"/>
-                        <PasswordBox Name="pwdConfirmPassword" FontSize="14" Margin="0 0 0 10"/>
-                    </StackPanel>
+                    <TextBlock Text="Tên đăng nhập:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                    <TextBox Text="{Binding EditedUser.TenDangNhap, UpdateSourceTrigger=PropertyChanged}"
+                             Grid.Row="2" Grid.Column="1"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}" />
 
-                    <StackPanel Grid.Column="1" Margin="10">
-                        <TextBlock Text="UserID:" FontSize="16" Margin="0 0 0 5"/>
-                        <TextBox Name="txtEmail" FontSize="14" Margin="0 0 0 10"/>
+                    <TextBlock Text="Vai trò:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                    <ComboBox ItemsSource="{Binding Roles}"
+                              SelectedValue="{Binding EditedUser.VaiTroID}"
+                              SelectedValuePath="VaiTroID"
+                              DisplayMemberPath="TenVaiTro"
+                              IsEnabled="{Binding CanEditRole}"
+                              Grid.Row="3" Grid.Column="1"
+                              Style="{StaticResource MaterialDesignOutlinedComboBox}" />
 
-                        <TextBlock Text="Họ và tên:" FontSize="16" Margin="0 0 0 5"/>
-                        <TextBox Name="txtFullName" FontSize="14" Margin="0 0 0 10"/>
+                    <TextBlock Text="Mật khẩu mới:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                    <PasswordBox x:Name="pwdNewPassword"
+                                 Grid.Row="4" Grid.Column="1"
+                                 materialDesign:HintAssist.Hint="Để trống nếu không đổi"
+                                 Style="{StaticResource MaterialDesignOutlinedPasswordBox}" />
 
-                        <TextBlock Text="Vai trò:" FontSize="16" Margin="0 0 0 5"/>
-                        <ComboBox x:Name="txtUserFunction"
-                                  FontSize="13"
-                                  IsEditable="False"
-                                  Margin="0 0 0 10">
-                            <ComboBoxItem Content="Học sinh"/>
-                            <ComboBoxItem Content="Giáo viên"/>
-                        </ComboBox>
-                    </StackPanel>
+                    <TextBlock Text="Xác nhận mật khẩu:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                    <PasswordBox x:Name="pwdConfirmPassword"
+                                 Grid.Row="5" Grid.Column="1"
+                                 materialDesign:HintAssist.Hint="Nhập lại mật khẩu"
+                                 Style="{StaticResource MaterialDesignOutlinedPasswordBox}" />
                 </Grid>
 
-                <Grid Grid.Row="2">
-                    <Button Style="{StaticResource MaterialDesignRaisedLightButton}"
-                            FontWeight="Bold"
-                            Margin="250,0,250,12"
-                            Content="LƯU THAY ĐÔI">
-                    </Button>
-                </Grid>
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                    <Button Content="Lưu"
+                            Command="{Binding SaveCommand}"
+                            Width="100"
+                            Margin="0,0,10,0"
+                            Background="#2196F3"
+                            Foreground="White"/>
 
+                    <Button Content="Hủy"
+                            Command="{Binding CancelCommand}"
+                            Width="100"
+                            Background="#E53935"
+                            Foreground="White"/>
+                </StackPanel>
             </Grid>
-        </Border>
+        </materialDesign:Card>
     </Grid>
 </UserControl>

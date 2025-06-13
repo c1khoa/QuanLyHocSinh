@@ -7,7 +7,10 @@ namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
 {
     public partial class QuanLyTaiKhoanMainUC : UserControl
     {
-        public QuanLyTaiKhoanMainUC() : this(null) { }
+        public QuanLyTaiKhoanMainUC()
+        {
+            InitializeComponent();
+        }
 
         public QuanLyTaiKhoanMainUC(MainViewModel mainVM)
         {
@@ -16,20 +19,7 @@ namespace QuanLyHocSinh.View.Controls.QuanLyTaiKhoan
             if (mainVM != null)
                 DataContext = new QuanLyTaiKhoanMainViewModel(mainVM);
             else
-                DataContext = new QuanLyTaiKhoanMainViewModel(new MainViewModel()); // hoặc xử lý null phù hợp
+                DataContext = new QuanLyTaiKhoanMainViewModel(new MainViewModel());
         }
     }
-
 }
-//public partial class QuanLyTaiKhoanMainUC : UserControl
-//{
-//    public QuanLyTaiKhoanMainUC(MainViewModel mainVM)
-//    {
-//        InitializeComponent();
-
-//        if (mainVM == null)
-//            throw new ArgumentNullException(nameof(mainVM));
-
-//        DataContext = new QuanLyTaiKhoanMainViewModel(mainVM);
-//    }
-//}
