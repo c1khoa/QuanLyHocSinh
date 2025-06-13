@@ -22,7 +22,6 @@ namespace QuanLyHocSinh.View.Controls.BaoCao
         public TongKetNamUC()
         {
             InitializeComponent();
-            this.DataContext = new TongKetNamViewModel(null); // Truyền MainViewModel nếu cần
         }
     }
 }

@@ -141,8 +141,23 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
         {
             try
             {
+                if (_mainVM.CurrentUser.VaiTro.VaiTroID == "VT02")
+                {
+                    // Lấy danh sách lớp mà giáo viên đang dạy
+                    var danhSachLopCuaGV = GiaoVienDAL.GetLopDayCuaUser(_mainVM.CurrentUser.UserID);
+
+                    // Lấy học sinh chỉ trong các lớp đó
+                    _allTongKetMon = new ObservableCollection<TongKetMonItem>(
+                        TongKetMonDAL.GetAllTongKetMon()
+                            .Where(item => danhSachLopCuaGV.Contains(item.TenLop))
+                    );
+
+                }
+                else
+                {
+                    _allTongKetMon = new ObservableCollection<TongKetMonItem>(TongKetMonDAL.GetAllTongKetMon());
+                }
                 //Tải tất cả dữ liệu tổng kết môn
-                _allTongKetMon = new ObservableCollection<TongKetMonItem>(TongKetMonDAL.GetAllTongKetMon());
                 DanhSachTongKetMon = new ObservableCollection<TongKetMonItem>(_allTongKetMon);
 
                 //Tải dữ liệu lọc

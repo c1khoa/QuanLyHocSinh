@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Configuration;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
@@ -7,7 +8,7 @@ using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
 using QuanLyHocSinh.ViewModel;
 
-public class QuyDinhSuaViewModel : INotifyPropertyChanged
+public class QuyDinhSuaViewModel : BaseViewModel
 {
     private string _quyDinhID;
     private string _quyDinhTuoiID;
@@ -96,7 +97,7 @@ public class QuyDinhSuaViewModel : INotifyPropertyChanged
     {
         try
         {
-            string connectionString = "Server=localhost;Database=quanlyhocsinh;Uid=root;Pwd=221005;";
+			string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
@@ -149,8 +150,4 @@ public class QuyDinhSuaViewModel : INotifyPropertyChanged
             MessageBox.Show("Lỗi cập nhật: " + ex.Message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
