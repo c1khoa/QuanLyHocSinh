@@ -9,6 +9,42 @@ namespace QuanLyHocSinh.Service
     public static class UserService
     {
         public static string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+        public static async Task UpdateUserAsync(User user)
+        {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user), "Đối tượng người dùng không được null.");
+
+            if (string.IsNullOrWhiteSpace(user.UserID))
+                throw new ArgumentException("UserID không được để trống.");
+
+            using var conn = new MySqlConnection(connectionString);
+            await conn.OpenAsync();
+
+            string query;
+            if (string.IsNullOrWhiteSpace(user.MatKhau))
+            {
+                // Không cập nhật mật khẩu nếu người dùng không thay đổi
+                query = @"UPDATE USERS SET TenDangNhap = @TenDangNhap, VaiTroID = @VaiTroID WHERE UserID = @UserID";
+            }
+            else
+            {
+                query = @"UPDATE USERS SET TenDangNhap = @TenDangNhap, MatKhau = @MatKhau, VaiTroID = @VaiTroID WHERE UserID = @UserID";
+            }
+
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@TenDangNhap", user.TenDangNhap);
+            cmd.Parameters.AddWithValue("@VaiTroID", user.VaiTroID);
+            cmd.Parameters.AddWithValue("@UserID", user.UserID);
+
+            if (!string.IsNullOrWhiteSpace(user.MatKhau))
+                cmd.Parameters.AddWithValue("@MatKhau", user.MatKhau);
+
+            int affectedRows = await cmd.ExecuteNonQueryAsync();
+            if (affectedRows == 0)
+            {
+                throw new InvalidOperationException($"Không tìm thấy UserID {user.UserID} để cập nhật.");
+            }
+        }
 
         // Lấy danh sách tài khoản từ DB
         public static List<User> LayDanhSachTaiKhoan()
@@ -19,9 +55,20 @@ namespace QuanLyHocSinh.Service
             {
                 conn.Open();
 
-                string query = @"SELECT u.UserID, u.TenDangNhap, u.MatKhau, u.VaiTroID, v.TenVaiTro
-                         FROM USERS u
-                         JOIN VAITRO v ON u.VaiTroID = v.VaiTroID";
+                string query = @"SELECT 
+                                u.UserID,
+                                u.TenDangNhap,
+                                u.MatKhau,
+                                h.HoTen,
+                                u.VaiTroID,
+                                v.TenVaiTro
+                            FROM USERS u
+                            JOIN VAITRO v ON u.VaiTroID = v.VaiTroID
+                            LEFT JOIN GIAOVIEN gv ON gv.UserID = u.UserID
+                            LEFT JOIN HOSOGIAOVIEN hgv ON hgv.GiaoVienID = gv.GiaoVienID
+                            LEFT JOIN HOCSINH hs ON hs.UserID = u.UserID
+                            LEFT JOIN HOSOHOCSINH hhs ON hhs.HocSinhID = hs.HocSinhID
+                            LEFT JOIN HOSO h ON h.HoSoID = COALESCE(hgv.HoSoID, hhs.HoSoID)";
 
                 using (var cmd = new MySqlCommand(query, conn))
                 using (var reader = cmd.ExecuteReader())
@@ -33,7 +80,7 @@ namespace QuanLyHocSinh.Service
                             UserID = reader["UserID"]?.ToString() ?? string.Empty,
                             TenDangNhap = reader["TenDangNhap"]?.ToString() ?? string.Empty,
                             MatKhau = reader["MatKhau"]?.ToString() ?? string.Empty,
-                            VaiTroID = reader["VaiTroID"]?.ToString() ?? string.Empty,
+                            HoTen = reader["HoTen"]?.ToString() ?? string.Empty,
                             VaiTro = new VaiTro
                             {
                                 VaiTroID = reader["VaiTroID"]?.ToString() ?? string.Empty,
@@ -135,22 +182,50 @@ namespace QuanLyHocSinh.Service
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                string query = @"UPDATE USERS 
-                         SET TenDangNhap = @TenDangNhap, MatKhau = @MatKhau, VaiTroID = @VaiTroID
-                         WHERE UserID = @UserID";
 
-                using (var cmd = new MySqlCommand(query, conn))
+                // 1. Cập nhật bảng USERS
+                string updateUserQuery = @"
+            UPDATE USERS 
+            SET TenDangNhap = @TenDangNhap, 
+                MatKhau = @MatKhau, 
+                VaiTroID = @VaiTroID
+            WHERE UserID = @UserID";
+
+                using (var cmd = new MySqlCommand(updateUserQuery, conn))
                 {
                     cmd.Parameters.AddWithValue("@TenDangNhap", user.TenDangNhap);
                     cmd.Parameters.AddWithValue("@MatKhau", user.MatKhau ?? string.Empty);
                     cmd.Parameters.AddWithValue("@VaiTroID", user.VaiTroID ?? string.Empty);
                     cmd.Parameters.AddWithValue("@UserID", user.UserID);
-
-                    int result = cmd.ExecuteNonQuery();
-                    return result > 0;
+                    cmd.ExecuteNonQuery();
                 }
+
+                // 2. Cập nhật HoTen trong bảng HOSO (nếu có)
+                string updateHoSoQuery = @"
+            UPDATE HOSO h
+            JOIN HOSOGIAOVIEN hgv ON h.HoSoID = hgv.HoSoID
+            JOIN GIAOVIEN gv ON hgv.GiaoVienID = gv.GiaoVienID
+            SET h.HoTen = @HoTen
+            WHERE gv.UserID = @UserID;
+
+            UPDATE HOSO h
+            JOIN HOSOHOCSINH hhs ON h.HoSoID = hhs.HoSoID
+            JOIN HOCSINH hs ON hhs.HocSinhID = hs.HocSinhID
+            SET h.HoTen = @HoTen
+            WHERE hs.UserID = @UserID;
+        ";
+
+                using (var hoSoCmd = new MySqlCommand(updateHoSoQuery, conn))
+                {
+                    hoSoCmd.Parameters.AddWithValue("@UserID", user.UserID);
+                    hoSoCmd.Parameters.AddWithValue("@HoTen", user.HoTen ?? string.Empty);
+                    hoSoCmd.ExecuteNonQuery();
+                }
+
+                return true; // ✅ Bổ sung return ở cuối
             }
         }
+
 
         public static bool XoaTaiKhoan(string userID)
         {

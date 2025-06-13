@@ -1,22 +1,56 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using QuanLyHocSinh.Model.Entities;
 using QuanLyHocSinh.Service;
+using QuanLyHocSinh.View.Dialogs;
 
 namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 {
     /// <summary>
-    /// ViewModel cho màn quản lý tài khoản.
-    /// Bao gồm logic tải danh sách, thêm, sửa, xoá và quyền cho nút thao tác.
+    /// ViewModel cho màn quản lý tài khoản (chỉ admin mới vào được).
+    /// Gồm logic: tải danh sách, thêm, sửa, xoá tài khoản.
     /// </summary>
     public class QuanLyTaiKhoanMainViewModel : BaseViewModel
     {
         private readonly MainViewModel _mainVM;
 
-        #region Thuộc tính bind sang View
+        #region Constructor
+        public QuanLyTaiKhoanMainViewModel(MainViewModel mainVM)
+        {
+            _mainVM = mainVM ?? throw new ArgumentNullException(nameof(mainVM));
+
+            // Khởi tạo các command
+            ShowThemTaiKhoanCommand = new RelayCommand(ShowThemTaiKhoan);
+            ReloadCommand = new RelayCommand(LoadDanhSachTaiKhoan);
+            SuaTaiKhoanCommand = new RelayCommand<User>(user => SuaTaiKhoan(user));
+            XoaTaiKhoanCommand = new RelayCommand(() => XoaTaiKhoan(SelectedUser));
+
+            // Tải dữ liệu ban đầu
+            LoadDanhSachTaiKhoan();
+        }
+        #endregion
+
+        #region Danh sách tài khoản
+
         public ObservableCollection<User> Users { get; } = new();
+
+        private ObservableCollection<User> _filteredUsers = new();
+        public ObservableCollection<User> FilteredUsers
+        {
+            get => _filteredUsers;
+            set
+            {
+                _filteredUsers = value;
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #region SelectedUser & Search
 
         private User _selectedUser;
         public User SelectedUser
@@ -28,61 +62,56 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                 {
                     _selectedUser = value;
                     OnPropertyChanged();
-                    OnPropertyChanged(nameof(CanEditCurrentUser));
-                    OnPropertyChanged(nameof(CanDeleteCurrentUser));
-                  
-                    CommandManager.InvalidateRequerySuggested();
                 }
             }
         }
 
-        /// <summary>
-        /// Xác định người đăng nhập có quyền Giáo Vụ/Admin hay không.
-        /// </summary>
-        private bool IsGiaoVu =>
-            string.Equals(_mainVM.CurrentUser?.VaiTro?.TenVaiTro, "GiaoVu", StringComparison.OrdinalIgnoreCase)
-         || string.Equals(_mainVM.CurrentUser?.VaiTroID, "GVU", StringComparison.OrdinalIgnoreCase)
-         || string.Equals(_mainVM.CurrentUser?.VaiTroID, "GIAOVU", StringComparison.OrdinalIgnoreCase)
-         || string.Equals(_mainVM.CurrentUser?.VaiTro?.TenVaiTro, "Admin", StringComparison.OrdinalIgnoreCase);
+        private string _searchText;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (_searchText != value)
+                {
+                    _searchText = value;
+                    OnPropertyChanged();
+                    FilterUsers();
+                }
+            }
+        }
 
-        public bool CanEditCurrentUser => CanEditUser(SelectedUser);
-        public bool CanDeleteCurrentUser => CanDeleteUser(SelectedUser);
         #endregion
 
         #region Command
+
         public ICommand ShowThemTaiKhoanCommand { get; }
         public ICommand ReloadCommand { get; }
         public ICommand SuaTaiKhoanCommand { get; }
         public ICommand XoaTaiKhoanCommand { get; }
+
         #endregion
 
-        public QuanLyTaiKhoanMainViewModel(MainViewModel mainVM)
+        #region Lọc người dùng
+
+        private void FilterUsers()
         {
-            _mainVM = mainVM ?? throw new ArgumentNullException(nameof(mainVM));
-
-            // Khởi tạo command
-            ShowThemTaiKhoanCommand = new RelayCommand(ShowThemTaiKhoan);
-            ReloadCommand = new RelayCommand(LoadDanhSachTaiKhoan);
-            SuaTaiKhoanCommand = new RelayCommand(
-                                        execute: () => SuaTaiKhoan(SelectedUser),
-                                        canExecute: () => CanEditCurrentUser);
-            XoaTaiKhoanCommand = new RelayCommand(
-                                        execute: () => XoaTaiKhoan(SelectedUser),
-                                        canExecute: () => CanDeleteCurrentUser);
-
-            // Tải dữ liệu ban đầu
-            LoadDanhSachTaiKhoan();
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                FilteredUsers = new ObservableCollection<User>(Users);
+            }
+            else
+            {
+                string keyword = SearchText.Trim().ToLower();
+                FilteredUsers = new ObservableCollection<User>(
+                    Users.Where(u => u.UserID?.ToLower().Contains(keyword) == true));
+            }
         }
 
-        #region Logic quyền
-        private bool CanEditUser(User user) =>
-            user != null && (IsGiaoVu || user.UserID == _mainVM.CurrentUser?.UserID);
-
-        private bool CanDeleteUser(User user) =>
-            user != null && IsGiaoVu && user.UserID != _mainVM.CurrentUser?.UserID;
         #endregion
 
         #region Tải danh sách tài khoản
+
         private void LoadDanhSachTaiKhoan()
         {
             try
@@ -98,26 +127,30 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 
                 foreach (var user in danhSach)
                 {
-                    user.VaiTro ??= new VaiTro(); // Bảo đảm không null
+                    user.VaiTro ??= new VaiTro(); // Đảm bảo không null
                     Users.Add(user);
                 }
+
+                FilterUsers(); // Cập nhật danh sách lọc
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Lỗi khi tải dữ liệu: {ex.Message}");
             }
         }
+
         #endregion
 
-        #region Thêm – Sửa – Xóa
+        #region Thêm tài khoản
+
         private void ShowThemTaiKhoan()
         {
             var themVM = new QuanLyTaiKhoanThemViewModel(_mainVM);
 
             themVM.AccountAddedSuccessfully += userMoi =>
             {
-                Users.Insert(0, userMoi);     // Thêm vào đầu danh sách
-                _mainVM.CurrentView = this;   // Quay về màn danh sách
+                Users.Insert(0, userMoi);
+                _mainVM.CurrentView = this;
             };
 
             themVM.CancelRequested += () => _mainVM.CurrentView = this;
@@ -125,51 +158,80 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             _mainVM.CurrentView = themVM;
         }
 
+        #endregion
+
+        #region Sửa tài khoản
+
         private void SuaTaiKhoan(User userToEdit)
         {
-            if (userToEdit == null) return;
+            if (userToEdit == null)
+            {
+                MessageBox.Show("Không tìm thấy tài khoản để sửa.");
+                return;
+            }
 
             var suaVM = new QuanLyTaiKhoanSuaViewModel(userToEdit, _mainVM);
+            var dialog = new SuaTaiKhoanDiaLog
+            {
+                DataContext = suaVM
+            };
+
+            suaVM.CancelRequested += () => dialog.Close();
 
             suaVM.AccountEditedSuccessfully += editedUser =>
             {
-                // Cập nhật lại item trong ObservableCollection
-                var index = Users.IndexOf(userToEdit);
-                if (index >= 0) Users[index] = editedUser;
-                _mainVM.CurrentView = this;
+                var user = Users.FirstOrDefault(u => u.UserID == editedUser.UserID);
+                if (user != null)
+                {
+                    user.HoTen = editedUser.HoTen;
+                    user.TenDangNhap = editedUser.TenDangNhap;
+                    user.VaiTroID = editedUser.VaiTroID;
+                    user.VaiTro = editedUser.VaiTro;
+
+                    // Nếu có cập nhật mật khẩu, bạn có thể thêm dòng:
+                     user.MatKhau = editedUser.MatKhau;
+                }
+
+                dialog.Close();
             };
 
-            suaVM.CancelRequested += () => _mainVM.CurrentView = this;
 
-            _mainVM.CurrentView = suaVM;
+            dialog.ShowDialog();
         }
+
+        #endregion
+
+        #region Xóa tài khoản
 
         private void XoaTaiKhoan(User user)
         {
-            if (user == null) return;
+            if (user == null)
+            {
+                MessageBox.Show("Không tìm thấy tài khoản để xóa.");
+                return;
+            }
 
             try
             {
-                // Kiểm tra liên quan học sinh
                 bool hasRelatedStudents = UserService.HasRelatedStudents(user.UserID);
 
                 if (hasRelatedStudents)
                 {
-                    var yes = MessageBox.Show(
+                    var confirm = MessageBox.Show(
                         "Tài khoản này có học sinh liên quan.\nXóa cả học sinh liên quan?",
                         "Cảnh báo", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
-                    if (yes != MessageBoxResult.Yes) return;
+                    if (confirm != MessageBoxResult.Yes) return;
 
                     UserService.XoaTaiKhoanVaHocSinh(user.UserID);
                 }
                 else
                 {
-                    var yes = MessageBox.Show(
+                    var confirm = MessageBox.Show(
                         $"Bạn chắc muốn xóa tài khoản \"{user.HoTen}\"?",
                         "Xác nhận", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-                    if (yes != MessageBoxResult.Yes) return;
+                    if (confirm != MessageBoxResult.Yes) return;
 
                     UserService.XoaTaiKhoan(user.UserID);
                 }
@@ -179,9 +241,10 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi xóa: {ex.Message}");
+                MessageBox.Show($"Lỗi khi xóa tài khoản: {ex.Message}");
             }
         }
+
         #endregion
     }
 }

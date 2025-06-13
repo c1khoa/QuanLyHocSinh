@@ -5,13 +5,13 @@
     <Compile Update="View\Controls\QuanLyTaiKhoan\QuanLyTaiKhoanCaNhanUC.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="View\Controls\QuanLyTaiKhoan\QuanLyTaiKhoanSuaUC.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Update="View\Controls\QuanLyTaiKhoan\QuanLyTaiKhoanThemUC.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="View\Controls\QuyDinh\QuyDinhSuaUC.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="View\Dialogs\SuaTaiKhoanDiaLog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="View\Windows\BeginWindow.xaml.cs">
