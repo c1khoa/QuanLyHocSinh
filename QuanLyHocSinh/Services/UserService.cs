@@ -97,9 +97,8 @@ namespace QuanLyHocSinh.Service
         public static bool ThemTaiKhoan(User user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
-            if (string.IsNullOrEmpty(user.TenDangNhap)) return false; // có thể check thêm
-            if (CheckDuplicateUsername(user.TenDangNhap))
-                return false;
+            if (string.IsNullOrEmpty(user.TenDangNhap)) return false;
+            if (CheckDuplicateUsername(user.TenDangNhap)) return false;
 
             using (var conn = new MySqlConnection(connectionString))
             {
@@ -108,70 +107,112 @@ namespace QuanLyHocSinh.Service
                 {
                     try
                     {
-                        // Thêm vào bảng USERS
-                        string userQuery = @"INSERT INTO USERS (UserID, TenDangNhap, MatKhau, VaiTroID) 
-                                 VALUES (@UserID, @TenDangNhap, @MatKhau, @VaiTroID)";
+                        string userID = user.UserID ?? Guid.NewGuid().ToString();
+                        string roleID = "";
+                        string hoSoID = "HSO" + userID.Substring(1);
 
+                        // 1. Thêm vào bảng USERS
+                        string userQuery = @"INSERT INTO USERS (UserID, TenDangNhap, MatKhau, VaiTroID) 
+                                     VALUES (@UserID, @TenDangNhap, @MatKhau, @VaiTroID)";
                         using (var cmd = new MySqlCommand(userQuery, conn, transaction))
                         {
-                            string userID = user.UserID ?? Guid.NewGuid().ToString();
                             cmd.Parameters.AddWithValue("@UserID", userID);
                             cmd.Parameters.AddWithValue("@TenDangNhap", user.TenDangNhap);
                             cmd.Parameters.AddWithValue("@MatKhau", user.MatKhau ?? string.Empty);
                             cmd.Parameters.AddWithValue("@VaiTroID", user.VaiTroID ?? string.Empty);
-
-                            int result = cmd.ExecuteNonQuery();
-                            if (result <= 0)
+                            if (cmd.ExecuteNonQuery() <= 0)
                             {
                                 transaction.Rollback();
                                 return false;
                             }
+                        }
 
-                            // Thêm vào bảng tương ứng dựa vào vai trò
-                            if (!string.IsNullOrEmpty(user.VaiTroID))
+                        // 2. Thêm vào bảng vai trò
+                        // Replace the `.With` usage with direct parameter addition and execution
+                        switch (user.VaiTroID?.ToUpper())
+                        {
+                            case "VT01": // Học sinh
+                                roleID = "HS" + userID.Substring(1);
+                                using (var cmd = new MySqlCommand("INSERT INTO HOCSINH (HocSinhID, UserID) VALUES (@ID, @UserID)", conn, transaction))
+                                {
+                                    cmd.Parameters.AddWithValue("@ID", roleID);
+                                    cmd.Parameters.AddWithValue("@UserID", userID);
+                                    cmd.ExecuteNonQuery();
+                                }
+                                break;
+
+                            case "VT02": // Giáo viên
+                                roleID = "GV" + userID.Substring(1);
+                                using (var cmd = new MySqlCommand("INSERT INTO GIAOVIEN (GiaoVienID, UserID) VALUES (@ID, @UserID)", conn, transaction))
+                                {
+                                    cmd.Parameters.AddWithValue("@ID", roleID);
+                                    cmd.Parameters.AddWithValue("@UserID", userID);
+                                    cmd.ExecuteNonQuery();
+                                }
+                                break;
+
+                            case "VT03": // Giáo vụ
+                                roleID = "GVU" + userID.Substring(1);
+                                using (var cmd = new MySqlCommand("INSERT INTO GIAOVU (GiaoVuID, UserID) VALUES (@ID, @UserID)", conn, transaction))
+                                {
+                                    cmd.Parameters.AddWithValue("@ID", roleID);
+                                    cmd.Parameters.AddWithValue("@UserID", userID);
+                                    cmd.ExecuteNonQuery();
+                                }
+                                break;
+                        }
+
+
+                        // 3. Tạo HOSO
+                        string insertHoSo = @"
+                    INSERT INTO HOSO (HoSoID, HoTen, GioiTinh, NgaySinh, Email, DiaChi, ChucVuID, TrangThaiHoSo, NgayTao, NgayCapNhatGanNhat)
+                    VALUES (@HoSoID, @HoTen, 'Nam', NOW(), 'test@email.com', 'Chua cap nhat', 'CV001', 'danghoatdong', NOW(), NOW())";
+                        using (var cmd = new MySqlCommand(insertHoSo, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@HoSoID", hoSoID);
+                            cmd.Parameters.AddWithValue("@HoTen", user.HoTen ?? "Không rõ");
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // 4. Liên kết HOSO với vai trò
+                        if (user.VaiTroID == "VT01") // học sinh
+                        {
+                            string linkQuery = @"INSERT INTO HOSOHOCSINH (HoSoHocSinhID, HocSinhID, HoSoID, LopHocID, NienKhoa)
+                                         VALUES (@LinkID, @HocSinhID, @HoSoID, '10A1', 2025)";
+                            using (var linkCmd = new MySqlCommand(linkQuery, conn, transaction))
                             {
-                                string roleQuery = "";
-                                string roleID = "";
-
-                                switch (user.VaiTroID.ToUpper())
-                                {
-                                    case "VT03": // Giáo vụ
-                                        roleQuery = "INSERT INTO GIAOVU (GiaoVuID, UserID) VALUES (@RoleID, @UserID)";
-                                        roleID = "GVU" + userID.Substring(1); // GVU001 từ U001
-                                        break;
-                                    case "VT02": // Giáo viên 
-                                        roleQuery = "INSERT INTO GIAOVIEN (GiaoVienID, UserID) VALUES (@RoleID, @UserID)";
-                                        roleID = "GV" + userID.Substring(1); // GV001 từ U001
-                                        break;
-                                    case "VT01": // Học sinh
-                                        roleQuery = "INSERT INTO HOCSINH (HocSinhID, UserID) VALUES (@RoleID, @UserID)";
-                                        roleID = "HS" + userID.Substring(1); // HS001 từ U001
-                                        break;
-                                }
-
-                                if (!string.IsNullOrEmpty(roleQuery))
-                                {
-                                    using (var roleCmd = new MySqlCommand(roleQuery, conn, transaction))
-                                    {
-                                        roleCmd.Parameters.AddWithValue("@RoleID", roleID);
-                                        roleCmd.Parameters.AddWithValue("@UserID", userID);
-                                        roleCmd.ExecuteNonQuery();
-                                    }
-                                }
+                                linkCmd.Parameters.AddWithValue("@LinkID", "HSHS" + userID.Substring(1));
+                                linkCmd.Parameters.AddWithValue("@HocSinhID", roleID);
+                                linkCmd.Parameters.AddWithValue("@HoSoID", hoSoID);
+                                linkCmd.ExecuteNonQuery();
+                            }
+                        }
+                        else if (user.VaiTroID == "VT02") // giáo viên
+                        {
+                            string linkQuery = @"INSERT INTO HOSOGIAOVIEN (HoSoGiaoVienID, GiaoVienID, HoSoID, LopDayID, NgayBatDauLamViec)
+                                         VALUES (@LinkID, @GiaoVienID, @HoSoID, '10A1', NOW())";
+                            using (var linkCmd = new MySqlCommand(linkQuery, conn, transaction))
+                            {
+                                linkCmd.Parameters.AddWithValue("@LinkID", "HSGV" + userID.Substring(1));
+                                linkCmd.Parameters.AddWithValue("@GiaoVienID", roleID);
+                                linkCmd.Parameters.AddWithValue("@HoSoID", hoSoID);
+                                linkCmd.ExecuteNonQuery();
                             }
                         }
 
                         transaction.Commit();
                         return true;
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         transaction.Rollback();
+                        Console.WriteLine("Lỗi khi thêm tài khoản: " + ex.Message);
                         return false;
                     }
                 }
             }
         }
+
 
         public static bool SuaTaiKhoan(User user)
         {
