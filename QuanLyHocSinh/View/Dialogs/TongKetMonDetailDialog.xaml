@@ -1,0 +1,37 @@
+<Window x:Class="QuanLyHocSinh.View.Dialogs.TongKetMonDetailDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Chi tiết tổng kết môn" Width="600" MinHeight="500"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="CHI TIẾT TỔNG KẾT MÔN" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+        <StackPanel Grid.Row="1" Margin="0,0,0,10">
+            <GroupBox Header="Thông tin học sinh" Margin="0,0,0,10">
+                <StackPanel>
+                    <TextBlock Text="{Binding HoTen, StringFormat='Họ tên: {0}'}" FontSize="16" Margin="0,5"/>
+                    <TextBlock Text="{Binding HocSinhID, StringFormat='Mã HS: {0}'}" FontSize="16" Margin="0,5"/>
+                    <TextBlock Text="{Binding TenLop, StringFormat='Lớp: {0}'}" FontSize="16" Margin="0,5"/>
+                    <TextBlock Text="{Binding NamHoc, StringFormat='Năm học: {0}'}" FontSize="16" Margin="0,5"/>
+                    <TextBlock Text="{Binding HocKy, StringFormat='Học kỳ: {0}'}" FontSize="16" Margin="0,5"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Chi tiết điểm" Margin="0,0,0,10">
+                <StackPanel>
+                    <TextBlock Text="{Binding DiemMiengStr, StringFormat='Điểm miệng: {0}'}" FontSize="16" Margin="0,5"/>
+                    <TextBlock Text="{Binding Diem15PhutStr, StringFormat='Điểm 15 phút: {0}'}" FontSize="16" Margin="0,5"/>
+                    <TextBlock Text="{Binding Diem1TietStr, StringFormat='Điểm 1 tiết: {0}'}" FontSize="16" Margin="0,5"/>
+                    <TextBlock Text="{Binding DiemThiStr, StringFormat='Điểm thi: {0}'}" FontSize="16" Margin="0,5"/>
+                    <TextBlock Text="{Binding DiemTrungBinh, StringFormat='Điểm TB: {0:F2}'}" FontSize="16" Margin="0,5"/>
+                    <TextBlock Text="{Binding XepLoai, StringFormat='Xếp loại: {0}'}" FontSize="16" Margin="0,5"/>
+                    <TextBlock Text="{Binding GhiChu, StringFormat='Ghi chú: {0}'}" FontSize="16" Margin="0,5"/>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+        <Button Grid.Row="2" Content="Đóng" Width="90" Height="38" HorizontalAlignment="Center" Margin="0,10,0,0" Click="Close_Click"/>
+    </Grid>
+</Window>

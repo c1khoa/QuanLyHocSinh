@@ -1,0 +1,88 @@
+<Window x:Class="QuanLyHocSinh.View.Dialogs.BangDiemHocSinh"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.TraCuu"
+        Title="Bảng điểm học sinh" MinHeight="400" MinWidth="700" ResizeMode="CanResize" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <local:DiemToDisplayStringConverter x:Key="DiemToDisplayStringConverter"/>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="BẢNG ĐIỂM HỌC SINH" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,16"/>
+        <!-- Bộ lọc năm học, học kỳ -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,12">
+            <TextBlock Text="Năm học: " FontWeight="Bold" VerticalAlignment="Center"/>
+            <ComboBox Width="120" Margin="0,0,16,0" ItemsSource="{Binding DanhSachNamHoc}" SelectedItem="{Binding SelectedNamHoc, Mode=TwoWay}" SelectedIndex="-1"/>
+            <TextBlock Text="Học kỳ: " FontWeight="Bold" VerticalAlignment="Center"/>
+            <ComboBox Width="80" ItemsSource="{Binding DanhSachHocKy}" SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}" SelectedIndex="-1"/>
+        </StackPanel>
+        <!-- Thông tin học sinh -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
+            <TextBlock Text="Họ tên: " FontWeight="Bold"/>
+            <TextBlock Text="{Binding HoTen}" Margin="0,0,16,0"/>
+            <TextBlock Text="Lớp: " FontWeight="Bold"/>
+            <TextBlock Text="{Binding TenLop}" Margin="0,0,16,0"/>
+            <TextBlock Text="Năm học: " FontWeight="Bold"/>
+            <TextBlock Text="{Binding NamHoc}" Margin="0,0,16,0"/>
+            <TextBlock Text="Học kỳ: " FontWeight="Bold"/>
+            <TextBlock Text="{Binding HocKy}"/>
+        </StackPanel>
+        <!-- Bảng điểm các môn -->
+        <DataGrid Grid.Row="3" 
+                  ItemsSource="{Binding BangDiemMon}" 
+                  Style="{StaticResource CommonDataGridStyle}" 
+                  Visibility="{Binding IsShowBangDiem, Converter={StaticResource BooleanToVisibilityConverter}}"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  AutoGenerateColumns="False"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ScrollViewer.CanContentScroll="True"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
+                  EnableRowVirtualization="True"
+                  EnableColumnVirtualization="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Môn học" Binding="{Binding MonHoc}" Width="*" ElementStyle="{StaticResource CenterAlignStyle}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Điểm miệng" Binding="{Binding DiemMieng, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                <DataGridTextColumn Header="Điểm 15p" Binding="{Binding Diem15Phut, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                <DataGridTextColumn Header="Điểm 1 tiết" Binding="{Binding Diem1Tiet, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                <DataGridTextColumn Header="Điểm thi" Binding="{Binding DiemThi, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                <DataGridTextColumn Header="Điểm TB" Binding="{Binding DiemTrungBinh, StringFormat=F2}" Width="*" ElementStyle="{StaticResource CenterAlignStyle}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Xếp loại" Binding="{Binding XepLoai}" Width="*" ElementStyle="{StaticResource CenterAlignStyle}" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Chức năng" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource MaterialDesignToolButton}"
+                                    Background="Transparent" BorderThickness="0"
+                                    Width="32" Height="32" Padding="0"
+                                    Click="SuaDiem_Click"
+                                    ToolTip="Sửa điểm">
+                                <materialDesign:PackIcon Kind="Pencil" Width="22" Height="22" Foreground="#0078D7" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <!-- Nút xuất Excel và đóng -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="Xuất Excel" Width="120" Height="32" Margin="0,0,16,0" Command="{Binding ExportExcelCommand}"
+                    Background="#388E3C" Foreground="White" FontWeight="Bold" FontSize="15"/>
+            <Button Content="Đóng" Width="100" Height="32" Click="BtnClose_Click" Style="{StaticResource ActionButtonStyle}"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,49 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                    xmlns:viewmodel="clr-namespace:QuanLyHocSinh.ViewModel"
+                    xmlns:vmQuanLyTaiKhoan="clr-namespace:QuanLyHocSinh.ViewModel.QuanLyTaiKhoan"
+                    xmlns:vmTraCuu="clr-namespace:QuanLyHocSinh.ViewModel.TraCuu"
+                    xmlns:vmQuyDinh="clr-namespace:QuanLyHocSinh.ViewModel.QuyDinh"
+                    xmlns:vmBaoCao="clr-namespace:QuanLyHocSinh.ViewModel.BaoCao"
+                    xmlns:view="clr-namespace:QuanLyHocSinh.View.Controls" 
+                    xmlns:viewqltk="clr-namespace:QuanLyHocSinh.View.Controls.QuanLyTaiKhoan"
+                    xmlns:viewbc="clr-namespace:QuanLyHocSinh.View.Controls.BaoCao"
+                    xmlns:viewtc="clr-namespace:QuanLyHocSinh.View.Controls.TraCuu"
+                    xmlns:viewqd="clr-namespace:QuanLyHocSinh.View.Controls.QuyDinh">
+    <!-- DataTemplate ánh xạ ViewModel -> View -->
+    <DataTemplate DataType="{x:Type viewmodel:TrangChuViewModel}">
+        <view:TrangChuUC />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanMainViewModel}">
+        <viewqltk:QuanLyTaiKhoanMainUC />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanThemViewModel}">
+        <viewqltk:QuanLyTaiKhoanThemUC/>
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanCaNhanViewModel}">
+        <viewqltk:QuanLyTaiKhoanCaNhanUC/>
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type vmTraCuu:TraCuuHocSinhViewModel}">
+        <viewtc:TraCuuHocSinhUC />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vmTraCuu:TraCuuGiaoVienViewModel}">
+        <viewtc:TraCuuGiaoVienUC />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vmBaoCao:TongKetMonViewModel}">
+        <viewbc:TongKetMonUC />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vmBaoCao:TongKetNamViewModel}">
+        <viewbc:TongKetNamUC />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vmQuyDinh:QuyDinhMainViewModel}">
+        <viewqd:QuyDinhMainUC />
+    </DataTemplate>
+</ResourceDictionary>

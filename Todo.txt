@@ -1,0 +1,4 @@
+1. Khi thay đổi thuộc tính của, ví dụ thêm niên khoá 2024 cho học sinh (niên khoá này chưa có)
+thì phải cập nhật lại filter
+2. Khi sử môn giáo viên dạy, phải show tất cả môn học đang có trong bảng MonHoc 
+3. Thêm lại lọc theo học kì cho TongKetNam 

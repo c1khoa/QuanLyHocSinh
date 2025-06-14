@@ -1,0 +1,90 @@
+<Window x:Class="QuanLyHocSinh.View.Dialogs.TongKetNamBangDiemLop"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Bảng điểm lớp" MinHeight="500" MinWidth="900" ResizeMode="CanResize" WindowState="Maximized" WindowStartupLocation="CenterScreen">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="BẢNG ĐIỂM LỚP" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,16"/>
+            <!-- Thông tin lớp -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
+                <TextBlock Text="Lớp: " FontWeight="Bold" FontSize="18" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding SelectedLop}" FontSize="18" Margin="4,0,16,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Năm học: " FontWeight="Bold" FontSize="18" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding NamHoc}" FontSize="18" Margin="4,0,16,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Học kỳ: " FontWeight="Bold" FontSize="18" VerticalAlignment="Center"/>
+                <ComboBox Width="100" ItemsSource="{Binding DanhSachHocKy}" SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}" FontSize="18" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                <Button Content="Xuất Excel" Width="140" Height="32" Margin="360,0,16,0" Command="{Binding ExportExcelCommand}"
+                        Background="#388E3C" Foreground="White" FontWeight="Bold" FontSize="15" HorizontalAlignment="Center"/>
+                </StackPanel>
+            <!-- Bảng điểm lớp -->
+            <DataGrid Grid.Row="2" 
+                      ItemsSource="{Binding BangDiemLop}" 
+                      AutoGenerateColumns="False" 
+                      IsReadOnly="True"
+                      RowHeight="40" 
+                      ColumnHeaderHeight="36" 
+                      Margin="0,0,0,16" 
+                      HeadersVisibility="Column"
+                      HorizontalAlignment="Stretch" 
+                      VerticalAlignment="Stretch" 
+                      GridLinesVisibility="All"
+                      BorderThickness="1" 
+                      BorderBrush="Gray"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      ScrollViewer.CanContentScroll="True"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling"
+                      EnableRowVirtualization="True"
+                      EnableColumnVirtualization="True">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                    </Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="TextAlignment" Value="Center"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="STT" Binding="{Binding STT}" Width="50" ElementStyle="{StaticResource {x:Type TextBlock}}"/>
+                    <DataGridTextColumn Header="Mã HS" Binding="{Binding HocSinhID}" Width="80" ElementStyle="{StaticResource {x:Type TextBlock}}"/>
+                    <DataGridTextColumn Header="Họ tên" Binding="{Binding HoTen}" Width="*" ElementStyle="{StaticResource {x:Type TextBlock}}"/>
+                    <!-- Các cột môn học sẽ được binding động từ ViewModel (AutoGenerateColumns=False, nhưng sẽ thêm bằng code) -->
+                    <DataGridTextColumn Header="Điểm TB học kỳ" Binding="{Binding DiemTrungBinh, StringFormat=F2}" Width="*" ElementStyle="{StaticResource {x:Type TextBlock}}"/>
+                    <DataGridTextColumn Header="Xếp loại học kỳ" Binding="{Binding XepLoai}" Width="*" ElementStyle="{StaticResource {x:Type TextBlock}}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <!-- Thống kê tổng quát dưới bảng điểm lớp -->
+            <StackPanel Grid.Row="3" Orientation="Vertical" Margin="10,0,10,10">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
+                    <TextBlock Text="Điểm trung bình của lớp: " FontWeight="Bold" FontSize="16"/>
+                    <TextBlock Text="{Binding DiemTrungBinhLop, StringFormat={}{0:F2}}" Foreground="#1976D2" FontSize="16" Margin="4,0,16,0"/>
+                    <TextBlock Text="Tỉ lệ đạt: " FontWeight="Bold" FontSize="16"/>
+                    <TextBlock Text="{Binding TiLeDat, StringFormat={}{0:F2}%}" Foreground="#388E3C" FontSize="16" Margin="4,0,16,0"/>
+                    <TextBlock Text="Số lượng giỏi: " Foreground="#1976D2" FontSize="16"/>
+                    <TextBlock Text="{Binding SoLuongGioi}" FontSize="16" Margin="0,0,8,0"/>
+                    <TextBlock Text="Khá: " Foreground="#388E3C" FontSize="16"/>
+                    <TextBlock Text="{Binding SoLuongKha}" FontSize="16" Margin="0,0,8,0"/>
+                    <TextBlock Text="Trung bình: " Foreground="#FFA000" FontSize="16"/>
+                    <TextBlock Text="{Binding SoLuongTrungBinh}" FontSize="16" Margin="0,0,8,0"/>
+                    <TextBlock Text="Yếu: " Foreground="#C62828" FontSize="16"/>
+                    <TextBlock Text="{Binding SoLuongYeu}" FontSize="16" Margin="0,0,8,0"/>
+                    <TextBlock Text="Kém: " Foreground="#6D4C41" FontSize="16"/>
+                    <TextBlock Text="{Binding SoLuongKem}" FontSize="16" Margin="0,0,8,0"/>
+                </StackPanel>
+                <TextBlock Text="Điểm trung bình từng môn:" FontWeight="Bold" Margin="0,8,0,0" FontSize="16" HorizontalAlignment="Center"/>
+                <DataGrid ItemsSource="{Binding DiemTrungBinhTungMon}" AutoGenerateColumns="False" HeadersVisibility="Column" CanUserAddRows="False" Margin="0,0,0,8" Height="120">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Môn học" Binding="{Binding MonHoc}" Width="*"/>
+                        <DataGridTextColumn Header="Điểm TB" Binding="{Binding DiemTB, StringFormat={}{0:F2}}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </Grid>
+</Window>
