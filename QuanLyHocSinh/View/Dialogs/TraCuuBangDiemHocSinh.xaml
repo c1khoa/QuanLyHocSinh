@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.TraCuu"
-        Title="Bảng điểm học sinh" MinHeight="400" MinWidth="700" ResizeMode="CanResize" WindowStartupLocation="CenterScreen">
+        Title="Bảng điểm học sinh" MinHeight="400" MinWidth="700" ResizeMode="CanResize" WindowStartupLocation="CenterScreen"
+        x:Name="main">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -67,6 +68,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource MaterialDesignToolButton}"
+                                    Visibility="{Binding DataContext.IsNotHocSinhVisible, ElementName=main, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     Background="Transparent" BorderThickness="0"
                                     Width="32" Height="32" Padding="0"
                                     Click="SuaDiem_Click"

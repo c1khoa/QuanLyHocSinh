@@ -52,6 +52,37 @@ namespace QuanLyHocSinh.Model.Entities
             }
             return list;
         }
+        public static List<string> GetLopHocCuaUser(string userID)
+        {
+            List<string> danhSachLop = new List<string>();
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+
+            string query = @"
+                    SELECT DISTINCT l.TenLop
+                    FROM USERS u
+                    JOIN HOCSINH hs ON u.UserID = hs.UserID
+                    JOIN HOSOHOCSINH hshs ON hs.HocSinhID = hshs.HocSinhID
+                    JOIN LOP l ON hshs.LopHocID = l.LopID
+                    WHERE u.UserID = @UserID
+    ";
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@UserID", userID);
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        danhSachLop.Add(reader["TenLop"].ToString());
+                    }
+                }
+            }
+
+            return danhSachLop;
+        }
 
         public static List<string> GetAllNienKhoa()
         {

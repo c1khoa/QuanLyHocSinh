@@ -130,13 +130,14 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Button Style="{StaticResource MaterialDesignToolButton}"
-
+                                <!--Visibility="{Binding DataContext.IsNotHocSinhVisible, ElementName=main, Converter={StaticResource BooleanToVisibilityConverter}}"-->
+                                <Button Style="{StaticResource MaterialDesignToolButton}"
+                                        Visibility="{Binding DataContext.IsNotHocSinhVisible, ElementName=main, Converter={StaticResource BooleanToVisibilityConverter}}"
                                             Background="Transparent" BorderThickness="0"
                                             Width="32" Height="32" Padding="0"
                                             Command="{Binding DataContext.XemBangDiemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                             CommandParameter="{Binding}"
-                                            Visibility="{Binding DataContext.IsNotHocSinhVisible, ElementName=main, Converter={StaticResource BooleanToVisibilityConverter}}"
+
                                             ToolTip="Xem bảng điểm">
                                         <materialDesign:PackIcon Kind="Eye" Width="22" Height="22" Foreground="#1976D2" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                     </Button>
