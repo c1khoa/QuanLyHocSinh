@@ -109,6 +109,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                 _allHocSinh = new ObservableCollection<HocSinh>(
                     HocSinhDAL.GetAllHocSinh().Where(hs => danhSachLopCuaGV.Contains(hs.TenLop))
                 );
+                MessageBox.Show(_mainVM.CurrentUser.VaiTro.VaiTroID);
                 
             }
             else
