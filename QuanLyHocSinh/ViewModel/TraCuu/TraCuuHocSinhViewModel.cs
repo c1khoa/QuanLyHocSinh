@@ -111,6 +111,17 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                 );
                 
             }
+            else if (_mainVM.CurrentUser.VaiTro.VaiTroID == "VT01")
+            {
+                // Lấy danh sách lớp mà giáo viên đang dạy
+                var danhSachLopCuaHS = HocSinhDAL.GetLopHocCuaUser(_mainVM.CurrentUser.UserID);
+
+                // Lấy học sinh chỉ trong các lớp đó
+                _allHocSinh = new ObservableCollection<HocSinh>(
+                    HocSinhDAL.GetAllHocSinh().Where(hs => danhSachLopCuaHS.Contains(hs.TenLop))
+                );
+
+            }
             else
             {
                 // Nếu là giáo vụ hoặc admin, load toàn bộ học sinh
@@ -171,12 +182,14 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         private void XemBangDiem(HocSinh hs)
         {
             if (hs == null) return;
-            // Lấy năm học và học kỳ hiện tại từ filter
+
             string namHoc = SelectedNienKhoa != null && SelectedNienKhoa != "Tất cả" ? SelectedNienKhoa : null;
-            int? hocKy = null; // Nếu có filter học kỳ, truyền vào đây
-            var dialog = new QuanLyHocSinh.View.Dialogs.BangDiemHocSinh();
-            dialog.DataContext = new QuanLyHocSinh.ViewModel.TraCuu.TraCuuBangDiemHocSinhViewModel(hs, namHoc, hocKy);
+            int? hocKy = null;
+
+            var dialog = new BangDiemHocSinh(); // assuming using directive is present
+            dialog.DataContext = new TraCuuBangDiemHocSinhViewModel(hs, _mainVM, namHoc, hocKy);
             dialog.ShowDialog();
         }
+
     }
 }

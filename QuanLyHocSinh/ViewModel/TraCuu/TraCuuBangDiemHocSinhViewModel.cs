@@ -43,8 +43,11 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         }
 
         private HocSinh _hocSinh;
-        public TraCuuBangDiemHocSinhViewModel(HocSinh hs, string namHoc = null, int? hocKy = null)
+
+        private MainViewModel _mainVM;
+        public TraCuuBangDiemHocSinhViewModel(HocSinh hs, MainViewModel mainVM, string namHoc = null, int? hocKy = null)
         {
+            _mainVM = mainVM;
             _hocSinh = hs;
             HoTen = hs.HoTen;
             TenLop = hs.TenLop;
@@ -59,6 +62,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             BangDiemMon = null;
             IsShowBangDiem = false;
             ExportExcelCommand = new RelayCommand(ExportExcel);
+            _mainVM = mainVM;
         }
         private void OnFilterChanged()
         {
