@@ -1,6 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
-using QuanLyHocSinh.Service;
 using System;
 using System.Collections.ObjectModel;
 using System.Configuration;
@@ -26,6 +25,7 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
         public event Action<User> AccountEditedSuccessfully;
         public event Action CancelRequested;
 
+        // Hai biến này được gán giá trị từ code-behind do PasswordBox không hỗ trợ binding
         public string NewPassword { get; set; } = string.Empty;
         public string ConfirmPassword { get; set; } = string.Empty;
 
@@ -35,7 +35,7 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
         {
             _mainVM = mainVM;
             _originalUser = userToEdit;
-            EditedUser = userToEdit.Clone() as User;
+            EditedUser = userToEdit.Clone() as User; // Tạo bản sao để chỉnh sửa
 
             LoadRoles();
 
@@ -43,6 +43,7 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             CancelCommand = new RelayCommand(CancelEdit);
         }
 
+        // Load danh sách vai trò từ database
         private void LoadRoles()
         {
             try
@@ -63,6 +64,7 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                     });
                 }
 
+                // Đảm bảo có VaiTro hợp lệ
                 if (string.IsNullOrEmpty(EditedUser.VaiTroID) || !Roles.Any(r => r.VaiTroID == EditedUser.VaiTroID))
                     EditedUser.VaiTroID = Roles.FirstOrDefault()?.VaiTroID;
             }
@@ -80,10 +82,12 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                    !string.IsNullOrWhiteSpace(EditedUser.VaiTroID);
         }
 
+        // Lưu thay đổi tài khoản
         private void SaveChanges()
         {
             try
             {
+                // Kiểm tra mật khẩu nếu có nhập
                 if (!string.IsNullOrWhiteSpace(NewPassword))
                 {
                     if (NewPassword != ConfirmPassword)
@@ -92,7 +96,7 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                         return;
                     }
 
-                    EditedUser.MatKhau = HashPassword(NewPassword);
+                    EditedUser.MatKhau = NewPassword;
                 }
 
                 if (!Roles.Any(r => r.VaiTroID == EditedUser.VaiTroID))
@@ -107,39 +111,52 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 
                 try
                 {
-                    // ✅ Cập nhật USERS, luôn truyền @MatKhau (có thể là null)
-                    string updateUserQuery = @"
-                UPDATE USERS 
-                SET TenDangNhap = @TenDangNhap, 
-                    VaiTroID = @VaiTroID, 
-                    MatKhau = IFNULL(@MatKhau, MatKhau)
-                WHERE UserID = @UserID;";
+                    // Tạo lệnh cập nhật USERS tuỳ theo có đổi mật khẩu hay không
+                    using var cmdUser = new MySqlCommand();
+                    cmdUser.Connection = conn;
+                    cmdUser.Transaction = trans;
 
-                    using var cmdUser = new MySqlCommand(updateUserQuery, conn, trans);
                     cmdUser.Parameters.AddWithValue("@TenDangNhap", EditedUser.TenDangNhap);
                     cmdUser.Parameters.AddWithValue("@VaiTroID", EditedUser.VaiTroID);
                     cmdUser.Parameters.AddWithValue("@UserID", EditedUser.UserID);
-                    cmdUser.Parameters.AddWithValue("@MatKhau",
-                        string.IsNullOrWhiteSpace(EditedUser.MatKhau) ? (object)DBNull.Value : EditedUser.MatKhau);
+
+                    if (!string.IsNullOrWhiteSpace(NewPassword))
+                    {
+                        cmdUser.CommandText = @"
+                            UPDATE USERS 
+                            SET TenDangNhap = @TenDangNhap, 
+                                VaiTroID = @VaiTroID, 
+                                MatKhau = @MatKhau
+                            WHERE UserID = @UserID;";
+                        cmdUser.Parameters.AddWithValue("@MatKhau", EditedUser.MatKhau);
+                    }
+                    else
+                    {
+                        cmdUser.CommandText = @"
+                            UPDATE USERS 
+                            SET TenDangNhap = @TenDangNhap, 
+                                VaiTroID = @VaiTroID
+                            WHERE UserID = @UserID;";
+                    }
 
                     cmdUser.ExecuteNonQuery();
 
-                    // ✅ Cập nhật HOSO nếu có (cho giáo viên hoặc học sinh)
+                    // Cập nhật HOSO nếu có (GV hoặc HS)
                     string updateHoSoQuery = @"
-                UPDATE HOSO h
-                JOIN (
-                    SELECT HoSoID FROM HOSOGIAOVIEN hgv
-                    JOIN GIAOVIEN gv ON gv.GiaoVienID = hgv.GiaoVienID
-                    WHERE gv.UserID = @UserID
+                        UPDATE HOSO h
+                        JOIN (
+                            SELECT HoSoID FROM HOSOGIAOVIEN hgv
+                            JOIN GIAOVIEN gv ON gv.GiaoVienID = hgv.GiaoVienID
+                            WHERE gv.UserID = @UserID
 
-                    UNION
+                            UNION
 
-                    SELECT HoSoID FROM HOSOHOCSINH hhs
-                    JOIN HOCSINH hs ON hs.HocSinhID = hhs.HocSinhID
-                    WHERE hs.UserID = @UserID
-                ) AS sub ON h.HoSoID = sub.HoSoID
-                SET h.HoTen = @HoTen, 
-                    h.NgayCapNhatGanNhat = @NgayCapNhat";
+                            SELECT HoSoID FROM HOSOHOCSINH hhs
+                            JOIN HOCSINH hs ON hs.HocSinhID = hhs.HocSinhID
+                            WHERE hs.UserID = @UserID
+                        ) AS sub ON h.HoSoID = sub.HoSoID
+                        SET h.HoTen = @HoTen, 
+                            h.NgayCapNhatGanNhat = @NgayCapNhat";
 
                     using var cmdHoSo = new MySqlCommand(updateHoSoQuery, conn, trans);
                     cmdHoSo.Parameters.AddWithValue("@HoTen", EditedUser.HoTen);
@@ -150,16 +167,18 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 
                     if (rowsAffected == 0)
                     {
-                        MessageBox.Show("Cảnh báo: Đã cập nhật thông tin tài khoản nhưng không tìm thấy hồ sơ liên quan.");
+                        MessageBox.Show("Cảnh báo: Đã cập nhật tài khoản nhưng không tìm thấy hồ sơ liên quan.");
                     }
 
+                    // Commit giao dịch
                     trans.Commit();
 
-                    // ✅ Cập nhật lại đối tượng gốc trong danh sách
+                    // Cập nhật đối tượng gốc
                     _originalUser.HoTen = EditedUser.HoTen;
                     _originalUser.TenDangNhap = EditedUser.TenDangNhap;
                     _originalUser.VaiTroID = EditedUser.VaiTroID;
-                    _originalUser.MatKhau = EditedUser.MatKhau;
+                    if (!string.IsNullOrWhiteSpace(NewPassword))
+                        _originalUser.MatKhau = EditedUser.MatKhau;
 
                     MessageBox.Show("Cập nhật thành công!");
                     AccountEditedSuccessfully?.Invoke(EditedUser);
@@ -167,26 +186,18 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                 catch (Exception ex)
                 {
                     trans.Rollback();
-                    MessageBox.Show($"Lỗi khi cập nhật: {ex.Message}");
+                    MessageBox.Show("Lỗi khi cập nhật: " + ex.Message);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi kết nối: {ex.Message}");
+                MessageBox.Show("Lỗi kết nối: " + ex.Message);
             }
         }
-
 
         private void CancelEdit()
         {
             CancelRequested?.Invoke();
-        }
-
-        private string HashPassword(string password)
-        {
-            using var sha256 = SHA256.Create();
-            var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(bytes);
         }
     }
 }

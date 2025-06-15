@@ -14,6 +14,15 @@ namespace QuanLyHocSinh.Model.Entities
         private string _hoTen;
         private VaiTro _vaiTro; // Private field cho navigation property
 
+        public string MaskedPassword
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(MatKhau))
+                    return "";
+                return new string('*', 8); // ho?c return "********"
+            }
+        }
         public string UserID
         {
             get => _userID;

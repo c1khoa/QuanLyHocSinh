@@ -189,7 +189,7 @@
                             <DataGridTextColumn Header="UserID" Binding="{Binding UserID}" Width="150"/>
                             <DataGridTextColumn Header="Họ và Tên" Binding="{Binding HoTen}" Width="250"/>
                             <DataGridTextColumn Header="Tên đăng nhập" Binding="{Binding TenDangNhap}" Width="250"/>
-                            <DataGridTextColumn Header="Mật khẩu" Binding="{Binding MatKhau}" Width="200"/>
+                            <DataGridTextColumn Header="Mật khẩu" Binding="{Binding MaskedPassword}" Width="200"/>
                             <DataGridTextColumn Header="Vai trò" Binding="{Binding VaiTro.TenVaiTro, TargetNullValue='[Chưa có vai trò]', FallbackValue='[Lỗi]'}" Width="100"/>
                          
                               

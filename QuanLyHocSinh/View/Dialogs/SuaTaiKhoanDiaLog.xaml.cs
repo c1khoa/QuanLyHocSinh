@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using QuanLyHocSinh.ViewModel.QuanLyTaiKhoan;
 
 namespace QuanLyHocSinh.View.Dialogs
 {
@@ -19,6 +20,22 @@ namespace QuanLyHocSinh.View.Dialogs
     /// </summary>
     public partial class SuaTaiKhoanDiaLog : Window
     {
+        private void pwdNewPassword_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is QuanLyTaiKhoanSuaViewModel vm)
+            {
+                vm.NewPassword = ((PasswordBox)sender).Password;
+            }
+        }
+
+        private void pwdConfirmPassword_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is QuanLyTaiKhoanSuaViewModel vm)
+            {
+                vm.ConfirmPassword = ((PasswordBox)sender).Password;
+            }
+        }
+
         public SuaTaiKhoanDiaLog()
         {
             InitializeComponent();

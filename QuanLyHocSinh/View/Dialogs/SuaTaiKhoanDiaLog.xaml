@@ -68,12 +68,14 @@
 
                     <TextBlock Text="Mật khẩu mới:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
                     <PasswordBox x:Name="pwdNewPassword"
+                                 PasswordChanged="pwdNewPassword_PasswordChanged"
                                  Grid.Row="4" Grid.Column="1"
                                  materialDesign:HintAssist.Hint="Để trống nếu không đổi"
                                  Style="{StaticResource MaterialDesignOutlinedPasswordBox}" />
 
                     <TextBlock Text="Xác nhận mật khẩu:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
                     <PasswordBox x:Name="pwdConfirmPassword"
+                                 PasswordChanged="pwdConfirmPassword_PasswordChanged"
                                  Grid.Row="5" Grid.Column="1"
                                  materialDesign:HintAssist.Hint="Nhập lại mật khẩu"
                                  Style="{StaticResource MaterialDesignOutlinedPasswordBox}" />
