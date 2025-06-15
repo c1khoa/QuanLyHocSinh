@@ -163,7 +163,7 @@ namespace QuanLyHocSinh.ViewModel
             string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
 
             string query = @"
-                SELECT nd.UserID, nd.TenDangNhap, nd.MatKhau, vt.TenVaiTro
+                SELECT nd.UserID, nd.TenDangNhap, nd.MatKhau, vt.VaiTroID, vt.TenVaiTro
                 FROM USERS nd
                 JOIN VAITRO vt ON nd.VaiTroID = vt.VaiTroID
                 WHERE nd.TenDangNhap = @Username 
@@ -193,9 +193,11 @@ namespace QuanLyHocSinh.ViewModel
                                 MatKhau = reader["MatKhau"].ToString(),
                                 VaiTro = new VaiTro
                                 {
+                                    VaiTroID = reader["VaiTroID"].ToString(),
                                     TenVaiTro = reader["TenVaiTro"].ToString()
                                 }
                             };
+
 
                             // Khởi tạo MainWindow với ViewModel có CurrentUser
                             var mainVM = new MainViewModel { CurrentUser = user };

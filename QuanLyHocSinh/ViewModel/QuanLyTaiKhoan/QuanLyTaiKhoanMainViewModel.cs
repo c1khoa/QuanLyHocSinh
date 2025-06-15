@@ -130,6 +130,7 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             {
                 Users.Insert(0, userMoi);
                 LoadDanhSachTaiKhoan();
+
                 _mainVM.CurrentView = this;
             };
             themVM.CancelRequested += () => _mainVM.CurrentView = this;

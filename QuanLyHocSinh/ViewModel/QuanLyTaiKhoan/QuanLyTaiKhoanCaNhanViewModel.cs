@@ -1,3 +1,9 @@
+using QuanLyHocSinh.View.Controls.QuanLyTaiKhoan;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
 using System;
@@ -162,9 +168,5 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                 MessageBox.Show($"Lỗi khi cập nhật: {ex.Message}");
             }
         }
-
-
-
-
     }
 }

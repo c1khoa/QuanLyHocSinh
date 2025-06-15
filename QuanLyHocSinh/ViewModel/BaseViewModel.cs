@@ -79,7 +79,6 @@ namespace QuanLyHocSinh.ViewModel
             _execute();
         }
 
-
         public event EventHandler? CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }

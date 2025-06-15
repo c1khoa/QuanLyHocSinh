@@ -70,6 +70,8 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
         #endregion
 
         #region Statistics Properties
+        private List<string> _dsLopGiaoVienDay = new();
+
         private int _tongHocSinh;
         public int TongHocSinh
         {
@@ -143,15 +145,24 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
         public TongKetNamViewModel(MainViewModel mainVM)
         {
             _mainVM = mainVM;
-            
+            if (_mainVM.CurrentUser.VaiTro.VaiTroID == "VT02")
+            {
+                _dsLopGiaoVienDay = GiaoVienDAL.GetLopDayCuaUser(_mainVM.CurrentUser.UserID);
+                var dsLop = new List<string>(_dsLopGiaoVienDay);
+                dsLop.Insert(0, "Tất cả");
+                DanhSachLop = new ObservableCollection<string>(dsLop);
+            }
+            else
+            {
+                var dsLop = TongKetNamDAL.GetAllLop();
+                dsLop.Insert(0, "Tất cả");
+                DanhSachLop = new ObservableCollection<string>(dsLop);
+            }
+
             // Khởi tạo danh sách
             var dsNamHoc = TongKetNamDAL.GetAllNamHoc();
             dsNamHoc.Insert(0, "Tất cả");
             DanhSachNamHoc = new ObservableCollection<string>(dsNamHoc);
-
-            var dsLop = TongKetNamDAL.GetAllLop();
-            dsLop.Insert(0, "Tất cả");
-            DanhSachLop = new ObservableCollection<string>(dsLop);
 
             var dsHocKy = TongKetNamDAL.GetAllHocKy().Select(h => h.ToString()).ToList();
             dsHocKy.Insert(0, "Cả năm");
@@ -172,11 +183,25 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
         {
             // Nếu tất cả filter đều là 'Tất cả' thì lấy toàn bộ dữ liệu
             string? namHoc = SelectedNamHoc == "Tất cả" ? null : SelectedNamHoc;
-            string? lop = SelectedLop == "Tất cả" ? null : SelectedLop;
             int? hocKy = (SelectedHocKy == "Tất cả" || SelectedHocKy == "Cả năm" || string.IsNullOrEmpty(SelectedHocKy)) ? null : int.Parse(SelectedHocKy);
 
+            List<string> lopCanLay;
+            if (SelectedLop == "Tất cả")
+            {
+                if (_mainVM.CurrentUser.VaiTro.VaiTroID == "VT02")
+                    lopCanLay = _dsLopGiaoVienDay;
+                else
+                    lopCanLay = TongKetNamDAL.GetAllLop(); // hoặc null nếu DAL hỗ trợ
+            }
+            else
+            {
+                lopCanLay = new List<string> { SelectedLop };
+            }
+
             DanhSachTongKetNamHoc.Clear();
-            var data = TongKetNamDAL.GetTongKetNamHoc(namHoc, lop, hocKy);
+            var data = TongKetNamDAL.GetTongKetNamHoc(namHoc, null, hocKy)
+                                    .Where(x => lopCanLay.Contains(x.TenLop))
+                                    .ToList();
             int stt = 1;
             foreach (var item in data)
             {

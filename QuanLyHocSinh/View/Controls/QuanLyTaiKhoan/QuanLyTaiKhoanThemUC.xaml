@@ -9,8 +9,10 @@
              FontSize="13"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+
              xmlns:viewmodel="clr-namespace:QuanLyHocSinh.ViewModel.QuanLyTaiKhoan" 
              d:DataContext="{d:DesignInstance Type=viewmodel:QuanLyTaiKhoanThemViewModel}"
+
              Name="ucQuanLyTaiKhoanThem"
              mc:Ignorable="d"
              MinHeight="600" MinWidth="800">

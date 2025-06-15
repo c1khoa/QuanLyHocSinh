@@ -10,6 +10,7 @@ using QuanLyHocSinh.Model.Entities;
 using QuanLyHocSinh.View.Dialogs;
 using System.Configuration;
 using QuanLyHocSinh.ViewModel;
+using System.Windows;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
@@ -99,8 +100,22 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         public TraCuuHocSinhViewModel(MainViewModel mainVM)
         {
             _mainVM = mainVM;
-            _allHocSinh = new ObservableCollection<HocSinh>(HocSinhDAL.GetAllHocSinh());
-            DanhSachHocSinh = new ObservableCollection<HocSinh>(_allHocSinh);
+            if (_mainVM.CurrentUser.VaiTro.VaiTroID == "VT02")
+            {
+                // Lấy danh sách lớp mà giáo viên đang dạy
+                var danhSachLopCuaGV = GiaoVienDAL.GetLopDayCuaUser(_mainVM.CurrentUser.UserID);
+
+                // Lấy học sinh chỉ trong các lớp đó
+                _allHocSinh = new ObservableCollection<HocSinh>(
+                    HocSinhDAL.GetAllHocSinh().Where(hs => danhSachLopCuaGV.Contains(hs.TenLop))
+                );
+                
+            }
+            else
+            {
+                // Nếu là giáo vụ hoặc admin, load toàn bộ học sinh
+                _allHocSinh = new ObservableCollection<HocSinh>(HocSinhDAL.GetAllHocSinh());
+            }
 
             // Lấy danh sách lớp duy nhất từ danh sách học sinh
             var dsLop = _allHocSinh.Select(hs => hs.TenLop).Distinct().OrderBy(l => l).ToList();
@@ -125,7 +140,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             SelectedLop = "Tất cả";
             SelectedGioiTinh = "Tất cả";
             SelectedNienKhoa = "Tất cả";
-            _mainVM = mainVM;
         }
 
         //Lọc học sinh theo tên và lớp

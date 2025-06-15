@@ -2,6 +2,10 @@ using System;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.Model.Entities
 {
@@ -104,10 +108,10 @@ namespace QuanLyHocSinh.Model.Entities
         // Constructor m?c ??nh
         public User() { }
 
-        // ?ây là ph??ng th?c Clone() ?úng và duy nh?t cho l?p User
+        // ?ï¿½y lï¿½ ph??ng th?c Clone() ?ï¿½ng vï¿½ duy nh?t cho l?p User
         public object Clone()
         {
-            // Quan tr?ng: T?o m?t b?n sao m?i, không ph?i tham chi?u
+            // Quan tr?ng: T?o m?t b?n sao m?i, khï¿½ng ph?i tham chi?u
             return new User
             {
                 UserID = this.UserID,
@@ -115,9 +119,9 @@ namespace QuanLyHocSinh.Model.Entities
                 MatKhau = this.MatKhau,
                 VaiTroID = this.VaiTroID,
                 HoTen = this.HoTen,
-                // N?u VaiTro c?ng c?n là m?t b?n sao ??c l?p, và nó implement ICloneable,
-                // thì dùng VaiTro = this.VaiTro?.Clone() as VaiTro
-                // N?u không, ch? c?n gán VaiTro = this.VaiTro (n?u b?n ch?p nh?n chia s? tham chi?u ho?c VaiTro là m?t enum/struct)
+                // N?u VaiTro c?ng c?n lï¿½ m?t b?n sao ??c l?p, vï¿½ nï¿½ implement ICloneable,
+                // thï¿½ dï¿½ng VaiTro = this.VaiTro?.Clone() as VaiTro
+                // N?u khï¿½ng, ch? c?n gï¿½n VaiTro = this.VaiTro (n?u b?n ch?p nh?n chia s? tham chi?u ho?c VaiTro lï¿½ m?t enum/struct)
                 VaiTro = this.VaiTro?.Clone() as VaiTro
             };
         }
@@ -132,7 +136,8 @@ namespace QuanLyHocSinh.Model.Entities
     public class QLHocSinhEntities : DbContext
     {
         public DbSet<User> Users { get; set; }
-        // B?n thêm các DbSet khác n?u có
+        // B?n thï¿½m cï¿½c DbSet khï¿½c n?u cï¿½
     }
 
 }
+

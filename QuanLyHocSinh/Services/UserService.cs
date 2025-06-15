@@ -272,7 +272,6 @@ namespace QuanLyHocSinh.Service
             }
         }
 
-
         //public static bool XoaTaiKhoan(string userID)
         //{
         //    if (string.IsNullOrEmpty(userID))
@@ -294,6 +293,7 @@ namespace QuanLyHocSinh.Service
         //        }
         //    }
         //}
+
 
         public static bool CheckDuplicateUserID(string userID)
         {
@@ -535,7 +535,6 @@ namespace QuanLyHocSinh.Service
                 var cmdDelUser = new MySqlCommand("DELETE FROM USERS WHERE UserID = @UserID", conn, tran);
                 cmdDelUser.Parameters.AddWithValue("@UserID", userId);
                 cmdDelUser.ExecuteNonQuery();
-
                 tran.Commit();
             }
             catch
@@ -544,12 +543,6 @@ namespace QuanLyHocSinh.Service
                 throw;
             }
         }
-
-
-
-
-
-
     }
 }
 

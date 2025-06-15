@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
 using System;
 using System.Collections.ObjectModel;
@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan

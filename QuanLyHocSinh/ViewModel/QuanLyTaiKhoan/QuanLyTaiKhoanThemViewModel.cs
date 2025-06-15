@@ -1,4 +1,3 @@
-// ✅ FILE: QuanLyTaiKhoanThemViewModel.cs
 using QuanLyHocSinh.Model.Entities;
 using QuanLyHocSinh.Service;
 using System;
@@ -22,7 +21,6 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
         private readonly MainViewModel _mainVM;
 
         public ObservableCollection<VaiTro> Roles { get; } = new ObservableCollection<VaiTro>();
-
         public string UserID
         {
             get => _userID;
@@ -79,7 +77,6 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                 {
                     Roles.Add(role);
                 }
-
                 if (Roles.Any())
                     VaiTroID = Roles.First().VaiTroID;
             }
@@ -89,6 +86,9 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             }
         }
 
+        /// <summary>
+        /// Kiểm tra xem thông tin nhập đã đủ để cho phép thêm tài khoản chưa
+        /// </summary>
         public bool CanExecuteAddAccount()
         {
             return !string.IsNullOrWhiteSpace(UserID) &&
@@ -98,22 +98,26 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                    !string.IsNullOrWhiteSpace(VaiTroID);
         }
 
+        /// <summary>
+        /// Xử lý khi người dùng bấm nút "Thêm tài khoản"
+        /// </summary>
         public void ExecuteAddAccount()
         {
             try
             {
+                // Kiểm tra trùng mã người dùng
                 if (UserService.CheckDuplicateUserID(UserID))
                 {
                     MessageBox.Show("Mã người dùng đã tồn tại! Vui lòng nhập mã khác.", "Trùng mã", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
+                // Kiểm tra trùng tên đăng nhập
                 if (UserService.CheckDuplicateUsername(TenDangNhap))
                 {
                     MessageBox.Show("Tên đăng nhập đã tồn tại! Vui lòng chọn tên khác.", "Trùng tên", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-
                 var userMoi = new User
                 {
                     UserID = UserID,
@@ -122,7 +126,6 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                     MatKhau = MatKhau,
                     VaiTroID = VaiTroID
                 };
-
                 var result = UserService.ThemTaiKhoan(userMoi);
 
                 if (result)
@@ -141,11 +144,15 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                 MessageBox.Show($"Lỗi khi thêm tài khoản: {ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        /// <summary>
+        /// Huỷ thao tác thêm tài khoản
+        /// </summary>
 
         public void ExecuteCancel()
         {
             CancelRequested?.Invoke();
         }
+
 
         private void ClearForm()
         {
@@ -156,6 +163,10 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             VaiTroID = Roles.Any() ? Roles.First().VaiTroID : string.Empty;
         }
 
+
+        /// <summary>
+        /// Mã hoá mật khẩu bằng SHA-256
+        /// </summary>
         public string HashPassword(string password)
         {
             using var sha256 = SHA256.Create();
