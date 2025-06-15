@@ -4,36 +4,95 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.QuanLyTaiKhoan"
-             d:DesignHeight="450" d:DesignWidth="800"
-             
-             Background="White"
-             FontSize="13"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
-             xmlns:viewmodel="clr-namespace:QuanLyHocSinh.ViewModel" 
-             d:DataContext="{d:DesignInstance Type=viewmodel:ControlBarViewModel}"
-             Name="ucQuanLyTaiKhoan"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodel="clr-namespace:QuanLyHocSinh.ViewModel.QuanLyTaiKhoan"
+             d:DataContext="{d:DesignInstance Type=viewmodel:QuanLyTaiKhoanCaNhanViewModel}"
              mc:Ignorable="d"
-             MinHeight="600" MinWidth="800" 
-             >
+             MinHeight="600" MinWidth="800"
+             Name="ucQuanLyTaiKhoanCaNhan"
+             Background="#F4F6F8">
+
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="1*"></RowDefinition>
-            <RowDefinition Height="1*"></RowDefinition>
-            <RowDefinition Height="6*"></RowDefinition>
-        </Grid.RowDefinitions>
+        <materialDesign:Card Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center" Width="600">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
+                <!-- Tiêu đề -->
+                <TextBlock Text="Thông Tin Cá Nhân"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,20"
+                           Foreground="#2C3E50"/>
 
-            <Grid Grid.Column="0">
-                <TextBlock Text="TÀI KHOẢN CÁ NHÂN"
-                       FontSize="24"
-                       FontWeight="Bold"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Center"
-                       Margin="10 10 0 10"/>
+                <!-- Nội dung -->
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="UserID:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                    <TextBox Text="{Binding CurrentUser.UserID}" IsEnabled="False"
+                             Grid.Row="0" Grid.Column="1"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+
+                    <TextBlock Text="Họ và tên:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                    <TextBox Text="{Binding CurrentUser.HoTen, UpdateSourceTrigger=PropertyChanged}"
+                             Grid.Row="1" Grid.Column="1"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+
+                    <TextBlock Text="Vai trò:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                    <ComboBox SelectedValue="{Binding CurrentUser.VaiTroID}"
+                              ItemsSource="{Binding Roles}"
+                              DisplayMemberPath="TenVaiTro"
+                              SelectedValuePath="VaiTroID"
+                              IsEnabled="False"
+                              Grid.Row="2" Grid.Column="1"
+                              Style="{StaticResource MaterialDesignOutlinedComboBox}" />
+
+                    <TextBlock Text="Tên đăng nhập:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                    <TextBox Text="{Binding CurrentUser.TenDangNhap}" IsEnabled="False"
+                             Grid.Row="3" Grid.Column="1"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+
+                    <TextBlock Text="Mật khẩu mới:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                    <PasswordBox x:Name="pwdNewPassword"
+                                 Grid.Row="4" Grid.Column="1"
+                                 materialDesign:HintAssist.Hint="Nhập mật khẩu mới"
+                                 Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                                 PasswordChanged="PwdNewPassword_PasswordChanged"/>
+
+                    <TextBlock Text="Xác nhận mật khẩu:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                    <PasswordBox x:Name="pwdConfirmPassword"
+                                 Grid.Row="5" Grid.Column="1"
+                                 materialDesign:HintAssist.Hint="Nhập lại mật khẩu"
+                                 Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                                 PasswordChanged="PwdConfirmPassword_PasswordChanged"/>
+                </Grid>
+
+                <!-- Nút lưu -->
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                    <Button Content="Lưu thay đổi"
+                            Command="{Binding SaveCommand}"
+                            Width="130"
+                            Background="#2196F3"
+                            Foreground="White"
+                            FontWeight="Bold"/>
+                </StackPanel>
             </Grid>
-
-        </Grid>
+        </materialDesign:Card>
     </Grid>
 </UserControl>

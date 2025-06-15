@@ -22,6 +22,11 @@
     <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanThemViewModel}">
         <viewqltk:QuanLyTaiKhoanThemUC/>
     </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanCaNhanViewModel}">
+        <viewqltk:QuanLyTaiKhoanCaNhanUC/>
+    </DataTemplate>
+    
 
     <DataTemplate DataType="{x:Type vmTraCuu:TraCuuHocSinhViewModel}">
         <viewtc:TraCuuHocSinhUC />

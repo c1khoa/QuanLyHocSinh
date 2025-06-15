@@ -91,6 +91,7 @@
                                 FontWeight="Bold" 
                                 FontSize="14"/>
                     </StackPanel>
+
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,10,0">
                         <TextBlock Text="Tổng số học sinh: " FontWeight="Bold" FontSize="14"/>
                         <TextBlock Text="{Binding TongHocSinh}" FontSize="14" FontWeight="Bold"/>

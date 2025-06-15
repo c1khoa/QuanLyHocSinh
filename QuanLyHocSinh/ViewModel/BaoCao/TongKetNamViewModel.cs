@@ -164,7 +164,6 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
             dsNamHoc.Insert(0, "Tất cả");
             DanhSachNamHoc = new ObservableCollection<string>(dsNamHoc);
 
-
             var dsHocKy = TongKetNamDAL.GetAllHocKy().Select(h => h.ToString()).ToList();
             dsHocKy.Insert(0, "Cả năm");
             DanhSachHocKy = new ObservableCollection<string>(dsHocKy);

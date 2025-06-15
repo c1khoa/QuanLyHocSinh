@@ -117,7 +117,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                 _allHocSinh = new ObservableCollection<HocSinh>(HocSinhDAL.GetAllHocSinh());
             }
 
-
             // Lấy danh sách lớp duy nhất từ danh sách học sinh
             var dsLop = _allHocSinh.Select(hs => hs.TenLop).Distinct().OrderBy(l => l).ToList();
             dsLop.Insert(0, "Tất cả"); // Thêm giá trị "Tất cả" vào đầu danh sách

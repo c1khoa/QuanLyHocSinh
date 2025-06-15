@@ -58,16 +58,17 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanMainViewModel}">
-            <viewqltk:QuanLyTaiKhoanMainUC />
+            <viewqltk:QuanLyTaiKhoanMainUC DataContext="{Binding}" />
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanThemViewModel}">
-        <viewqltk:QuanLyTaiKhoanThemUC/> 
+        <viewqltk:QuanLyTaiKhoanThemUC DataContext="{Binding}"/> 
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanCaNhanViewModel}">
-            <viewqltk:QuanLyTaiKhoanCaNhanUC/>
-        </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanCaNhanViewModel}">
+        <viewqltk:QuanLyTaiKhoanCaNhanUC DataContext="{Binding}"/>
+    </DataTemplate>
 
     <DataTemplate DataType="{x:Type vmTraCuu:TraCuuHocSinhViewModel}">
             <viewtc:TraCuuHocSinhUC />

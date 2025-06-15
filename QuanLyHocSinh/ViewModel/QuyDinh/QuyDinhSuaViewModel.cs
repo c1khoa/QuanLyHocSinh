@@ -9,6 +9,7 @@ using QuanLyHocSinh.Model.Entities;
 using QuanLyHocSinh.ViewModel;
 
 public class QuyDinhSuaViewModel : BaseViewModel
+
 {
     private string _quyDinhID;
     private string _quyDinhTuoiID;
@@ -97,6 +98,7 @@ public class QuyDinhSuaViewModel : BaseViewModel
     {
         try
         {
+
 			string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
             using (var conn = new MySqlConnection(connectionString))
             {

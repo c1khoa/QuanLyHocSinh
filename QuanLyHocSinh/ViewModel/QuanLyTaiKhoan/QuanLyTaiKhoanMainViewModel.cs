@@ -129,6 +129,8 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             themVM.AccountAddedSuccessfully += userMoi =>
             {
                 Users.Insert(0, userMoi);
+                LoadDanhSachTaiKhoan();
+
                 _mainVM.CurrentView = this;
             };
             themVM.CancelRequested += () => _mainVM.CurrentView = this;
@@ -189,7 +191,7 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 
             try
             {
-                UserService.XoaTaiKhoanVaHocSinh(user.UserID);
+                UserService.XoaTaiKhoanVaLienQuan(user.UserID);
                 Users.Remove(user);
                 MessageBox.Show("Đã xóa tài khoản thành công!");
             }
@@ -197,6 +199,8 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             {
                 MessageBox.Show($"Lỗi khi xóa tài khoản: {ex.Message}");
             }
+
+            LoadDanhSachTaiKhoan(); // gọi lại để load danh sách tươi mới từ DB
         }
 
 

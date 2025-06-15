@@ -160,9 +160,10 @@
                         </StackPanel>
                     </Button>
 
+                   
                     <Button Command="{Binding ShowTaiKhoanCaNhanCommand}"
-                                Visibility="{Binding IsNotGiaoVuVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                Style="{StaticResource MenuButtonStyle}">
+                            Visibility="{Binding IsNotGiaoVuVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            Style="{StaticResource MenuButtonStyle}">
                         <Button.Triggers>
                             <EventTrigger RoutedEvent="Button.Click">
                                 <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />

@@ -79,7 +79,6 @@ public class GiaoVienDAL
         return danhSachLop;
     }
 
-
     public static List<string> GetAllLop()
         {
             List<string> list = new List<string>();
