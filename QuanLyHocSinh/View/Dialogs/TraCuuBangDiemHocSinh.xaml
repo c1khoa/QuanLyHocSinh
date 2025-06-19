@@ -10,8 +10,18 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <local:DiemToDisplayStringConverter x:Key="DiemToDisplayStringConverter"/>
+
+            <Style x:Key="ImageBorderStyle" TargetType="Border">
+                <Setter Property="BorderBrush" Value="Gray"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="CornerRadius" Value="30"/>
+                <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Margin" Value="20 80 20 80"/>
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="20">
@@ -81,10 +91,39 @@
             </DataGrid.Columns>
         </DataGrid>
         <!-- Nút xuất Excel và đóng -->
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="Xuất Excel" Width="120" Height="32" Margin="0,0,16,0" Command="{Binding ExportExcelCommand}"
-                    Background="#388E3C" Foreground="White" FontWeight="Bold" FontSize="15"/>
-            <Button Content="Đóng" Width="100" Height="32" Click="BtnClose_Click" Style="{StaticResource ActionButtonStyle}"/>
-        </StackPanel>
+        <Grid Grid.Row="4" HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="1" 
+                    Style="{StaticResource ImageBorderStyle}"
+                Grid.Row="2"
+                Margin="50 0 50 0"
+                Background="#4CAF50">
+                <Button Content="Xuất Excel" 
+                        Command="{Binding ExportExcelCommand}"
+                        BorderBrush="Transparent"
+                        Style="{StaticResource MaterialDesignRaisedLightButton}"
+                        Background="Transparent"
+                        HorizontalAlignment="Center"/>
+            </Border>
+            <Border Grid.Column="0"
+                    Style="{StaticResource ImageBorderStyle}" 
+                    Background="#F08080"
+                    VerticalAlignment="Center" 
+                    Width="120"
+                    Margin="50 0 50 0">
+                <Button Command="{Binding CancelCommand}" 
+                        CommandParameter="{Binding ElementName=passwordfield, Path=Password}"
+                        Style="{StaticResource MaterialDesignRaisedLightButton}"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        FontWeight="Regular"
+                        Click="BtnClose_Click"
+                        Content="Đóng"/>
+            </Border>
+        </Grid>
     </Grid>
 </Window>
+

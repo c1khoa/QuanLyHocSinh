@@ -8,6 +8,14 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="ImageBorderStyle" TargetType="Border">
+                <Setter Property="BorderBrush" Value="Gray"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="CornerRadius" Value="30"/>
+                <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Margin" Value="20 80 20 80"/>
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="20">
@@ -97,9 +105,38 @@
         </GroupBox>
 
         <!-- Nút xuất Excel và đóng -->
-        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="Xuất Excel" Width="120" Height="32" Margin="0,0,16,0" Command="{Binding ExportExcelCommand}"
-                    Background="#388E3C" Foreground="White" FontWeight="Bold" FontSize="15"/>
-        </StackPanel>
+        <Grid Grid.Row="5" HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="1" 
+            Style="{StaticResource ImageBorderStyle}"
+        Grid.Row="2"
+        Margin="50 0 50 0"
+        Background="#4CAF50">
+                <Button Content="Xuất Excel" 
+                Command="{Binding ExportExcelCommand}"
+                BorderBrush="Transparent"
+                Style="{StaticResource MaterialDesignRaisedLightButton}"
+                Background="Transparent"
+                HorizontalAlignment="Center"/>
+            </Border>
+            <Border Grid.Column="0"
+            Style="{StaticResource ImageBorderStyle}" 
+            Background="#F08080"
+            VerticalAlignment="Center" 
+            Width="120"
+            Margin="50 0 50 0">
+                <Button Command="{Binding CancelCommand}" 
+                CommandParameter="{Binding ElementName=passwordfield, Path=Password}"
+                Style="{StaticResource MaterialDesignRaisedLightButton}"
+                Background="Transparent"
+                BorderBrush="Transparent"
+                FontWeight="Regular"
+                Click="Close_Click"
+                Content="Đóng"/>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

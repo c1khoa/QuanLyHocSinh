@@ -3,30 +3,116 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
 using System.Configuration;
+using System.Xml.Xsl;
 
 public class DiemDAL : BaseDAL
 {
+    public static Dictionary<string, int> GetThongKeXepLoai()
+    {
+        var result = new Dictionary<string, int>()
+    {
+        { "Giỏi", 0 },
+        { "Khá", 0 },
+        { "Trung bình", 0 },
+        { "Yếu", 0 }
+    };
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+        using (var conn = new MySqlConnection(connectionString))
+        {
+            conn.Open();
+            var query = @"
+            SELECT XepLoai, COUNT(*) AS SoLuong
+            FROM DIEM
+            WHERE XepLoai IS NOT NULL
+            GROUP BY XepLoai;
+        ";
+
+            using (var cmd = new MySqlCommand(query, conn))
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    var loai = reader.GetString("XepLoai");
+                    var soLuong = reader.GetInt32("SoLuong");
+                    if (result.ContainsKey(loai))
+                        result[loai] = soLuong;
+                }
+            }
+        }
+
+        return result;
+    }
+    public static Dictionary<string, Dictionary<string, float>> GetDiemTrungBinhTheoKhoi()
+    {
+        var result = new Dictionary<string, Dictionary<string, float>>();
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+
+        using (var conn = new MySqlConnection(connectionString))
+        {
+            conn.Open();
+            string query = @"SELECT 
+                                LEFT(l.TenLop, 2) AS Khoi,
+                                mh.TenMonHoc,
+                                ROUND(AVG(d.DiemTrungBinh), 2) AS DiemTB
+                            FROM DIEM d
+                            JOIN HOSOHOCSINH hs ON hs.HocSinhID = d.HocSinhID
+                            JOIN LOP l ON l.LopID = hs.LopHocID
+                            JOIN MONHOC mh ON mh.MonHocID = d.MonHocID
+                            WHERE d.NamHocID = 'NH2025'
+                                AND d.HocKy IN (1, 2)
+                                AND d.DiemTrungBinh IS NOT NULL
+                            GROUP BY Khoi, mh.TenMonHoc
+                            ORDER BY Khoi, mh.TenMonHoc;
+";
+
+            using (var cmd = new MySqlCommand(query, conn))
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    string khoi = reader.GetString("Khoi");
+                    string mon = reader.GetString("TenMonHoc");
+                    float diem = reader.GetFloat("DiemTB");
+
+                    if (!result.ContainsKey(khoi))
+                        result[khoi] = new Dictionary<string, float>();
+
+                    result[khoi][mon] = diem;
+                }
+            }
+        }
+
+        return result;
+    }
+
+
     public static List<Diem> GetAllDiemHocSinh()
     {
         List<Diem> list = new List<Diem>();
         string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
-        string query = @"
-            SELECT hs.HocSinhID AS MaHS, ho.HoTen, l.TenLop AS Lop, mh.TenMonHoc AS MonHoc, d.NamHocID, d.HocKy,
-                   IFNULL(diem_mieng.GiaTri, -1) AS DiemMieng,
-                   IFNULL(diem_15p.GiaTri, -1) AS Diem15p,
-                   IFNULL(diem_1tiet.GiaTri, -1) AS Diem1Tiet,
-                   IFNULL(diem_thi.GiaTri, -1) AS DiemThi,
-                   IFNULL(d.DiemTrungBinh, 0) AS DiemTB
-            FROM HOCSINH hs
-            JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
-            JOIN HOSO ho ON hhs.HoSoID = ho.HoSoID
-            JOIN LOP l ON hhs.LopHocID = l.LopID
-            JOIN DIEM d ON d.HocSinhID = hs.HocSinhID
-            JOIN MONHOC mh ON d.MonHocID = mh.MonHocID
-            LEFT JOIN CHITIETDIEM diem_mieng ON diem_mieng.DiemID = d.DiemID AND diem_mieng.LoaiDiemID = 'LD001'
-            LEFT JOIN CHITIETDIEM diem_15p ON diem_15p.DiemID = d.DiemID AND diem_15p.LoaiDiemID = 'LD002'
-            LEFT JOIN CHITIETDIEM diem_1tiet ON diem_1tiet.DiemID = d.DiemID AND diem_1tiet.LoaiDiemID = 'LD003'
-            LEFT JOIN CHITIETDIEM diem_thi ON diem_thi.DiemID = d.DiemID AND diem_thi.LoaiDiemID = 'LD004'
+        string query = @"SELECT 
+                        hs.HocSinhID AS MaHS, 
+                        ho.HoTen, 
+                        l.TenLop AS Lop, 
+                        mh.TenMonHoc AS MonHoc, 
+                        d.NamHocID, 
+                        d.HocKy,
+                        IFNULL(diem_mieng.GiaTri, -1) AS DiemMieng,
+                        IFNULL(diem_15p.GiaTri, -1) AS Diem15p,
+                        IFNULL(diem_1tiet.GiaTri, -1) AS Diem1Tiet,
+                        IFNULL(diem_thi.GiaTri, -1) AS DiemThi,
+                        IFNULL(d.DiemTrungBinh, 0) AS DiemTB
+                    FROM HOCSINH hs
+                    JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
+                    JOIN HOSO ho ON hhs.HoSoID = ho.HoSoID
+                    JOIN LOP l ON hhs.LopHocID = l.LopID
+                    JOIN DIEM d ON d.HocSinhID = hs.HocSinhID
+                    JOIN MONHOC mh ON d.MonHocID = mh.MonHocID
+                    LEFT JOIN CHITIETDIEM diem_mieng ON diem_mieng.DiemID = d.DiemID AND diem_mieng.LoaiDiemID = 'LD01'
+                    LEFT JOIN CHITIETDIEM diem_15p ON diem_15p.DiemID = d.DiemID AND diem_15p.LoaiDiemID = 'LD02'
+                    LEFT JOIN CHITIETDIEM diem_1tiet ON diem_1tiet.DiemID = d.DiemID AND diem_1tiet.LoaiDiemID = 'LD03'
+                    LEFT JOIN CHITIETDIEM diem_thi ON diem_thi.DiemID = d.DiemID AND diem_thi.LoaiDiemID = 'LD04'
+                    ORDER BY l.TenLop, ho.HoTen, mh.TenMonHoc;
         ";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
@@ -179,10 +265,10 @@ public class DiemDAL : BaseDAL
             // Danh sách loại điểm và giá trị
             var diemTypes = new Dictionary<string, float>
             {
-                { "LD001", diem.DiemMieng ?? -1 },
-                { "LD002", diem.Diem15p ?? -1 },
-                { "LD003", diem.Diem1Tiet ?? -1 },
-                { "LD004", diem.DiemThi ?? -1 }
+                { "LD01", diem.DiemMieng ?? -1 },
+                { "LD02", diem.Diem15p ?? -1 },
+                { "LD03", diem.Diem1Tiet ?? -1 },
+                { "LD04", diem.DiemThi ?? -1 }
             };
 
             foreach (var item in diemTypes)
@@ -277,20 +363,19 @@ public class DiemDAL : BaseDAL
     private static string GenerateNewChiTietDiemID(MySqlConnection conn)
     {
         string prefix = "CTD";
-        string query = "SELECT ChiTietDiemID FROM CHITIETDIEM ORDER BY ChiTietDiemID DESC LIMIT 1";
+        string query = "SELECT ChiTietDiemID FROM CHITIETDIEM WHERE ChiTietDiemID LIKE 'CTD%' ORDER BY ChiTietDiemID DESC LIMIT 1";
+
         using (var cmd = new MySqlCommand(query, conn))
         {
             var result = cmd.ExecuteScalar();
             if (result != null && result.ToString().StartsWith(prefix))
             {
                 string lastId = result.ToString();
-                int num = int.Parse(lastId.Substring(prefix.Length));
-                return prefix + (num + 1).ToString("D3");
+                if (int.TryParse(lastId.Substring(prefix.Length), out int num))
+                    return prefix + (num + 1).ToString("D5");  // 👈 5 chữ số tại đây
             }
-            else
-            {
-                return prefix + "001";
-            }
+            return prefix + "00001";  // 👈 ID đầu tiên
         }
     }
+
 }

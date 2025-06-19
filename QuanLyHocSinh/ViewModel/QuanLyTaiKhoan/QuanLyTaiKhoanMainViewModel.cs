@@ -250,17 +250,8 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                 hasRel ? MessageBoxImage.Warning : MessageBoxImage.Question) != MessageBoxResult.Yes)
                 return;
 
-            try
-            {
-                UserService.XoaTaiKhoanVaLienQuan(user.UserID);
-                Users.Remove(user);
-                MessageBox.Show("Đã xóa tài khoản thành công!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Lỗi khi xóa tài khoản: {ex.Message}");
-            }
-
+            UserService.XoaTaiKhoanVaLienQuan(user.UserID);
+            Users.Remove(user);
             LoadDanhSachTaiKhoan();
         }
         #endregion

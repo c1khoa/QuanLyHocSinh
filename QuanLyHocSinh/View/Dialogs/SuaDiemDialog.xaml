@@ -8,12 +8,22 @@
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <local:DiemToStringConverter x:Key="DiemToStringConverter"/>
+        <!-- Style viền cho Border -->
+        <Style x:Key="ImageBorderStyle" TargetType="Border">
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="30"/>
+            <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="20 80 20 80"/>
+        </Style>
     </Window.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="4*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <TextBlock Text="THÔNG TIN ĐIỂM HỌC SINH"
@@ -78,13 +88,39 @@
                      Text="{Binding DiemTB, StringFormat='F2'}"
                      IsReadOnly="True"
                      Margin="0,5"/>
-            <Button Content="Lưu"
-                    Command="{Binding SaveCommandDiem}"
-                    Margin="0,10"/>
-            <Button Content="Hủy"
-                    Command="{Binding CancelCommandDiem}"
-                    Margin="0,10"/>
         </StackPanel>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="1"
+                    Style="{StaticResource ImageBorderStyle}" 
+                    Background="#FF90CAF9"
+                    VerticalAlignment="Center" 
+                    Margin="50 0 50 0">
+                <Button Command="{Binding SaveCommandDiem}" 
+                        CommandParameter="{Binding ElementName=passwordfield, Path=Password}"
+                        Style="{StaticResource MaterialDesignRaisedLightButton}"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        FontWeight="Regular"
+                        Content="Lưu"/>
+            </Border>
+            <Border Grid.Column="0"
+                    Style="{StaticResource ImageBorderStyle}" 
+                    Background="#F08080"
+                    VerticalAlignment="Center" 
+                    Margin="50 0 50 0">
+                <Button Command="{Binding CancelCommandDiem}" 
+                        CommandParameter="{Binding ElementName=passwordfield, Path=Password}"
+                        Style="{StaticResource MaterialDesignRaisedLightButton}"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        FontWeight="Regular"
+                        Content="Hủy"/>
+            </Border>
+        </Grid>
     </Grid>
 </Window>
                      

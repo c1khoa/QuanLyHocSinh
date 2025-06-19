@@ -3,6 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Chi tiết tổng kết môn" Width="600" MinHeight="500"
         WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style x:Key="ImageBorderStyle" TargetType="Border">
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="30"/>
+            <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="20 80 20 80"/>
+        </Style>
+    </Window.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -38,7 +48,15 @@
                 </GroupBox>
             </StackPanel>
         </ScrollViewer>
-        
-        <Button Grid.Row="2" Content="Đóng" Width="90" Height="38" HorizontalAlignment="Center" Margin="0,10,0,0" Click="Close_Click"/>
+        <Border Style="{StaticResource ImageBorderStyle}"
+                Grid.Row="2"
+                Margin="150 0 150 0"
+                Background="#F08080">
+            <Button Background="Transparent"
+                    BorderBrush="Transparent"
+                    Content="Đóng"
+                    Style="{StaticResource MaterialDesignRaisedLightButton}"
+                    Click="Close_Click"/>
+        </Border>
     </Grid>
 </Window>

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
                     
              Background="White"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
@@ -59,7 +60,8 @@
                                     BorderBrush="#03a9f4"
                                     BorderThickness="2">
                         <Grid>
-                            <TextBlock Text="1200"
+                            <TextBlock Text="{Binding SoLuongHocSinh}"
+                                       ToolTip="Số học sinh"
                                        FontSize="40"
                                        FontWeight="Bold"
                                        VerticalAlignment="Center"
@@ -94,7 +96,8 @@
                             BorderBrush="#03a9f4"
                             BorderThickness="2">
                         <Grid>
-                            <TextBlock Text="30"
+                            <TextBlock Text="{Binding SoLuongLop}"
+                                       ToolTip="Số lớp"
                                        FontSize="40"
                                        FontWeight="Bold"
                                        VerticalAlignment="Center"
@@ -130,7 +133,8 @@
                             BorderBrush="#03a9f4"
                             BorderThickness="2">
                         <Grid>
-                            <TextBlock Text="100"
+                            <TextBlock Text="{Binding SoLuongGiaoVien}"
+                                       ToolTip="Số giáo viên"
                                        FontSize="40"
                                        FontWeight="Bold"
                                        VerticalAlignment="Center"
@@ -145,7 +149,7 @@
         <Grid Grid.Row="2">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"></ColumnDefinition>
+                <ColumnDefinition Width="3*"></ColumnDefinition>
                 <ColumnDefinition Width="1*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
@@ -156,19 +160,36 @@
                     BorderBrush="#03a9f4"
                     Margin="20">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*"></RowDefinition>
-                        <RowDefinition Height="5*"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <TextBlock Text="SỐ HỌC SINH QUA TỪNG NIÊN KHÓA"
-                                   FontSize="20"
-                                   FontWeight="Bold"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Center"/>
-                    </Grid>
-                    <Grid Grid.Row="1">
-                        <!-- Biểu đồ-->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1*"></RowDefinition>
+                                <RowDefinition Height="2*"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <lvc:PieChart Grid.Row="0"
+                                      Series="{Binding GioiTinhSeries}" 
+                                      LegendLocation="Right"
+                                      InnerRadius="10"
+                                      HoverPushOut="5"/>
+                            <lvc:PieChart Grid.Row="1"
+                                      Series="{Binding XepLoaiPieSeries}"
+                                      LegendLocation="Right"
+                                      InnerRadius="10"
+                                      HoverPushOut="5"/>
+                        </Grid>
+                        <lvc:CartesianChart Grid.Column="0"
+                                            Series="{Binding MonHocSeries}">
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Title="Môn học" Labels="{Binding MonHocLabels}"/>
+                            </lvc:CartesianChart.AxisX>
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Title="Điểm trung bình" LabelFormatter="{Binding Formatter}" />
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
                     </Grid>
                 </Grid>
             </Border>

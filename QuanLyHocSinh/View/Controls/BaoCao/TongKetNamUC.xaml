@@ -16,6 +16,14 @@
                 <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <converters:NullableDoubleToStringConverter x:Key="NullableDoubleToStringConverter"/>
+            <Style x:Key="ImageBorderStyle" TargetType="Border">
+                <Setter Property="BorderBrush" Value="Gray"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="CornerRadius" Value="30"/>
+                <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Margin" Value="20 80 20 80"/>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid Margin="20">
@@ -73,24 +81,40 @@
                 
                 <!-- Các nút chức năng và thông tin tổng số -->
                 <StackPanel Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <Button Content="Bảng điểm lớp" 
-                                Margin="0,0,10,0" 
-                                Padding="16,8" 
-                                Command="{Binding OpenBangDiemLopCommand}"
-                                Background="#1976D2" 
-                                Foreground="White" 
-                                FontWeight="Bold" 
-                                FontSize="14"/>
-                        <Button Content="Xuất Excel" 
-                                Margin="0,0,10,0"
-                                Padding="16,8" 
-                                Command="{Binding ExportExcelCommand}"
-                                Background="#388E3C" 
-                                Foreground="White" 
-                                FontWeight="Bold" 
-                                FontSize="14"/>
+
+                        <Border Grid.Column="1" 
+                                Style="{StaticResource ImageBorderStyle}"
+                                Grid.Row="2"
+                                Margin="50 0 0 0"
+                                Background="#FF90CAF9">
+                            <Button Content="Bảng điểm lớp" 
+                                    Command="{Binding OpenBangDiemLopCommand}"
+                                    BorderBrush="Transparent"
+                                    Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                    Background="Transparent"
+                                    HorizontalAlignment="Center"/>
+                        </Border>
+                        <Border Grid.Column="1" 
+                                Style="{StaticResource ImageBorderStyle}"
+                                Grid.Row="2"
+                                Margin="50 0 0 0"
+                                Background="#4CAF50">
+                            <Button Content="Xuất Excel" 
+                                    Command="{Binding ExportExcelCommand}"
+                                    BorderBrush="Transparent"
+                                    Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                    Background="Transparent"
+                                    HorizontalAlignment="Center"/>
+                        </Border>
                     </StackPanel>
+                 </Grid>
+
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,10,0">
                         <TextBlock Text="Tổng số học sinh: " FontWeight="Bold" FontSize="14"/>

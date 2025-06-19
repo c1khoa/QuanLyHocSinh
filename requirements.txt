@@ -1,2 +1,3 @@
 ClosedXML
 System.Drawing.Common
+LiveChartsCore.SkiaSharpView.WPF
