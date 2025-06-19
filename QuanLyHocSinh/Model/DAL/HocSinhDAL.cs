@@ -52,6 +52,36 @@ namespace QuanLyHocSinh.Model.Entities
             }
             return list;
         }
+        public static (int soNam, int soNu) GetThongKeGioiTinh()
+        {
+            int nam = 0, nu = 0;
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+
+                string query = @"SELECT gioitinh, COUNT(*) AS SoLuong 
+                                        from hoso hs 
+                                        inner join hosohocsinh hshs on hs.HoSoID = hshs.HoSoID
+                                        group by gioitinh";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string gioiTinh = reader.GetString("gioitinh");
+                        int soLuong = reader.GetInt32("SoLuong");
+
+                        if (gioiTinh.ToLower() == "nam") nam = soLuong;
+                        else if (gioiTinh.ToLower() == "nữ" || gioiTinh.ToLower() == "nu") nu = soLuong;
+                    }
+                }
+            }
+
+            return (nam, nu);
+        }
         public static List<string> GetLopHocCuaUser(string userID)
         {
             List<string> danhSachLop = new List<string>();
@@ -225,22 +255,22 @@ namespace QuanLyHocSinh.Model.Entities
                 LEFT JOIN (
                     SELECT d.DiemID, ctd.GiaTri FROM DIEM d
                     JOIN CHITIETDIEM ctd ON d.DiemID = ctd.DiemID
-                    WHERE ctd.LoaiDiemID = 'LD001'
+                    WHERE ctd.LoaiDiemID = 'LD01'
                 ) diem_mieng ON d.DiemID = diem_mieng.DiemID
                 LEFT JOIN (
                     SELECT d.DiemID, ctd.GiaTri FROM DIEM d
                     JOIN CHITIETDIEM ctd ON d.DiemID = ctd.DiemID
-                    WHERE ctd.LoaiDiemID = 'LD002'
+                    WHERE ctd.LoaiDiemID = 'LD02'
                 ) diem_15p ON d.DiemID = diem_15p.DiemID
                 LEFT JOIN (
                     SELECT d.DiemID, ctd.GiaTri FROM DIEM d
                     JOIN CHITIETDIEM ctd ON d.DiemID = ctd.DiemID
-                    WHERE ctd.LoaiDiemID = 'LD003'
+                    WHERE ctd.LoaiDiemID = 'LD03'
                 ) diem_1tiet ON d.DiemID = diem_1tiet.DiemID
                 LEFT JOIN (
                     SELECT d.DiemID, ctd.GiaTri FROM DIEM d
                     JOIN CHITIETDIEM ctd ON d.DiemID = ctd.DiemID
-                    WHERE ctd.LoaiDiemID = 'LD004'
+                    WHERE ctd.LoaiDiemID = 'LD04'
                 ) diem_thi ON d.DiemID = diem_thi.DiemID
                 WHERE hs.HocSinhID = @HocSinhID
                 " + (namHoc != null ? " AND d.NamHocID = @NamHoc " : "") + (hocKy != null ? " AND d.HocKy = @HocKy " : "") +

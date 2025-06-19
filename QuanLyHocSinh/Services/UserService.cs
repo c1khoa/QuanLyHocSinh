@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System;
 using System.Configuration;
+using System.Windows;
 
 namespace QuanLyHocSinh.Service
 {
@@ -56,24 +57,31 @@ namespace QuanLyHocSinh.Service
                 conn.Open();
 
                 string query = @"SELECT 
-                            u.UserID,
-                            u.TenDangNhap,
-                            u.MatKhau,
-                            COALESCE(hs_info.HoTen, gv_info.HoTen) AS HoTen,
-                            u.VaiTroID,
-                            v.TenVaiTro
-                        FROM USERS u
-                        JOIN VAITRO v ON u.VaiTroID = v.VaiTroID
+                                u.UserID,
+                                u.TenDangNhap,
+                                u.MatKhau,
+                                COALESCE(hs_info.HoTen, gv_info.HoTen, gvus_info.HoTen) AS HoTen,
+                                u.VaiTroID,
+                                v.TenVaiTro
 
-                        -- Học sinh
-                        LEFT JOIN HOCSINH hs ON hs.UserID = u.UserID
-                        LEFT JOIN HOSOHOCSINH hhs ON hhs.HocSinhID = hs.HocSinhID
-                        LEFT JOIN HOSO hs_info ON hs_info.HoSoID = hhs.HoSoID
+                            FROM USERS u
+                            JOIN VAITRO v ON u.VaiTroID = v.VaiTroID
 
-                        -- Giáo viên
-                        LEFT JOIN GIAOVIEN gv ON gv.UserID = u.UserID
-                        LEFT JOIN HOSOGIAOVIEN hgv ON hgv.GiaoVienID = gv.GiaoVienID
-                        LEFT JOIN HOSO gv_info ON gv_info.HoSoID = hgv.HoSoID;";
+                            -- Học sinh
+                            LEFT JOIN HOCSINH hs ON hs.UserID = u.UserID
+                            LEFT JOIN HOSOHOCSINH hhs ON hhs.HocSinhID = hs.HocSinhID
+                            LEFT JOIN HOSO hs_info ON hs_info.HoSoID = hhs.HoSoID
+
+                            -- Giáo viên
+                            LEFT JOIN GIAOVIEN gv ON gv.UserID = u.UserID
+                            LEFT JOIN HOSOGIAOVIEN hgv ON hgv.GiaoVienID = gv.GiaoVienID
+                            LEFT JOIN HOSO gv_info ON gv_info.HoSoID = hgv.HoSoID
+
+                            -- Giáo vụ
+                            LEFT JOIN GIAOVU gvus ON gvus.UserID = u.UserID
+                            LEFT JOIN HOSOGIAOVU hgvus ON hgvus.GiaoVuID = gvus.GiaoVuID
+                            LEFT JOIN HOSO gvus_info ON gvus_info.HoSoID = hgvus.HoSoID;
+                            ";
 
                 using (var cmd = new MySqlCommand(query, conn))
                 using (var reader = cmd.ExecuteReader())
@@ -442,7 +450,22 @@ namespace QuanLyHocSinh.Service
 
             try
             {
-                // 1. Kiểm tra có phải học sinh không
+                // 🔒 Kiểm tra nếu là giáo vụ → KHÔNG CHO XOÁ
+                string giaoVuID = null;
+                using (var cmdCheckGVu = new MySqlCommand("SELECT GiaoVuID FROM GIAOVU WHERE UserID = @UserID", conn, tran))
+                {
+                    cmdCheckGVu.Parameters.AddWithValue("@UserID", userId);
+                    giaoVuID = cmdCheckGVu.ExecuteScalar()?.ToString();
+                }
+
+                if (!string.IsNullOrEmpty(giaoVuID))
+                {
+                    MessageBox.Show("Không thể xóa tài khoản giáo vụ.");
+                    tran.Rollback();
+                    return;
+                }
+
+                // --- Học sinh ---
                 string hocSinhID = null;
                 using (var getHs = new MySqlCommand("SELECT HocSinhID FROM HOCSINH WHERE UserID = @UserID", conn, tran))
                 {
@@ -452,7 +475,6 @@ namespace QuanLyHocSinh.Service
 
                 if (!string.IsNullOrEmpty(hocSinhID))
                 {
-                    // Xoá CAPNHATDIEM liên quan học sinh này
                     var cmdXoaCNDiem = new MySqlCommand(@"
                 DELETE cnd FROM CAPNHATDIEM cnd
                 JOIN CHITIETDIEM ctd ON cnd.ChiTietDiemID = ctd.ChiTietDiemID
@@ -461,7 +483,6 @@ namespace QuanLyHocSinh.Service
                     cmdXoaCNDiem.Parameters.AddWithValue("@HocSinhID", hocSinhID);
                     cmdXoaCNDiem.ExecuteNonQuery();
 
-                    // Xoá CHITIETDIEM
                     var cmdXoaCTD = new MySqlCommand(@"
                 DELETE ctd FROM CHITIETDIEM ctd
                 JOIN DIEM d ON ctd.DiemID = d.DiemID
@@ -469,23 +490,20 @@ namespace QuanLyHocSinh.Service
                     cmdXoaCTD.Parameters.AddWithValue("@HocSinhID", hocSinhID);
                     cmdXoaCTD.ExecuteNonQuery();
 
-                    // Xoá DIEM
                     var cmdXoaDiem = new MySqlCommand("DELETE FROM DIEM WHERE HocSinhID = @HocSinhID", conn, tran);
                     cmdXoaDiem.Parameters.AddWithValue("@HocSinhID", hocSinhID);
                     cmdXoaDiem.ExecuteNonQuery();
 
-                    // Xoá HOSOHOCSINH
                     var cmdXoaHS = new MySqlCommand("DELETE FROM HOSOHOCSINH WHERE HocSinhID = @HocSinhID", conn, tran);
                     cmdXoaHS.Parameters.AddWithValue("@HocSinhID", hocSinhID);
                     cmdXoaHS.ExecuteNonQuery();
 
-                    // Xoá HOCSINH
                     var cmdDelHS = new MySqlCommand("DELETE FROM HOCSINH WHERE HocSinhID = @HocSinhID", conn, tran);
                     cmdDelHS.Parameters.AddWithValue("@HocSinhID", hocSinhID);
                     cmdDelHS.ExecuteNonQuery();
                 }
 
-                // 2. Kiểm tra có phải giáo viên không
+                // --- Giáo viên ---
                 string giaoVienID = null;
                 using (var getGV = new MySqlCommand("SELECT GiaoVienID FROM GIAOVIEN WHERE UserID = @UserID", conn, tran))
                 {
@@ -495,54 +513,59 @@ namespace QuanLyHocSinh.Service
 
                 if (!string.IsNullOrEmpty(giaoVienID))
                 {
-                    // Xoá CAPNHATDIEM do giáo viên cập nhật
+                    // 🔍 Kiểm tra nếu giáo viên đang là GVCN → không cho xoá
+                    var cmdCheckGVCN = new MySqlCommand("SELECT COUNT(*) FROM LOP WHERE GVCNID = @GiaoVienID", conn, tran);
+                    cmdCheckGVCN.Parameters.AddWithValue("@GiaoVienID", giaoVienID);
+                    int count = Convert.ToInt32(cmdCheckGVCN.ExecuteScalar());
+
+                    if (count > 0)
+                    {
+                        MessageBox.Show("Không thể xóa giáo viên này vì đang là GVCN của lớp học.");
+                        tran.Rollback();
+                        return;
+                    }
+
                     var cmdDelCNDGV = new MySqlCommand("DELETE FROM CAPNHATDIEM WHERE GiaoVienID = @GiaoVienID", conn, tran);
                     cmdDelCNDGV.Parameters.AddWithValue("@GiaoVienID", giaoVienID);
                     cmdDelCNDGV.ExecuteNonQuery();
 
-                    // Xoá CHITIETMONHOC
                     var cmdDelCTMH = new MySqlCommand("DELETE FROM CHITIETMONHOC WHERE GiaoVienID = @GiaoVienID", conn, tran);
                     cmdDelCTMH.Parameters.AddWithValue("@GiaoVienID", giaoVienID);
                     cmdDelCTMH.ExecuteNonQuery();
 
-                    // Xoá HOSOGIAOVIEN
                     var cmdDelHSGV = new MySqlCommand("DELETE FROM HOSOGIAOVIEN WHERE GiaoVienID = @GiaoVienID", conn, tran);
                     cmdDelHSGV.Parameters.AddWithValue("@GiaoVienID", giaoVienID);
                     cmdDelHSGV.ExecuteNonQuery();
 
-                    // Xoá GIAOVIEN
                     var cmdDelGV = new MySqlCommand("DELETE FROM GIAOVIEN WHERE GiaoVienID = @GiaoVienID", conn, tran);
                     cmdDelGV.Parameters.AddWithValue("@GiaoVienID", giaoVienID);
                     cmdDelGV.ExecuteNonQuery();
                 }
 
-                // 3. Xoá GIAOVU nếu có
-                var cmdDelGVu = new MySqlCommand("DELETE FROM GIAOVU WHERE UserID = @UserID", conn, tran);
-                cmdDelGVu.Parameters.AddWithValue("@UserID", userId);
-                cmdDelGVu.ExecuteNonQuery();
-
-                // 4. Xoá PHANQUYEN liên quan
+                // --- Các bảng liên quan chung ---
                 var cmdPQ = new MySqlCommand("DELETE FROM PHANQUYEN WHERE GiaoVuPhanQuyenID = @UserID OR UserDuocPhanQuyenID = @UserID", conn, tran);
                 cmdPQ.Parameters.AddWithValue("@UserID", userId);
                 cmdPQ.ExecuteNonQuery();
 
-                // 5. Xoá CAPNHAT liên quan
                 var cmdCapNhat = new MySqlCommand("DELETE FROM CAPNHAT WHERE UserID = @UserID", conn, tran);
                 cmdCapNhat.Parameters.AddWithValue("@UserID", userId);
                 cmdCapNhat.ExecuteNonQuery();
 
-                // 6. Xoá USERS
                 var cmdDelUser = new MySqlCommand("DELETE FROM USERS WHERE UserID = @UserID", conn, tran);
                 cmdDelUser.Parameters.AddWithValue("@UserID", userId);
                 cmdDelUser.ExecuteNonQuery();
+
                 tran.Commit();
             }
-            catch
+            catch (Exception ex)
             {
                 tran.Rollback();
+                MessageBox.Show("Xảy ra lỗi khi xoá tài khoản: " + ex.Message);
                 throw;
             }
         }
+
+
     }
 }
 

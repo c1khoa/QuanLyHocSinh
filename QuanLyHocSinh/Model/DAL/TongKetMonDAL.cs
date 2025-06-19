@@ -43,10 +43,10 @@ public class TongKetMonDAL
             JOIN LOP l ON hhs.LopHocID = l.LopID
             JOIN DIEM d ON d.HocSinhID = hs.HocSinhID
             JOIN MONHOC mh ON d.MonHocID = mh.MonHocID
-            LEFT JOIN CHITIETDIEM diem_mieng ON diem_mieng.DiemID = d.DiemID AND diem_mieng.LoaiDiemID = 'LD001'
-            LEFT JOIN CHITIETDIEM diem_15p ON diem_15p.DiemID = d.DiemID AND diem_15p.LoaiDiemID = 'LD002'
-            LEFT JOIN CHITIETDIEM diem_1tiet ON diem_1tiet.DiemID = d.DiemID AND diem_1tiet.LoaiDiemID = 'LD003'
-            LEFT JOIN CHITIETDIEM diem_thi ON diem_thi.DiemID = d.DiemID AND diem_thi.LoaiDiemID = 'LD004'
+            LEFT JOIN CHITIETDIEM diem_mieng ON diem_mieng.DiemID = d.DiemID AND diem_mieng.LoaiDiemID = 'LD01'
+            LEFT JOIN CHITIETDIEM diem_15p ON diem_15p.DiemID = d.DiemID AND diem_15p.LoaiDiemID = 'LD02'
+            LEFT JOIN CHITIETDIEM diem_1tiet ON diem_1tiet.DiemID = d.DiemID AND diem_1tiet.LoaiDiemID = 'LD03'
+            LEFT JOIN CHITIETDIEM diem_thi ON diem_thi.DiemID = d.DiemID AND diem_thi.LoaiDiemID = 'LD04'
             WHERE d.DiemTrungBinh IS NOT NULL AND d.DiemTrungBinh > 0
             ORDER BY hs.HocSinhID, mh.TenMonHoc, d.NamHocID, d.HocKy
         ";
@@ -128,10 +128,10 @@ public class TongKetMonDAL
             JOIN LOP l ON hhs.LopHocID = l.LopID
             JOIN DIEM d ON d.HocSinhID = hs.HocSinhID
             JOIN MONHOC mh ON d.MonHocID = mh.MonHocID
-            LEFT JOIN CHITIETDIEM diem_mieng ON diem_mieng.DiemID = d.DiemID AND diem_mieng.LoaiDiemID = 'LD001'
-            LEFT JOIN CHITIETDIEM diem_15p ON diem_15p.DiemID = d.DiemID AND diem_15p.LoaiDiemID = 'LD002'
-            LEFT JOIN CHITIETDIEM diem_1tiet ON diem_1tiet.DiemID = d.DiemID AND diem_1tiet.LoaiDiemID = 'LD003'
-            LEFT JOIN CHITIETDIEM diem_thi ON diem_thi.DiemID = d.DiemID AND diem_thi.LoaiDiemID = 'LD004'
+            LEFT JOIN CHITIETDIEM diem_mieng ON diem_mieng.DiemID = d.DiemID AND diem_mieng.LoaiDiemID = 'LD01'
+            LEFT JOIN CHITIETDIEM diem_15p ON diem_15p.DiemID = d.DiemID AND diem_15p.LoaiDiemID = 'LD02'
+            LEFT JOIN CHITIETDIEM diem_1tiet ON diem_1tiet.DiemID = d.DiemID AND diem_1tiet.LoaiDiemID = 'LD03'
+            LEFT JOIN CHITIETDIEM diem_thi ON diem_thi.DiemID = d.DiemID AND diem_thi.LoaiDiemID = 'LD04'
             {whereClause}
             ORDER BY hs.HocSinhID, mh.TenMonHoc, d.NamHocID, d.HocKy
         ";

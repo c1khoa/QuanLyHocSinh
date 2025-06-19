@@ -10,5 +10,9 @@ namespace QuanLyHocSinh.View.Dialogs
             InitializeComponent();
             DataContext = new ChiTietHocSinhViewModel(hocSinhID, namHoc, lop);
         }
+        private void Close_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }

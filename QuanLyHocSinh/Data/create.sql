@@ -69,7 +69,7 @@ CREATE TABLE DIEM (
     NamHocID CHAR(8) NOT NULL,
     HocKy INT NOT NULL CHECK (HocKy IN (1, 2)),
     DiemTrungBinh FLOAT CHECK(DiemTrungBinh BETWEEN 0 AND 10),
-    XepLoai VARCHAR(10) CHECK (XepLoai IN ('Gioi','Kha','TB','Yeu')),
+    XepLoai VARCHAR(10) CHECK (XepLoai IN ('Giỏi', 'Khá', 'Trung bình', 'Yếu')),
     FOREIGN KEY (HocSinhID) REFERENCES HOCSINH(HocSinhID),
     FOREIGN KEY (MonHocID) REFERENCES MONHOC(MonHocID),
     FOREIGN KEY (NamHocID) REFERENCES NAMHOC(NamHocID)
@@ -77,7 +77,7 @@ CREATE TABLE DIEM (
 
 -- Tạo bảng LOAIDIEM
 CREATE TABLE LOAIDIEM (
-    LoaiDiemID CHAR(8) PRIMARY KEY,
+    LoaiDiemID CHAR(4) PRIMARY KEY,
     TenLoaiDiem VARCHAR(8) NOT NULL,
     MoTa VARCHAR(255),
     HeSo FLOAT NOT NULL CHECK(HeSo > 0)
@@ -109,7 +109,7 @@ CREATE TABLE CHITIETMONHOC (
 -- Tạo bảng CHUCVU
 CREATE TABLE CHUCVU (
     ChucVuID CHAR(8) PRIMARY KEY,
-    TenChucVu VARCHAR(255) NOT NULL CHECK (TenChucVu IN ('Lop truong', 'To truong', 'Giao vien chu nhiem', 'Giao vien bo mon', '')),
+    TenChucVu VARCHAR(255) NOT NULL CHECK (TenChucVu IN ('Lớp trưởng', 'Tổ trưởng', 'Giáo viên chủ nhiệm', 'Giáo viên bộ môn', 'Thành viên lớp', 'Giáo vụ')),
     MoTa VARCHAR(255) NOT NULL,
     VaiTroID CHAR(8) NOT NULL,
     FOREIGN KEY (VaiTroID) REFERENCES VAITRO(VaiTroID)
@@ -119,12 +119,12 @@ CREATE TABLE CHUCVU (
 CREATE TABLE HOSO (
     HoSoID CHAR(8) PRIMARY KEY,
     HoTen VARCHAR(255) NOT NULL,
-    GioiTinh CHAR(8) NOT NULL CHECK (GioiTinh IN ('Nam','Nu')),
+    GioiTinh CHAR(8) NOT NULL CHECK (GioiTinh IN ('Nam','Nữ')),
     NgaySinh DATETIME NOT NULL,
     Email VARCHAR(255) NOT NULL CHECK (Email LIKE '%@%.com' OR Email LIKE '%@%.vn'),
     DiaChi VARCHAR(255) NOT NULL,
     ChucVuID CHAR(8) NOT NULL,
-    TrangThaiHoSo VARCHAR(20) NOT NULL CHECK(TrangThaiHoSo IN ('danghoatdong', 'dabihuy')),
+    TrangThaiHoSo VARCHAR(20) NOT NULL CHECK(TrangThaiHoSo IN ('Đang hoạt động', 'Đã bị hủy')),
     NgayTao DATETIME NOT NULL,
     NgayCapNhatGanNhat DATETIME NOT NULL,
     FOREIGN KEY (ChucVuID) REFERENCES CHUCVU(ChucVuID)
@@ -152,6 +152,15 @@ CREATE TABLE HOSOHOCSINH (
     FOREIGN KEY (HocSinhID) REFERENCES HOCSINH(HocSinhID),
     FOREIGN KEY (HoSoID) REFERENCES HOSO(HoSoID),
     FOREIGN KEY (LopHocID) REFERENCES LOP(LopID)
+);
+
+-- Tạo bảng HOSOGIAOVU
+CREATE TABLE HOSOGIAOVU (
+    HoSoGiaoVuID CHAR(8) PRIMARY KEY,
+    GiaoVuID CHAR(8) NOT NULL,
+    HoSoID CHAR(8) NOT NULL,
+    FOREIGN KEY (GiaoVuID) REFERENCES GIAOVU(GiaoVuID),
+    FOREIGN KEY (HoSoID) REFERENCES HOSO(HoSoID)
 );
 
 -- Tạo bảng QUYDINHTUOI

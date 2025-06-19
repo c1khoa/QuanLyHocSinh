@@ -112,7 +112,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         public TraCuuDiemHocSinhViewModel(MainViewModel mainVM)
         {
             _mainVM = mainVM;
-            MessageBox.Show($"Vai Trò: {_mainVM.CurrentUser?.VaiTro?.TenVaiTro}");
             _allDiem = new ObservableCollection<Diem>(DiemDAL.GetAllDiemHocSinh());
             DanhSachDiem = new ObservableCollection<Diem>(_allDiem);
 

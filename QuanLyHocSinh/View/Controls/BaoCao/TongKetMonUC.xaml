@@ -14,6 +14,14 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="ImageBorderStyle" TargetType="Border">
+                <Setter Property="BorderBrush" Value="Gray"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="CornerRadius" Value="30"/>
+                <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Margin" Value="20 80 20 80"/>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid Margin="20">
@@ -191,22 +199,19 @@
                           FontWeight="Bold" 
                           FontSize="16"/>
             </StackPanel>
-            
-            <StackPanel Grid.Column="1" 
-                        Orientation="Horizontal" 
-                        HorizontalAlignment="Right" 
-                        VerticalAlignment="Center">
+
+            <Border Grid.Column="1" 
+                    Style="{StaticResource ImageBorderStyle}"
+                    Grid.Row="2"
+                    Margin="50 0 0 0"
+                    Background="#4CAF50">
                 <Button Content="Xuất Excel" 
-                        Margin="0,0,10,0" 
-                        Padding="20,8" 
                         Command="{Binding ExportExcelCommand}"
-                        Background="#388E3C" 
-                        Foreground="White" 
-                        FontWeight="Bold" 
-                        FontSize="15" 
-                        MinWidth="140"
-                        Style="{StaticResource ActionButtonStyle}"/>
-            </StackPanel>
+                        BorderBrush="Transparent"
+                        Style="{StaticResource MaterialDesignRaisedLightButton}"
+                        Background="Transparent"
+                        HorizontalAlignment="Center"/>
+            </Border>
         </Grid>
     </Grid>
 </UserControl>

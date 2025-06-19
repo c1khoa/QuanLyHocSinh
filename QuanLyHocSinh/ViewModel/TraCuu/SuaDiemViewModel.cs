@@ -167,12 +167,12 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                 string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
                 string query = @"
                     SELECT 
-                        SUM(CASE WHEN LoaiDiemID = 'LD001' THEN HeSo ELSE 0 END) as HeSoMieng,
-                        SUM(CASE WHEN LoaiDiemID = 'LD002' THEN HeSo ELSE 0 END) as HeSo15p,
-                        SUM(CASE WHEN LoaiDiemID = 'LD003' THEN HeSo ELSE 0 END) as HeSo1Tiet,
-                        SUM(CASE WHEN LoaiDiemID = 'LD004' THEN HeSo ELSE 0 END) as HeSoThi
+                        SUM(CASE WHEN LoaiDiemID = 'LD01' THEN HeSo ELSE 0 END) as HeSoMieng,
+                        SUM(CASE WHEN LoaiDiemID = 'LD02' THEN HeSo ELSE 0 END) as HeSo15p,
+                        SUM(CASE WHEN LoaiDiemID = 'LD03' THEN HeSo ELSE 0 END) as HeSo1Tiet,
+                        SUM(CASE WHEN LoaiDiemID = 'LD04' THEN HeSo ELSE 0 END) as HeSoThi
                     FROM LOAIDIEM
-                    WHERE LoaiDiemID IN ('LD001', 'LD002', 'LD003', 'LD004')";
+                    WHERE LoaiDiemID IN ('LD01', 'LD02', 'LD03', 'LD04')";
 
                 using (MySqlConnection conn = new MySqlConnection(connectionString))
                 {
