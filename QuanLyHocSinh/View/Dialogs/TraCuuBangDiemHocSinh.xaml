@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.TraCuu"
-        Title="Bảng điểm học sinh" MinHeight="400" MinWidth="700" ResizeMode="CanResize" WindowStartupLocation="CenterScreen"
+        Title="Bảng điểm học sinh" MinHeight="500" MinWidth="700" ResizeMode="CanResize" WindowStartupLocation="CenterScreen"
         x:Name="main">
     <Window.Resources>
         <ResourceDictionary>
@@ -34,38 +34,44 @@
         </Grid.RowDefinitions>
         <TextBlock Text="BẢNG ĐIỂM HỌC SINH" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,16"/>
         <!-- Bộ lọc năm học, học kỳ -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,12">
-            <TextBlock Text="Năm học: " FontWeight="Bold" VerticalAlignment="Center"/>
-            <ComboBox Width="120" Margin="0,0,16,0" ItemsSource="{Binding DanhSachNamHoc}" SelectedItem="{Binding SelectedNamHoc, Mode=TwoWay}" SelectedIndex="-1"/>
-            <TextBlock Text="Học kỳ: " FontWeight="Bold" VerticalAlignment="Center"/>
-            <ComboBox Width="80" ItemsSource="{Binding DanhSachHocKy}" SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}" SelectedIndex="-1"/>
-        </StackPanel>
+        <Border Grid.Row="1" Background="#f8f9fa" CornerRadius="15" Padding="15" Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="Năm học: " FontWeight="Bold" VerticalAlignment="Center"/>
+                <ComboBox Width="120" Margin="0,0,16,0" ItemsSource="{Binding DanhSachNamHoc}" SelectedItem="{Binding SelectedNamHoc, Mode=TwoWay}" SelectedIndex="-1"/>
+                <TextBlock Text="Học kỳ: " FontWeight="Bold" VerticalAlignment="Center"/>
+                <ComboBox Width="80" ItemsSource="{Binding DanhSachHocKy}" SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}" SelectedIndex="-1"/>
+            </StackPanel>
+        </Border>
         <!-- Thông tin học sinh -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
-            <TextBlock Text="Họ tên: " FontWeight="Bold"/>
-            <TextBlock Text="{Binding HoTen}" Margin="0,0,16,0"/>
-            <TextBlock Text="Lớp: " FontWeight="Bold"/>
-            <TextBlock Text="{Binding TenLop}" Margin="0,0,16,0"/>
-            <TextBlock Text="Năm học: " FontWeight="Bold"/>
-            <TextBlock Text="{Binding NamHoc}" Margin="0,0,16,0"/>
-            <TextBlock Text="Học kỳ: " FontWeight="Bold"/>
-            <TextBlock Text="{Binding HocKy}"/>
-        </StackPanel>
+        <Border Grid.Row="2" Background="#e3f2fd" CornerRadius="15" Padding="15" Margin="0,0,0,16">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="Họ tên: " FontWeight="Bold"/>
+                <TextBlock Text="{Binding HoTen}" Margin="0,0,16,0"/>
+                <TextBlock Text="Lớp: " FontWeight="Bold"/>
+                <TextBlock Text="{Binding TenLop}" Margin="0,0,16,0"/>
+                <TextBlock Text="Năm học: " FontWeight="Bold"/>
+                <TextBlock Text="{Binding NamHoc}" Margin="0,0,16,0"/>
+                <TextBlock Text="Học kỳ: " FontWeight="Bold"/>
+                <TextBlock Text="{Binding HocKy}"/>
+            </StackPanel>
+        </Border>
         <!-- Bảng điểm các môn -->
-        <DataGrid Grid.Row="3" 
-                  ItemsSource="{Binding BangDiemMon}" 
-                  Style="{StaticResource CommonDataGridStyle}" 
-                  Visibility="{Binding IsShowBangDiem, Converter={StaticResource BooleanToVisibilityConverter}}"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  AutoGenerateColumns="False"
-                  ScrollViewer.VerticalScrollBarVisibility="Auto"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                  ScrollViewer.CanContentScroll="True"
-                  VirtualizingPanel.IsVirtualizing="True"
-                  VirtualizingPanel.VirtualizationMode="Recycling"
-                  EnableRowVirtualization="True"
-                  EnableColumnVirtualization="True">
+        <Border Grid.Row="3" Background="White" CornerRadius="15" Padding="10" Margin="0,0,0,16" BorderBrush="#e0e0e0" BorderThickness="1">
+            <DataGrid ItemsSource="{Binding BangDiemMon}" 
+                      Style="{StaticResource CommonDataGridStyle}" 
+                      Visibility="{Binding IsShowBangDiem, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      ScrollViewer.CanContentScroll="True"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling"
+                      EnableRowVirtualization="True"
+                      EnableColumnVirtualization="True"
+                      BorderBrush="Transparent"
+                      Background="Transparent">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Môn học" Binding="{Binding MonHoc}" Width="*" ElementStyle="{StaticResource CenterAlignStyle}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Điểm miệng" Binding="{Binding DiemMieng, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
@@ -88,8 +94,9 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+                            </DataGrid.Columns>
+            </DataGrid>
+        </Border>
         <!-- Nút xuất Excel và đóng -->
         <Grid Grid.Row="4" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>

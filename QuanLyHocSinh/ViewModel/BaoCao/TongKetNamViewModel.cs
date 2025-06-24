@@ -254,6 +254,11 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
                 MessageBox.Show("Vui lòng chọn đầy đủ Năm học, Học kỳ và Lớp!", "Thiếu thông tin", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+            if (SelectedHocKy == "Cả năm")
+            {
+                MessageBox.Show("Vui lòng không chọn cả năm cho học kỳ", "Sai thông tin", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             var dialog = new TongKetNamBangDiemLop(SelectedNamHoc, int.Parse(SelectedHocKy), SelectedLop);
             dialog.ShowDialog();
         }
