@@ -17,48 +17,50 @@
                                    CommandParameter="{Binding ElementName=ucControlBar}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Grid>
-        <materialDesign:ColorZone Mode="PrimaryMid" TextBlock.Foreground="{DynamicResource MaterialDesignBody}">
-            <DockPanel>
+    <materialDesign:DialogHost Identifier="RootDialog_ControlBar">
+        <Grid>
+            <materialDesign:ColorZone Mode="PrimaryMid" TextBlock.Foreground="{DynamicResource MaterialDesignBody}">
+                <DockPanel>
 
-                <StackPanel DockPanel.Dock="Right"
+                    <StackPanel DockPanel.Dock="Right"
                             Orientation="Horizontal">
-                    <Button Command="{Binding MinimizeWindowCommand}"
+                        <Button Command="{Binding MinimizeWindowCommand}"
                             CommandParameter="{Binding ElementName=ucControlBar}"
                             ToolBar.OverflowMode="AsNeeded"
                             BorderBrush="Transparent"
                             Background="transparent"
                             materialDesign:ButtonAssist.CornerRadius="4">
-                        <materialDesign:PackIcon  Kind="WindowMinimize" />
-                    </Button>
-                    <Button Command="{Binding MaximizeWindowCommand}"
+                            <materialDesign:PackIcon  Kind="WindowMinimize" />
+                        </Button>
+                        <Button Command="{Binding MaximizeWindowCommand}"
                             CommandParameter="{Binding ElementName=ucControlBar}"
                             ToolBar.OverflowMode="AsNeeded"
                             BorderBrush="Transparent"
                             Background="Transparent"
                             materialDesign:ButtonAssist.CornerRadius="4">
-                        <materialDesign:PackIcon  Kind="WindowMaximize" />
-                    </Button>
-                    <Button Command="{Binding CloseWindowCommand}"
-                            CommandParameter="{Binding ElementName=ucControlBar}" 
-                            ToolBar.OverflowMode="AsNeeded"
-                            BorderBrush="#F44336"
-                            Background="#FF5C5C"
-                            Foreground="#E0F0FF"
-                            materialDesign:ButtonAssist.CornerRadius="4">
-                        <materialDesign:PackIcon  Kind="WindowClose"/>
-                    </Button>
-                </StackPanel>
+                            <materialDesign:PackIcon  Kind="WindowMaximize" />
+                        </Button>
+                        <Button Command="{Binding CloseWindowCommand}"
+                                ToolBar.OverflowMode="AsNeeded"
+                                BorderBrush="#F44336"
+                                Background="#FF5C5C"
+                                Foreground="#E0F0FF"
+                                materialDesign:ButtonAssist.CornerRadius="4">
+                            <materialDesign:PackIcon Kind="WindowClose"/>
+                        </Button>
 
-                <StackPanel DockPanel.Dock="Left" 
+                    </StackPanel>
+
+                    <StackPanel DockPanel.Dock="Left" 
                             Orientation="Horizontal">
-                    <TextBlock VerticalAlignment="Center"
+                        <TextBlock VerticalAlignment="Center"
                                Margin="16 0 0 0"
                                Text="{Binding Tag, ElementName=ucControlBar}">
-                    </TextBlock>
-                </StackPanel>
-                
-            </DockPanel>
-        </materialDesign:ColorZone>
-    </Grid>
+                        </TextBlock>
+                    </StackPanel>
+
+                </DockPanel>
+            </materialDesign:ColorZone>
+        </Grid>
+    </materialDesign:DialogHost>
 </UserControl>

@@ -1,32 +1,46 @@
 using System;
 using System.ComponentModel;
-using System.Data.Entity;
 using System.Runtime.CompilerServices;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data.Entity;
+using QuanLyHocSinh.View.RoleControls;
 
 namespace QuanLyHocSinh.Model.Entities
 {
     public class User : INotifyPropertyChanged, ICloneable
     {
+        // --- BACKING FIELDS ---
         private string _userID;
         private string _tenDangNhap;
         private string _matKhau;
-        private string _vaiTroID;
         private string _hoTen;
-        private VaiTro _vaiTro; // Private field cho navigation property
+        private string _gioiTinh;
+        private DateTime? _ngaySinh;
+        private string _email;
+        private string _diaChi;
 
-        public string MaskedPassword
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(MatKhau))
-                    return "";
-                return new string('*', 8); // ho?c return "********"
-            }
-        }
+        private string _vaiTroID;
+        private VaiTro _vaiTro;
+        private string _chucVuTen;
+
+        private string _lopHocID;
+        private string _lopDayID;
+
+        private string _maHoSoCaNhan;
+        private string _maHoSo;
+
+        private string _hocSinhID;
+        private string _giaoVienID;
+        private string _giaoVuID;
+        // --- BACKING FIELDS BỔ SUNG ---
+        private string _lopDayID1;
+        private string _lopDayID2;
+        private string _lopDayID3;
+        private string _lopDayIDCN;
+        private string _boMon;
+
+
+        // --- PROPERTIES ---
+
         public string UserID
         {
             get => _userID;
@@ -66,19 +80,6 @@ namespace QuanLyHocSinh.Model.Entities
             }
         }
 
-        public string VaiTroID
-        {
-            get => _vaiTroID;
-            set
-            {
-                if (_vaiTroID != value)
-                {
-                    _vaiTroID = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
         public string HoTen
         {
             get => _hoTen;
@@ -92,7 +93,138 @@ namespace QuanLyHocSinh.Model.Entities
             }
         }
 
-        public VaiTro VaiTro // Navigation property
+        public string GioiTinh
+        {
+            get => _gioiTinh;
+            set
+            {
+                if (_gioiTinh != value)
+                {
+                    _gioiTinh = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        // --- PROPERTIES BỔ SUNG ---
+        public string LopDayID1
+        {
+            get => _lopDayID1;
+            set
+            {
+                if (_lopDayID1 != value)
+                {
+                    _lopDayID1 = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string LopDayID2
+        {
+            get => _lopDayID2;
+            set
+            {
+                if (_lopDayID2 != value)
+                {
+                    _lopDayID2 = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string LopDayID3
+        {
+            get => _lopDayID3;
+            set
+            {
+                if (_lopDayID3 != value)
+                {
+                    _lopDayID3 = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string LopDayIDCN
+        {
+            get => _lopDayIDCN;
+            set
+            {
+                if (_lopDayIDCN != value)
+                {
+                    _lopDayIDCN = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string BoMon
+        {
+            get => _boMon;
+            set
+            {
+                if (_boMon != value)
+                {
+                    _boMon = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        public DateTime? NgaySinh
+        {
+            get => _ngaySinh;
+            set
+            {
+                if (_ngaySinh != value)
+                {
+                    _ngaySinh = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string Email
+        {
+            get => _email;
+            set
+            {
+                if (_email != value)
+                {
+                    _email = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string DiaChi
+        {
+            get => _diaChi;
+            set
+            {
+                if (_diaChi != value)
+                {
+                    _diaChi = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string VaiTroID
+        {
+            get => _vaiTroID;
+            set
+            {
+                if (_vaiTroID != value)
+                {
+                    _vaiTroID = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public VaiTro VaiTro
         {
             get => _vaiTro;
             set
@@ -105,13 +237,116 @@ namespace QuanLyHocSinh.Model.Entities
             }
         }
 
-        // Constructor m?c ??nh
+        public string ChucVu
+        {
+            get => _chucVuTen;
+            set
+            {
+                _chucVuTen = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string LopHocID
+        {
+            get => _lopHocID;
+            set
+            {
+                if (_lopHocID != value)
+                {
+                    _lopHocID = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string LopDayID
+        {
+            get => _lopDayID;
+            set
+            {
+                if (_lopDayID != value)
+                {
+                    _lopDayID = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string MaHoSoCaNhan
+        {
+            get => _maHoSoCaNhan;
+            set
+            {
+                if (_maHoSoCaNhan != value)
+                {
+                    _maHoSoCaNhan = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string MaHoSo
+        {
+            get => _maHoSo;
+            set
+            {
+                if (_maHoSo != value)
+                {
+                    _maHoSo = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string HocSinhID
+        {
+            get => _hocSinhID;
+            set
+            {
+                if (_hocSinhID != value)
+                {
+                    _hocSinhID = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string GiaoVienID
+        {
+            get => _giaoVienID;
+            set
+            {
+                if (_giaoVienID != value)
+                {
+                    _giaoVienID = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string GiaoVuID
+        {
+            get => _giaoVuID;
+            set
+            {
+                if (_giaoVuID != value)
+                {
+                    _giaoVuID = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        // --- MASKED PASSWORD ---
+        public string MaskedPassword => string.IsNullOrEmpty(MatKhau) ? "" : new string('*', 8);
+
+        // --- CONSTRUCTOR ---
         public User() { }
 
-        // ?�y l� ph??ng th?c Clone() ?�ng v� duy nh?t cho l?p User
+        // --- CLONE ---
         public object Clone()
         {
-            // Quan tr?ng: T?o m?t b?n sao m?i, kh�ng ph?i tham chi?u
             return new User
             {
                 UserID = this.UserID,
@@ -119,25 +354,40 @@ namespace QuanLyHocSinh.Model.Entities
                 MatKhau = this.MatKhau,
                 VaiTroID = this.VaiTroID,
                 HoTen = this.HoTen,
-                // N?u VaiTro c?ng c?n l� m?t b?n sao ??c l?p, v� n� implement ICloneable,
-                // th� d�ng VaiTro = this.VaiTro?.Clone() as VaiTro
-                // N?u kh�ng, ch? c?n g�n VaiTro = this.VaiTro (n?u b?n ch?p nh?n chia s? tham chi?u ho?c VaiTro l� m?t enum/struct)
-                VaiTro = this.VaiTro?.Clone() as VaiTro
+                VaiTro = this.VaiTro?.Clone() as VaiTro,
+                GioiTinh = this.GioiTinh,
+                NgaySinh = this.NgaySinh,
+                Email = this.Email,
+                DiaChi = this.DiaChi,
+                LopHocID = this.LopHocID,
+                LopDayID = this.LopDayID,
+                MaHoSoCaNhan = this.MaHoSoCaNhan,
+                MaHoSo = this.MaHoSo,
+                ChucVu = this.ChucVu,
+                HocSinhID = this.HocSinhID,
+                GiaoVienID= this.GiaoVienID,
+                GiaoVuID = this.GiaoVuID,
+                LopDayID1 = this.LopDayID1,
+                LopDayID2 = this.LopDayID2,
+                LopDayID3 = this.LopDayID3,
+                LopDayIDCN = this.LopDayIDCN,
+                BoMon = this.BoMon
+
             };
         }
 
+        // --- INotifyPropertyChanged ---
         public event PropertyChangedEventHandler PropertyChanged;
-
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
+
+    // DbContext
     public class QLHocSinhEntities : DbContext
     {
         public DbSet<User> Users { get; set; }
-        // B?n th�m c�c DbSet kh�c n?u c�
+        // Thêm các DbSet khác nếu có
     }
-
 }
-

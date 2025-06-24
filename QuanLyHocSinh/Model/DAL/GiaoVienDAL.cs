@@ -11,14 +11,18 @@ public class GiaoVienDAL
     {
         List<GiaoVien> list = new List<GiaoVien>();
         string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
-        string query = @"
-            SELECT gv.GiaoVienID AS MaGV, ho.HoTen, ho.NgaySinh, ho.GioiTinh, ho.Email, ho.DiaChi, mh.TenMonHoc AS BoMon, l.TenLop AS LopDayID
-            FROM GIAOVIEN gv
-            JOIN HOSOGIAOVIEN hsgv ON gv.GiaoVienID = hsgv.GiaoVienID
-            JOIN HOSO ho ON hsgv.HoSoID = ho.HoSoID
-            LEFT JOIN CHITIETMONHOC ctmh ON ctmh.GiaoVienID = gv.GiaoVienID
-            LEFT JOIN MONHOC mh ON ctmh.MonHocID = mh.MonHocID
-            LEFT JOIN LOP l ON l.LopID = hsgv.LopDayID
+        string query = @"SELECT gv.GiaoVienID AS MaGV, 
+                                ho.HoTen, 
+                                ho.NgaySinh, 
+                                ho.GioiTinh, 
+                                ho.Email, 
+                                ho.DiaChi, 
+                                mh.TenMonHoc AS BoMon
+                            FROM GIAOVIEN gv
+                            JOIN HOSOGIAOVIEN hsgv ON gv.GiaoVienID = hsgv.GiaoVienID
+                            JOIN HOSO ho ON hsgv.HoSoID = ho.HoSoID
+                            LEFT JOIN PHANCONGDAY pcd ON pcd.GiaoVienID = gv.GiaoVienID
+                            LEFT JOIN MONHOC mh ON pcd.MonHocID = mh.MonHocID;
         ";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
@@ -37,7 +41,6 @@ public class GiaoVienDAL
                         GioiTinh = reader["GioiTinh"].ToString(),
                         Email = reader["Email"].ToString(),
                         BoMon = reader["BoMon"].ToString(),
-                        LopDayID = reader["LopDayID"].ToString(),
                         DiaChi = reader["DiaChi"].ToString()
                     };
                     list.Add(gv);
@@ -56,9 +59,10 @@ public class GiaoVienDAL
         SELECT DISTINCT l.TenLop
         FROM USERS u
         JOIN GIAOVIEN gv ON u.UserID = gv.UserID
-        JOIN HOSOGIAOVIEN hsgv ON gv.GiaoVienID = hsgv.GiaoVienID
-        JOIN LOP l ON hsgv.LopDayID = l.LopID
-        WHERE u.UserID = @UserID
+        JOIN PHANCONGDAY pcd ON gv.GiaoVienID = pcd.GiaoVienID
+        JOIN LOP l ON pcd.LopID = l.LopID
+        WHERE u.UserID = @UserID;
+
     ";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))

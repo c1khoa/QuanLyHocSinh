@@ -67,125 +67,128 @@
             </Style.Triggers>
         </Style>
     </Window.Resources>
+    <materialDesign:DialogHost Identifier="RootDialog_Begin"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <uc:ControlBarUC Tag="{Binding Title, ElementName=role}"/>
+            </Grid>
 
-        <Grid Grid.Row="0">
-            <uc:ControlBarUC Tag="{Binding Title, ElementName=role}"/>
-        </Grid>
-
-        <Border Grid.Row="1"
+            <Border Grid.Row="1"
                 Margin="30"
                 Background="#87CEEB"
                 CornerRadius="30">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="7*"/>
-                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="7*"/>
+                    </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0">
-                    <TextBlock HorizontalAlignment="Center"
+                    <Grid Grid.Row="0">
+                        <TextBlock HorizontalAlignment="Center"
                                VerticalAlignment="Center"
                                FontSize="24"
                                FontWeight="Bold"
                                Text="CHỌN VAI TRÒ"
                                Margin="10"/>
-                </Grid>
+                    </Grid>
 
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
 
-                    <!-- AdminRole -->
-                    <Border Grid.Column="0" 
+                        <!-- AdminRole -->
+                        <Border Grid.Column="0" 
                             Style="{StaticResource ImageBorderStyle}"
                             DataContext="{Binding AdminRole}">
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <Image Source="{Binding LogoPath}"
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <Image Source="{Binding LogoPath}"
                                    Style="{StaticResource HoverZoomImage}"
                                    Width="100" Height="100"
                                    Stretch="Uniform"
                                    Margin="0,0,0,10"
                                    Cursor="Hand">
-                                <Image.InputBindings>
-                                    <MouseBinding Gesture="LeftClick"
+                                    <Image.InputBindings>
+                                        <MouseBinding Gesture="LeftClick"
                                                   Command="{Binding DataContext.SelectRoleCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                   CommandParameter="{Binding}" />
-                                </Image.InputBindings>
-                            </Image>
-                            <TextBlock Text="{Binding RoleName}"
+                                    </Image.InputBindings>
+                                </Image>
+                                <TextBlock Text="{Binding RoleName}"
                                        FontSize="24"
                                        FontWeight="Bold"
                                        Foreground="Black"
                                        HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
+                            </StackPanel>
+                        </Border>
 
-                    <!-- TeacherRole -->
-                    <Border Grid.Column="1" 
+                        <!-- TeacherRole -->
+                        <Border Grid.Column="1" 
                             Style="{StaticResource ImageBorderStyle}"
-                            DataContext="{Binding TeacherRole}">            
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <Image Source="{Binding LogoPath}"
+                            DataContext="{Binding TeacherRole}">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <Image Source="{Binding LogoPath}"
                                    Style="{StaticResource HoverZoomImage}"
                                    Width="100" Height="100"
                                    Stretch="Uniform"
                                    Margin="0,0,0,10"
                                    Cursor="Hand">
-                                <Image.InputBindings>
-                                    <MouseBinding Gesture="LeftClick"
+                                    <Image.InputBindings>
+                                        <MouseBinding Gesture="LeftClick"
                                   Command="{Binding DataContext.SelectRoleCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                   CommandParameter="{Binding}" />
-                                </Image.InputBindings>
-                            </Image>
-                            <TextBlock Text="{Binding RoleName}"
+                                    </Image.InputBindings>
+                                </Image>
+                                <TextBlock Text="{Binding RoleName}"
                                        FontSize="24"
                                        FontWeight="Bold"
                                        Foreground="Black"
                                        HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
+                            </StackPanel>
+                        </Border>
 
-                    <!-- StudentRole -->
-                    <Border Grid.Column="2" 
+                        <!-- StudentRole -->
+                        <Border Grid.Column="2" 
                             Style="{StaticResource ImageBorderStyle}"
                             DataContext="{Binding StudentRole}">
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <Image Source="{Binding LogoPath}"
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <Image Source="{Binding LogoPath}"
                                    Style="{StaticResource HoverZoomImage}"
                                    Width="100" Height="100"
                                    Stretch="Uniform"
                                    Margin="0,0,0,10"
                                    Cursor="Hand">
-                                <Image.InputBindings>
-                                    <MouseBinding Gesture="LeftClick"
+                                    <Image.InputBindings>
+                                        <MouseBinding Gesture="LeftClick"
                                   Command="{Binding DataContext.SelectRoleCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                   CommandParameter="{Binding}" />
-                                </Image.InputBindings>
-                            </Image>
-                            <TextBlock Text="{Binding RoleName}"
+                                    </Image.InputBindings>
+                                </Image>
+                                <TextBlock Text="{Binding RoleName}"
                                        FontSize="24"
                                        FontWeight="Bold"
                                        Foreground="Black"
                                        HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
+                            </StackPanel>
+                        </Border>
+
+                    </Grid>
 
                 </Grid>
-    
-            </Grid>
-        </Border>
-
-    </Grid>
+            </Border>
+        </Grid>
+    </materialDesign:DialogHost>
 </Window>

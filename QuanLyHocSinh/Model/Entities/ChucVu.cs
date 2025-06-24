@@ -15,5 +15,10 @@ namespace QuanLyHocSinh.Model.Entities
 
         // Navigation property (tùy chọn)
         public VaiTro VaiTro { get; set; }
+
+        public static implicit operator string?(ChucVu? v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

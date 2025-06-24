@@ -23,7 +23,7 @@ public class TestConnection
         {
             try
             {
-                    conn.Open();
+                conn.Open();
             }
             catch (Exception ex)
             {
@@ -46,4 +46,3 @@ public partial class App : Application
 
 
 }
-

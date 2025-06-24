@@ -183,21 +183,34 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                 MessageBox.Show($"Lỗi khi tải dữ liệu: {ex.Message}");
             }
         }
+       
+
 
         private void ShowThemTaiKhoan()
         {
             var themVM = new QuanLyTaiKhoanThemViewModel(_mainVM);
 
-            themVM.AccountAddedSuccessfully += userMoi =>
+            var dialog = new ThemTaiKhoanDialog
             {
-                Users.Insert(0, userMoi);
-                LoadDanhSachTaiKhoan();
-                _mainVM.CurrentView = this;
+                DataContext = themVM,
+                Owner = Application.Current.MainWindow // hoặc this nếu bạn đang trong Window
             };
 
-            themVM.CancelRequested += () => _mainVM.CurrentView = this;
-            _mainVM.CurrentView = themVM;
+            themVM.AccountAddedSuccessfully += userMoi =>
+            {
+                Users.Insert(0, userMoi); // Cập nhật danh sách
+                LoadDanhSachTaiKhoan();   // Nạp lại danh sách từ DB nếu cần
+                dialog.DialogResult = true; // đóng dialog với kết quả thành công
+            };
+
+            themVM.CancelRequested += () =>
+            {
+                dialog.DialogResult = false; // đóng dialog mà không thêm gì
+            };
+
+            dialog.ShowDialog(); // Show dạng modal
         }
+
 
         private void SuaTaiKhoan(User userToEdit)
         {

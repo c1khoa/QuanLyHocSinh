@@ -75,7 +75,8 @@
             </Style.Triggers>
         </Style>
     </Window.Resources>
-    <Grid>
+    <materialDesign:DialogHost Identifier="RootDialog_Login">
+        <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
@@ -186,5 +187,6 @@
                 </Border>
             </Grid>
         </materialDesign:Card>
-    </Grid>
+        </Grid>
+    </materialDesign:DialogHost>
 </Window>
