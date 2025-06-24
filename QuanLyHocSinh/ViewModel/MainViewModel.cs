@@ -51,7 +51,6 @@ namespace QuanLyHocSinh.ViewModel
                 if (_currentView != value)
                 {
                     _currentView = value;
-                    System.Diagnostics.Debug.WriteLine("CurrentView changed to: " + value?.GetType().Name);
                     OnPropertyChanged(nameof(CurrentView));
                 }
             }

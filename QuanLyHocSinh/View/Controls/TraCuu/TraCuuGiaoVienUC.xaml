@@ -126,7 +126,7 @@
                                   Binding="{Binding BoMon}" 
                                   Width="*" 
                                   ElementStyle="{StaticResource CenterAlignStyle}"/>
-                <DataGridTemplateColumn Header="Chức năng" Width="*">
+                <DataGridTemplateColumn Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource MaterialDesignFlatButton}"

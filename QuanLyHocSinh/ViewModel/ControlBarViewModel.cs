@@ -1,96 +1,82 @@
-﻿using QuanLyHocSinh.View.Controls;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using MaterialDesignThemes.Wpf;
+using QuanLyHocSinh.View.Converters;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace QuanLyHocSinh.ViewModel
 {
     public class ControlBarViewModel : BaseViewModel
     {
-        #region commands
-        public ICommand CloseWindowCommand { get; set; }
-        public ICommand MinimizeWindowCommand { get; set; }
-        public ICommand MaximizeWindowCommand { get; set; }
-        public ICommand MouseDownWindowCommand { get; set; }
-        #endregion
+        public ICommand CloseWindowCommand { get; }
+        public ICommand MinimizeWindowCommand { get; }
+        public ICommand MaximizeWindowCommand { get; }
+        public ICommand MouseDownWindowCommand { get; }
+        
+
         public ControlBarViewModel()
         {
-            MinimizeWindowCommand = new RelayCommand<UserControl>(
-                (p) => { return p == null ? false : true; },
-                (p) => {
-                    FrameworkElement window = GetWindowParents(p);
-                    var w = (Window)window;
-                    if (w != null)
-                    {   
-                       if (w.WindowState != WindowState.Minimized)
-                            w.WindowState = WindowState.Minimized;
-                       else
-                            w.WindowState = WindowState.Maximized;
-                    }
-                }
-            );
-            MaximizeWindowCommand = new RelayCommand<UserControl>(
-                (p) => { return p == null ? false : true; },
-                (p) => {
-                    FrameworkElement window = GetWindowParents(p);
-                    var w = (Window)window;
-                    if (w != null)
-                    {
-                        if (w.WindowState != WindowState.Maximized)
-                            w.WindowState = WindowState.Maximized;
-                        else
-                            w.WindowState = WindowState.Normal;
-                    }
-                }
-            );
-            CloseWindowCommand = new RelayCommand<UserControl>(
-                (p) => p != null,
+            MinimizeWindowCommand = new RelayCommand<object>(
+                (p) => true,
                 (p) =>
                 {
-                    FrameworkElement window = GetWindowParents(p);
-                    var w = window as Window;
+                    var w = Application.Current.Windows
+                                .OfType<Window>()
+                                .FirstOrDefault(x => x.IsActive);
                     if (w != null)
-                    {
-                        var result = MessageBox.Show("Bạn có muốn thoát không?", "Thông báo", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                        if (result == MessageBoxResult.Yes)
-                        {
-                            w.Close();
-                        }
-                        // Nếu No thì không làm gì cả
-                    }
-                }
-            );
+                        w.WindowState = WindowState.Minimized;
+                });
 
-            MouseDownWindowCommand =  new RelayCommand<UserControl>(
-                (p) => { return p == null ? false : true; },
+            MaximizeWindowCommand = new RelayCommand<object>(
+                (p) => true,
                 (p) =>
                 {
-                    FrameworkElement window = GetWindowParents(p);
-                    var w = (Window)window;
+                    var w = Application.Current.Windows
+                                .OfType<Window>()
+                                .FirstOrDefault(x => x.IsActive);
                     if (w != null)
-                    {
-                        w.DragMove();
-                    }
-                }
-            );
+                        w.WindowState = w.WindowState == WindowState.Maximized
+                            ? WindowState.Normal
+                            : WindowState.Maximized;
+                });
 
-        }
-        FrameworkElement GetWindowParents(UserControl p)
-        {
-            FrameworkElement parent = p;
-            while (parent.Parent != null)
-            {
-                parent = (FrameworkElement)parent.Parent;
-            }
-            return parent;
-        }
+            CloseWindowCommand = new RelayCommand<object>(
+                            async (p) =>
+                            {
+                                var window = Application.Current.Windows
+                                                .OfType<Window>()
+                                                .FirstOrDefault(x => x.IsActive);
 
+                                if (window == null) return;
+
+                                var dialogHost = window.FindVisualChild<DialogHost>();
+                                if (dialogHost == null) return;
+
+                                var dialog = new ConfirmDialog
+                                {
+                                    DataContext = new ConfirmDialogViewModel("Bạn có muốn thoát không?")
+                                };
+
+                                var result = await dialogHost.ShowDialog(dialog);
+
+                                if (result?.ToString() == "True")
+                                {
+                                    window.Close();
+                                }
+                            });
+
+
+            MouseDownWindowCommand = new RelayCommand<object>(
+                (p) => true,
+                (p) =>
+                {
+                    var w = Application.Current.Windows
+                                .OfType<Window>()
+                                .FirstOrDefault(x => x.IsActive);
+                    w?.DragMove();
+                });
+        }
     }
 }

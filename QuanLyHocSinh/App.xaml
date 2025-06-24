@@ -16,8 +16,9 @@
                 <ResourceDictionary Source="/ResourceXaml/MainResource.xaml"/>
                 <ResourceDictionary Source="/ResourceXaml/DataTemplate.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
             <viewmodel:MainViewModel x:Key="MainVM"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
-              <!--  <ResourceDictionary Source="/ResourceXaml/DataTemplate.xaml"/> -->
+<!--  <ResourceDictionary Source="/ResourceXaml/DataTemplate.xaml"/> -->

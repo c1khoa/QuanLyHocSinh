@@ -10,6 +10,31 @@ namespace QuanLyHocSinh.Service
     public static class UserService
     {
         public static string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+         public static string LayUserIDMoi()
+        {
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT MAX(UserID) FROM USERS WHERE UserID LIKE 'U%'";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    var result = cmd.ExecuteScalar()?.ToString();
+
+                    if (!string.IsNullOrEmpty(result) && result.Length > 1)
+                    {
+                        string numberPart = result.Substring(1); // bỏ chữ 'U'
+                        if (int.TryParse(numberPart, out int maxNumber))
+                        {
+                            // tăng số và format về 7 chữ số
+                            return "U" + (maxNumber + 1).ToString("D7");
+                        }
+                    }
+
+                    // Nếu chưa có User nào
+                    return "U0000001";
+                }
+            }
+        }
         public static async Task UpdateUserAsync(User user)
         {
             if (user == null)
@@ -106,12 +131,43 @@ namespace QuanLyHocSinh.Service
             }
             return danhSach;
         }
+        public static List<MonHoc> LayDanhSachBoMon()
+        {
+            var danhSachBoMon = new List<MonHoc>();
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT * FROM MONHOC";
+                using (var cmd = new MySqlCommand(query, conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var monHoc = new MonHoc
+                        {
+                            MonHocID = reader["MonHocID"].ToString(),
+                            TenMonHoc = reader["TenMonHoc"].ToString(),
+                        };
+                        danhSachBoMon.Add(monHoc);
+                    }
+                }
+            }
+            return danhSachBoMon;
+        }
+
+
+
+        public static string LastErrorMessage = "";
 
         public static bool ThemTaiKhoan(User user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             if (string.IsNullOrEmpty(user.TenDangNhap)) return false;
-            if (CheckDuplicateUsername(user.TenDangNhap)) return false;
+            if (CheckDuplicateUsername(user.TenDangNhap))
+            {
+                LastErrorMessage = "Tên đăng nhập đã tồn tại.";
+                return false;
+            }
 
             using (var conn = new MySqlConnection(connectionString))
             {
@@ -120,94 +176,149 @@ namespace QuanLyHocSinh.Service
                 {
                     try
                     {
-                        string userID = user.UserID ?? Guid.NewGuid().ToString();
-                        string roleID = "";
-                        string hoSoID = "HSO" + userID.Substring(1);
+                        string userID = user.UserID ?? Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
+                        string hoSoID = user.MaHoSoCaNhan ?? ("HSO" + userID.Substring(1));
+                        string hoTen = user.HoTen ?? "Không rõ";
+                        string tenChucVu = user.ChucVu ?? "CV00";
 
-                        // 1. Thêm vào bảng USERS
-                        string userQuery = @"INSERT INTO USERS (UserID, TenDangNhap, MatKhau, VaiTroID) 
-                                     VALUES (@UserID, @TenDangNhap, @MatKhau, @VaiTroID)";
+                        // 1. USERS
+                        string userQuery = "INSERT INTO USERS (UserID, TenDangNhap, MatKhau, VaiTroID) VALUES (@UserID, @TenDangNhap, @MatKhau, @VaiTroID)";
                         using (var cmd = new MySqlCommand(userQuery, conn, transaction))
                         {
                             cmd.Parameters.AddWithValue("@UserID", userID);
                             cmd.Parameters.AddWithValue("@TenDangNhap", user.TenDangNhap);
-                            cmd.Parameters.AddWithValue("@MatKhau", user.MatKhau ?? string.Empty);
-                            cmd.Parameters.AddWithValue("@VaiTroID", user.VaiTroID ?? string.Empty);
+                            cmd.Parameters.AddWithValue("@MatKhau", user.MatKhau ?? "");
+                            cmd.Parameters.AddWithValue("@VaiTroID", user.VaiTroID ?? "");
                             if (cmd.ExecuteNonQuery() <= 0)
                             {
+                                LastErrorMessage = "Không thể thêm vào bảng USERS.";
                                 transaction.Rollback();
                                 return false;
                             }
                         }
 
-                        // 2. Thêm vào bảng vai trò
-                        // Replace the `.With` usage with direct parameter addition and execution
+                        // 2. Bảng vai trò cụ thể
                         switch (user.VaiTroID?.ToUpper())
                         {
                             case "VT01": // Học sinh
-                                roleID = "HS" + userID.Substring(1);
                                 using (var cmd = new MySqlCommand("INSERT INTO HOCSINH (HocSinhID, UserID) VALUES (@ID, @UserID)", conn, transaction))
                                 {
-                                    cmd.Parameters.AddWithValue("@ID", roleID);
+                                    cmd.Parameters.AddWithValue("@ID", user.HocSinhID);
                                     cmd.Parameters.AddWithValue("@UserID", userID);
                                     cmd.ExecuteNonQuery();
                                 }
                                 break;
 
                             case "VT02": // Giáo viên
-                                roleID = "GV" + userID.Substring(1);
                                 using (var cmd = new MySqlCommand("INSERT INTO GIAOVIEN (GiaoVienID, UserID) VALUES (@ID, @UserID)", conn, transaction))
                                 {
-                                    cmd.Parameters.AddWithValue("@ID", roleID);
+                                    cmd.Parameters.AddWithValue("@ID", user.GiaoVienID);
                                     cmd.Parameters.AddWithValue("@UserID", userID);
                                     cmd.ExecuteNonQuery();
                                 }
                                 break;
 
                             case "VT03": // Giáo vụ
-                                roleID = "GVU" + userID.Substring(1);
                                 using (var cmd = new MySqlCommand("INSERT INTO GIAOVU (GiaoVuID, UserID) VALUES (@ID, @UserID)", conn, transaction))
                                 {
-                                    cmd.Parameters.AddWithValue("@ID", roleID);
+                                    cmd.Parameters.AddWithValue("@ID", user.GiaoVuID);
                                     cmd.Parameters.AddWithValue("@UserID", userID);
                                     cmd.ExecuteNonQuery();
                                 }
                                 break;
+
+                            default:
+                                throw new Exception("Vai trò không hợp lệ.");
+                        }
+                        string ChucVuID = null;
+                        using (var cmd = new MySqlCommand("SELECT ChucVuID FROM CHUCVU WHERE TenChucVu = @TenChucVu", conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@TenChucVu", tenChucVu);
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                    ChucVuID = reader["ChucVuID"].ToString();
+                            }
                         }
 
-
-                        // 3. Tạo HOSO
-                        string insertHoSo = @"
-                    INSERT INTO HOSO (HoSoID, HoTen, GioiTinh, NgaySinh, Email, DiaChi, ChucVuID, TrangThaiHoSo, NgayTao, NgayCapNhatGanNhat)
-                    VALUES (@HoSoID, @HoTen, 'Nam', NOW(), 'test@email.com', 'Chua cap nhat', 'CV001', 'danghoatdong', NOW(), NOW())";
+                        // 3. HOSO
+                        string insertHoSo = @"INSERT INTO HOSO (HoSoID, HoTen, GioiTinh, NgaySinh, Email, DiaChi, ChucVuID, TrangThaiHoSo, NgayTao, NgayCapNhatGanNhat)
+                                        VALUES (@HoSoID, @HoTen, @GioiTinh, @NgaySinh, @Email, @DiaChi, @ChucVuID, @TrangThai, NOW(), NOW())";
                         using (var cmd = new MySqlCommand(insertHoSo, conn, transaction))
                         {
                             cmd.Parameters.AddWithValue("@HoSoID", hoSoID);
-                            cmd.Parameters.AddWithValue("@HoTen", user.HoTen ?? "Không rõ");
+                            cmd.Parameters.AddWithValue("@HoTen", hoTen);
+                            cmd.Parameters.AddWithValue("@GioiTinh", user.GioiTinh ?? "Nam");
+                            cmd.Parameters.AddWithValue("@NgaySinh", user.NgaySinh ?? new DateTime(2000, 1, 1));
+                            cmd.Parameters.AddWithValue("@Email", user.Email ?? "test@email.com");
+                            cmd.Parameters.AddWithValue("@DiaChi", user.DiaChi ?? "Chưa cập nhật");
+                            cmd.Parameters.AddWithValue("@ChucVuID", ChucVuID);
+                            cmd.Parameters.AddWithValue("@TrangThai", "Đang hoạt động");
                             cmd.ExecuteNonQuery();
                         }
 
-                        // 4. Liên kết HOSO với vai trò
-                        if (user.VaiTroID == "VT01") // học sinh
+                        // 4. HOSO cụ thể
+                        if (user.VaiTroID == "VT01")
                         {
-                            string linkQuery = @"INSERT INTO HOSOHOCSINH (HoSoHocSinhID, HocSinhID, HoSoID, LopHocID, NienKhoa)
-                                         VALUES (@LinkID, @HocSinhID, @HoSoID, '10A1', 2025)";
+                            string linkQuery = "INSERT INTO HOSOHOCSINH (HoSoHocSinhID, HocSinhID, HoSoID, LopHocID, NienKhoa) VALUES (@LinkID, @HocSinhID, @HoSoID, @LopHocID, @NienKhoa)";
                             using (var linkCmd = new MySqlCommand(linkQuery, conn, transaction))
                             {
-                                linkCmd.Parameters.AddWithValue("@LinkID", "HSHS" + userID.Substring(1));
-                                linkCmd.Parameters.AddWithValue("@HocSinhID", roleID);
+                                linkCmd.Parameters.AddWithValue("@LinkID", "HSHS" + userID.Substring(2));
+                                linkCmd.Parameters.AddWithValue("@HocSinhID", user.HocSinhID);
                                 linkCmd.Parameters.AddWithValue("@HoSoID", hoSoID);
+                                linkCmd.Parameters.AddWithValue("@LopHocID", user.LopHocID ?? "10A1");
+                                linkCmd.Parameters.AddWithValue("@NienKhoa", 2025);
                                 linkCmd.ExecuteNonQuery();
                             }
                         }
-                        else if (user.VaiTroID == "VT02") // giáo viên
+                        else if (user.VaiTroID == "VT02")
                         {
-                            string linkQuery = @"INSERT INTO HOSOGIAOVIEN (HoSoGiaoVienID, GiaoVienID, HoSoID, LopDayID, NgayBatDauLamViec)
-                                         VALUES (@LinkID, @GiaoVienID, @HoSoID, '10A1', NOW())";
+
+                            // HOSOGIAOVIEN
+                            using (var cmd = new MySqlCommand("INSERT INTO HOSOGIAOVIEN (HoSoGiaoVienID, GiaoVienID, HoSoID, NgayBatDauLamViec) VALUES (@ID, @GiaoVienID, @HoSoID, NOW())", conn, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("@ID", "HSGV" + userID.Substring(2));
+                                cmd.Parameters.AddWithValue("@GiaoVienID", user.GiaoVienID);
+                                cmd.Parameters.AddWithValue("@HoSoID", hoSoID);
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            // PHANCONGDAY cho LopDayID1/2/3
+                            string[] lopDayIDs = new[] { user.LopDayID1, user.LopDayID2, user.LopDayID3 };
+                            foreach (string lopID in lopDayIDs)
+                            {
+                                if (!string.IsNullOrEmpty(lopID))
+                                {
+                                    using (var cmd = new MySqlCommand("INSERT INTO PHANCONGDAY (PhanCongDayID, GiaoVienID, LopHocID, MonHocID, NamHocID) VALUES (@ID, @GiaoVienID, @LopHocID, @MonHocID, @NamHocID)", conn, transaction))
+                                    {
+                                        cmd.Parameters.AddWithValue("@ID", Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper());
+                                        cmd.Parameters.AddWithValue("@GiaoVienID", user.GiaoVienID);
+                                        cmd.Parameters.AddWithValue("@LopHocID", lopID);
+                                        cmd.Parameters.AddWithValue("@MonHocID", user.BoMon);
+                                        cmd.Parameters.AddWithValue("@NamHocID", "NH2025");
+                                        cmd.ExecuteNonQuery();
+                                    }
+                                }
+                            }
+
+                            // GVCN: cập nhật lớp
+                            if (!string.IsNullOrEmpty(user.LopDayIDCN))
+                            {
+                                using (var cmd = new MySqlCommand("UPDATE LOP SET IDGVCN = @GiaoVienID WHERE LopHocID = @LopHocID AND IDGVCN IS NULL", conn, transaction))
+                                {
+                                    cmd.Parameters.AddWithValue("@GiaoVienID", user.GiaoVienID);
+                                    cmd.Parameters.AddWithValue("@LopHocID", user.LopDayIDCN);
+                                    cmd.ExecuteNonQuery();
+                                }
+                            }
+                        }
+                        else if (user.VaiTroID == "VT03")
+                        {
+                            string linkQuery = "INSERT INTO HOSOGIAOVU (HoSoGiaoVuID, GiaoVuID, HoSoID) VALUES (@LinkID, @GiaoVuID, @HoSoID)";
                             using (var linkCmd = new MySqlCommand(linkQuery, conn, transaction))
                             {
-                                linkCmd.Parameters.AddWithValue("@LinkID", "HSGV" + userID.Substring(1));
-                                linkCmd.Parameters.AddWithValue("@GiaoVienID", roleID);
+                                linkCmd.Parameters.AddWithValue("@LinkID", "HSGVU" + userID.Substring(2));
+                                linkCmd.Parameters.AddWithValue("@GiaoVuID", user.GiaoVuID);
                                 linkCmd.Parameters.AddWithValue("@HoSoID", hoSoID);
                                 linkCmd.ExecuteNonQuery();
                             }
@@ -218,13 +329,33 @@ namespace QuanLyHocSinh.Service
                     }
                     catch (Exception ex)
                     {
+                        LastErrorMessage = ex.Message;
                         transaction.Rollback();
-                        Console.WriteLine("Lỗi khi thêm tài khoản: " + ex.Message);
                         return false;
                     }
                 }
             }
         }
+
+        private static bool CheckDuplicateUsername(string username)
+        {
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT COUNT(*) FROM USERS WHERE TenDangNhap = @TenDangNhap";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@TenDangNhap", username);
+                    int count = Convert.ToInt32(cmd.ExecuteScalar());
+                    return count > 0;
+                }
+            }
+        }
+
+
+
+
+
 
 
         public static bool SuaTaiKhoan(User user)
@@ -322,24 +453,6 @@ namespace QuanLyHocSinh.Service
             }
         }
 
-        public static bool CheckDuplicateUsername(string username)
-        {
-            if (string.IsNullOrEmpty(username))
-                return false;
-
-            using (var conn = new MySqlConnection(connectionString))
-            {
-                conn.Open();
-                string query = "SELECT COUNT(*) FROM USERS WHERE TenDangNhap = @TenDangNhap";
-
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@TenDangNhap", username);
-                    long count = (long)cmd.ExecuteScalar();
-                    return count > 0;
-                }
-            }
-        }
 
         public static string LayTenVaiTroTuDB(string vaiTroID)
         {
@@ -440,6 +553,156 @@ namespace QuanLyHocSinh.Service
             cmd.Parameters.AddWithValue("@UserID", userId);
             return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
         }
+        public static List<string> LayDanhSachTenChucVuTheoVaiTro(string vaiTroID)
+        {
+            List<string> danhSachTenChucVu = new List<string>();
+
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+            string query = @"SELECT TenChucVu FROM CHUCVU WHERE VaiTroID = @VaiTroID";
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@VaiTroID", vaiTroID);
+
+                connection.Open();
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string tenChucVu = reader["TenChucVu"].ToString();
+                        danhSachTenChucVu.Add(tenChucVu);
+                    }
+                }
+            }
+
+            return danhSachTenChucVu;
+        }
+
+
+        public static string LayHoSoIDMoi()
+        {
+            string newID = "HOSO00000001";
+            string query = "SELECT MAX(HoSoID) FROM HOSO WHERE HoSoID LIKE 'HSO%'";
+            using var conn = new MySqlConnection(connectionString);
+            {
+                conn.Open();
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    var result = cmd.ExecuteScalar()?.ToString();
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        string numberPart = new string(result.Where(char.IsDigit).ToArray());
+                        if (int.TryParse(numberPart, out int num))
+                        {
+                            newID = $"HOSO{(num + 1):D8}";
+                        }
+                    }
+                }
+            }
+            return newID;
+        }
+        public static string LayMaHoSoCaNhanMoi(string vaiTroID)
+        {
+            string prefix, table, column;
+
+            switch (vaiTroID)
+            {
+                case "VT01":
+                    prefix = "HSHS";
+                    table = "HOSOHOCSINH";
+                    column = "HoSoHocSinhID";
+                    break;
+                case "VT02":
+                    prefix = "HSGV";
+                    table = "HOSOGIAOVIEN";
+                    column = "HoSoGiaoVienID";
+                    break;
+                case "VT03":
+                    prefix = "HSAD";
+                    table = "HOSOGIAOVU";
+                    column = "HoSoGiaoVuID";
+                    break;
+                default:
+                    throw new ArgumentException("Vai trò không hợp lệ.");
+            }
+
+            string query = $"SELECT MAX({column}) FROM {table} WHERE {column} LIKE '{prefix}%'";
+            using var conn = new MySqlConnection(connectionString);
+            conn.Open();
+            using var cmd = new MySqlCommand(query, conn);
+            var result = cmd.ExecuteScalar()?.ToString();
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                // Tách số và tăng
+                string numberPart = new string(result.SkipWhile(c => !char.IsDigit(c)).ToArray());
+                if (int.TryParse(numberPart, out int number))
+                {
+                    return $"{prefix}{(number + 1):D6}";
+                }
+            }
+
+            return $"{prefix}000001";
+        }
+
+
+
+
+        public static string GetNextLoginUsername(string vaiTroID)
+        {
+            if (string.IsNullOrEmpty(vaiTroID)) return "";
+
+            string prefix = vaiTroID switch
+            {
+                "VT01" => "HS",
+                "VT02" => "GV",
+                "VT03" => "AD", // AD → GIAOVU
+                _ => "U"
+            };
+
+            string table = vaiTroID switch
+            {
+                "VT01" => "HOCSINH",
+                "VT02" => "GIAOVIEN",
+                "VT03" => "GIAOVU",
+                _ => null
+            };
+
+            string idColumn = table switch
+            {
+                "HOCSINH" => "HocSinhID",
+                "GIAOVIEN" => "GiaoVienID",
+                "GIAOVU" => "GiaoVuID",
+                _ => null
+            };
+
+            if (table == null || idColumn == null) return prefix + "000001";
+
+            using var conn = new MySqlConnection(connectionString);
+            conn.Open();
+
+            string query = $"SELECT MAX({idColumn}) FROM {table} WHERE {idColumn} LIKE @prefix";
+
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@prefix", prefix + "%");
+
+            string maxID = cmd.ExecuteScalar()?.ToString();
+            int nextNumber = 1;
+
+            if (!string.IsNullOrEmpty(maxID) && maxID.Length > prefix.Length)
+            {
+                string numberPart = maxID.Substring(prefix.Length);
+                if (int.TryParse(numberPart, out int currentMax))
+                {
+                    nextNumber = currentMax + 1;
+                }
+            }
+
+            return prefix + nextNumber.ToString("D6");
+        }
+
+
 
 
         public static void XoaTaiKhoanVaLienQuan(string userId)
@@ -564,6 +827,28 @@ namespace QuanLyHocSinh.Service
                 throw;
             }
         }
+        public static List<Lop> LayDanhSachLopHoc()
+        {
+            var dsLop = new List<Lop>();
+            using var conn = new MySqlConnection(connectionString);
+            conn.Open();
+
+            string query = "SELECT LopID, TenLop FROM LOP ORDER BY TenLop";
+
+            using var cmd = new MySqlCommand(query, conn);
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                dsLop.Add(new Lop
+                {
+                    LopID = reader["LopID"]?.ToString(),
+                    TenLop = reader["TenLop"]?.ToString()
+                });
+            }
+
+            return dsLop;
+        }
+
 
 
     }

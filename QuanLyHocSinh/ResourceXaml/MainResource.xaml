@@ -17,34 +17,34 @@
     <local:RoleToVisibilityConverter x:Key="RoleToVisibilityConverter"/>
 
     <Storyboard x:Key="OpenMenu">
-       <ThicknessAnimation
+        <ThicknessAnimation
            Storyboard.TargetName="GridMenu"
            Storyboard.TargetProperty="Margin"
            From="-300,0,0,0"
            To="0,0,0,0"
            Duration="0:0:0.3" />
-       <DoubleAnimation
+        <DoubleAnimation
            Storyboard.TargetName="GridBackground"
            Storyboard.TargetProperty="Opacity"
            From="0"
            To="0.3"
            Duration="0:0:0.3" />
-   </Storyboard>
+    </Storyboard>
 
-   <Storyboard x:Key="CloseMenu">
-       <ThicknessAnimation
+    <Storyboard x:Key="CloseMenu">
+        <ThicknessAnimation
            Storyboard.TargetName="GridMenu"
            Storyboard.TargetProperty="Margin"
            From="0,0,0,0"
            To="-300,0,0,0"
            Duration="0:0:0.3" />
-       <DoubleAnimation
+        <DoubleAnimation
            Storyboard.TargetName="GridBackground"
            Storyboard.TargetProperty="Opacity"
            From="0.3"
            To="0"
            Duration="0:0:0.3" />
-   </Storyboard>
+    </Storyboard>
 
     <Style x:Key="TextTrimmingStyle" TargetType="TextBlock">
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
@@ -52,18 +52,18 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
-        <!-- DataTemplate ánh xạ ViewModel -> View -->
-        <DataTemplate DataType="{x:Type viewmodel:TrangChuViewModel}">
-            <view:TrangChuUC />
-        </DataTemplate>
+    <!-- DataTemplate ánh xạ ViewModel -> View -->
+    <DataTemplate DataType="{x:Type viewmodel:TrangChuViewModel}">
+        <view:TrangChuUC />
+    </DataTemplate>
 
-        <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanMainViewModel}">
-            <viewqltk:QuanLyTaiKhoanMainUC DataContext="{Binding}" />
-        </DataTemplate>
+    <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanMainViewModel}">
+        <viewqltk:QuanLyTaiKhoanMainUC DataContext="{Binding}" />
+    </DataTemplate>
 
-        <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanThemViewModel}">
-        <viewqltk:QuanLyTaiKhoanThemUC DataContext="{Binding}"/> 
-        </DataTemplate>
+    <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanThemViewModel}">
+        <viewqltk:QuanLyTaiKhoanThemUC DataContext="{Binding}"/>
+    </DataTemplate>
 
 
     <DataTemplate DataType="{x:Type vmQuanLyTaiKhoan:QuanLyTaiKhoanCaNhanViewModel}">
@@ -71,22 +71,22 @@
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type vmTraCuu:TraCuuHocSinhViewModel}">
-            <viewtc:TraCuuHocSinhUC />
-        </DataTemplate>
+        <viewtc:TraCuuHocSinhUC />
+    </DataTemplate>
 
-        <DataTemplate DataType="{x:Type vmTraCuu:TraCuuGiaoVienViewModel}">
-            <viewtc:TraCuuGiaoVienUC />
-        </DataTemplate>
+    <DataTemplate DataType="{x:Type vmTraCuu:TraCuuGiaoVienViewModel}">
+        <viewtc:TraCuuGiaoVienUC />
+    </DataTemplate>
 
-        <DataTemplate DataType="{x:Type vmBaoCao:TongKetMonViewModel}">
-            <viewbc:TongKetMonUC />
-        </DataTemplate>
+    <DataTemplate DataType="{x:Type vmBaoCao:TongKetMonViewModel}">
+        <viewbc:TongKetMonUC />
+    </DataTemplate>
 
-        <DataTemplate DataType="{x:Type vmBaoCao:TongKetNamViewModel}">
-            <viewbc:TongKetNamUC />
-        </DataTemplate>
+    <DataTemplate DataType="{x:Type vmBaoCao:TongKetNamViewModel}">
+        <viewbc:TongKetNamUC />
+    </DataTemplate>
 
-        <DataTemplate DataType="{x:Type vmQuyDinh:QuyDinhMainViewModel}">
-            <viewqd:QuyDinhMainUC />
-        </DataTemplate>
-    </ResourceDictionary>
+    <DataTemplate DataType="{x:Type vmQuyDinh:QuyDinhMainViewModel}">
+        <viewqd:QuyDinhMainUC />
+    </DataTemplate>
+</ResourceDictionary>
