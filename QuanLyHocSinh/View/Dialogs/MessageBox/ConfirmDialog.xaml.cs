@@ -12,7 +12,14 @@ namespace QuanLyHocSinh.View.Dialogs.MessageBox
         {
             InitializeComponent();
         }
+
+        public ConfirmDialog(string message)
+        {
+            InitializeComponent();
+            DataContext = new ConfirmDialogViewModel(message);
+        }
     }
+
 
     // ✅ ViewModel phải nằm ngoài class ConfirmDialog, nhưng vẫn trong cùng namespace
     public class ConfirmDialogViewModel

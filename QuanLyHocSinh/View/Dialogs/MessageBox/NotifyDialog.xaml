@@ -35,10 +35,10 @@
             </Grid.RowDefinitions>
 
             <!-- Tiêu đề -->
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0 0 0 10">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10" HorizontalAlignment="Center">
                 <TextBlock Text="🔔" FontSize="26" Margin="0 0 10 0"/>
                 <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                            x:Name="TitleTextBlock" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
+                           x:Name="TitleTextBlock" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
             </StackPanel>
 
             <!-- Nội dung -->
@@ -47,12 +47,14 @@
                        Grid.Row="1"
                        FontSize="16"
                        TextWrapping="Wrap"
-                       Margin="0 10 0 10"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Top"/>
+                       TextAlignment="Center"
+                       Margin="20 0 20 0"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Top"
+                       MaxWidth="360"/>
 
             <!-- Nút hành động -->
-            <Grid Grid.Row="2" Margin="0,0,0,0">
+            <Grid Grid.Row="2" Margin="0">
                 <Border HorizontalAlignment="Center"
                         Style="{StaticResource ImageBorderStyle}" Background="#90CAF9" Margin="0">
                     <Button Content="OK"

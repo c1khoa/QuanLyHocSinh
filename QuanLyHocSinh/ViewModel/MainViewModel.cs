@@ -71,15 +71,23 @@ namespace QuanLyHocSinh.ViewModel
                     OnPropertyChanged(nameof(CurrentUser));
                     OnPropertyChanged(nameof(VaiTro));
 
-                    var roleName = _currentUser?.VaiTro?.TenVaiTro?.Trim() ?? "null";
+                    var roleName = _currentUser?.VaiTro?.TenVaiTro?.Trim().ToLower() ?? "null";
 
-                    IsGiaoVuVisible = string.Equals(roleName, "Giáo vụ", StringComparison.OrdinalIgnoreCase);
-                    IsNotHocSinhVisible = _currentUser != null && !string.Equals(roleName, "Học sinh", StringComparison.OrdinalIgnoreCase);
-                    IsNotGiaoVuVisible = _currentUser != null && !string.Equals(roleName, "Giáo vụ", StringComparison.OrdinalIgnoreCase);
+                    IsGiaoVuVisible = roleName == "giáo vụ";
+                    IsHocSinhVisible = roleName == "học sinh";
+                    IsGiaoVienVisible = roleName == "giáo viên";
+                    IsNotHocSinhVisible = _currentUser != null && roleName != "học sinh";
+                    IsNotGiaoVuVisible = _currentUser != null && roleName != "giáo vụ";
 
+                    OnPropertyChanged(nameof(IsGiaoVuVisible));
+                    OnPropertyChanged(nameof(IsHocSinhVisible));
+                    OnPropertyChanged(nameof(IsGiaoVienVisible));
+                    OnPropertyChanged(nameof(IsNotHocSinhVisible));
+                    OnPropertyChanged(nameof(IsNotGiaoVuVisible));
                 }
             }
         }
+
 
         private string _selectedRole;
         public string SelectedRole
@@ -91,8 +99,6 @@ namespace QuanLyHocSinh.ViewModel
                 OnPropertyChanged();
             }
         }
-
-        // Các cờ điều khiển hiển thị UI theo vai trò người dùng
         private bool _isGiaoVuVisible;
         public bool IsGiaoVuVisible
         {
@@ -103,6 +109,28 @@ namespace QuanLyHocSinh.ViewModel
                 OnPropertyChanged();
             }
         }
+        private bool _isHocSinhVisible;
+        public bool IsHocSinhVisible
+        {
+            get => _isHocSinhVisible;
+            set
+            {
+                _isHocSinhVisible = value;
+                OnPropertyChanged();
+            }
+        }
+        private bool _isGiaoVienVisible;
+        public bool IsGiaoVienVisible
+        {
+            get => _isGiaoVienVisible;
+            set
+            {
+                _isGiaoVienVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // Các cờ điều khiển hiển thị UI theo vai trò người dùng
 
         private bool _isNotHocSinhVisible;
         public bool IsNotHocSinhVisible

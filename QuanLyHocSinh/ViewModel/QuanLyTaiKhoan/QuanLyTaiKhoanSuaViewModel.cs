@@ -9,11 +9,34 @@ using System.Text;
 using System.Windows;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using QuanLyHocSinh.Service;
+using MaterialDesignThemes.Wpf;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
 
 namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 {
     public class QuanLyTaiKhoanSuaViewModel : BaseViewModel
     {
+        private string _newPassword;
+        public string NewPassword
+        {
+            get => _newPassword;
+            set => SetProperty(ref _newPassword, value);
+        }
+
+        private string _confirmPassword;
+        public string ConfirmPassword
+        {
+            get => _confirmPassword;
+            set => SetProperty(ref _confirmPassword, value);
+        }
+
+        private bool _isPasswordVisible;
+        public bool IsPasswordVisible
+        {
+            get => _isPasswordVisible;
+            set => SetProperty(ref _isPasswordVisible, value);
+        }
         private readonly MainViewModel _mainVM;
         private readonly User _originalUser;
 
@@ -27,8 +50,6 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
         public event Action CancelRequested;
 
         // Hai biến này được gán giá trị từ code-behind do PasswordBox không hỗ trợ binding
-        public string NewPassword { get; set; } = string.Empty;
-        public string ConfirmPassword { get; set; } = string.Empty;
 
         string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
 
@@ -84,7 +105,7 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
         }
 
         // Lưu thay đổi tài khoản
-        private void SaveChanges()
+        private async void SaveChanges()
         {
             try
             {
@@ -93,108 +114,58 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                 {
                     if (NewPassword != ConfirmPassword)
                     {
-                        MessageBox.Show("Mật khẩu xác nhận không khớp!");
+                        await DialogHost.Show(new ErrorDialog("Lỗi", "Mật khẩu xác nhận không khớp!"), "RootDialog_SuaAccount");
                         return;
                     }
 
                     EditedUser.MatKhau = NewPassword;
                 }
 
-                if (!Roles.Any(r => r.VaiTroID == EditedUser.VaiTroID))
-                {
-                    MessageBox.Show("Vai trò không hợp lệ!");
-                    return;
-                }
-
+                // Kết nối DB và xử lý transaction
                 using var conn = new MySqlConnection(connectionString);
                 conn.Open();
                 using var trans = conn.BeginTransaction();
 
                 try
                 {
-                    // Tạo lệnh cập nhật USERS tuỳ theo có đổi mật khẩu hay không
-                    using var cmdUser = new MySqlCommand();
-                    cmdUser.Connection = conn;
-                    cmdUser.Transaction = trans;
+                    // Gọi hàm xử lý chính trong UserService
+                    UserService.UpdateUserAndHoSo(EditedUser, NewPassword, conn, trans);
 
-                    cmdUser.Parameters.AddWithValue("@TenDangNhap", EditedUser.TenDangNhap);
-                    cmdUser.Parameters.AddWithValue("@VaiTroID", EditedUser.VaiTroID);
-                    cmdUser.Parameters.AddWithValue("@UserID", EditedUser.UserID);
-
-                    if (!string.IsNullOrWhiteSpace(NewPassword))
-                    {
-                        cmdUser.CommandText = @"
-                            UPDATE USERS 
-                            SET TenDangNhap = @TenDangNhap, 
-                                VaiTroID = @VaiTroID, 
-                                MatKhau = @MatKhau
-                            WHERE UserID = @UserID;";
-                        cmdUser.Parameters.AddWithValue("@MatKhau", EditedUser.MatKhau);
-                    }
-                    else
-                    {
-                        cmdUser.CommandText = @"
-                            UPDATE USERS 
-                            SET TenDangNhap = @TenDangNhap, 
-                                VaiTroID = @VaiTroID
-                            WHERE UserID = @UserID;";
-                    }
-
-                    cmdUser.ExecuteNonQuery();
-
-                    // Cập nhật HOSO nếu có (GV hoặc HS)
-                    string updateHoSoQuery = @"
-                        UPDATE HOSO h
-                        JOIN (
-                            SELECT HoSoID FROM HOSOGIAOVIEN hgv
-                            JOIN GIAOVIEN gv ON gv.GiaoVienID = hgv.GiaoVienID
-                            WHERE gv.UserID = @UserID
-
-                            UNION
-
-                            SELECT HoSoID FROM HOSOHOCSINH hhs
-                            JOIN HOCSINH hs ON hs.HocSinhID = hhs.HocSinhID
-                            WHERE hs.UserID = @UserID
-                        ) AS sub ON h.HoSoID = sub.HoSoID
-                        SET h.HoTen = @HoTen, 
-                            h.NgayCapNhatGanNhat = @NgayCapNhat";
-
-                    using var cmdHoSo = new MySqlCommand(updateHoSoQuery, conn, trans);
-                    cmdHoSo.Parameters.AddWithValue("@HoTen", EditedUser.HoTen);
-                    cmdHoSo.Parameters.AddWithValue("@NgayCapNhat", DateTime.Now);
-                    cmdHoSo.Parameters.AddWithValue("@UserID", EditedUser.UserID);
-
-                    int rowsAffected = cmdHoSo.ExecuteNonQuery();
-
-                    if (rowsAffected == 0)
-                    {
-                        MessageBox.Show("Cảnh báo: Đã cập nhật tài khoản nhưng không tìm thấy hồ sơ liên quan.");
-                    }
-
-                    // Commit giao dịch
+                    // Commit nếu thành công
                     trans.Commit();
 
-                    // Cập nhật đối tượng gốc
+                    // Cập nhật lại bản gốc
                     _originalUser.HoTen = EditedUser.HoTen;
                     _originalUser.TenDangNhap = EditedUser.TenDangNhap;
                     _originalUser.VaiTroID = EditedUser.VaiTroID;
                     if (!string.IsNullOrWhiteSpace(NewPassword))
                         _originalUser.MatKhau = EditedUser.MatKhau;
 
-                    MessageBox.Show("Cập nhật thành công!");
+                    await DialogHost.Show(new NotifyDialog("Thành công", "Đã cập nhật!"), "RootDialog_SuaAccount");
                     AccountEditedSuccessfully?.Invoke(EditedUser);
                 }
                 catch (Exception ex)
                 {
                     trans.Rollback();
-                    MessageBox.Show("Lỗi khi cập nhật: " + ex.Message);
+                    await DialogHost.Show(new ErrorDialog("Lỗi" ,"Cập nhật không thành công: " + GetFullExceptionMessage(ex)), "RootDialog_SuaAccount");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi kết nối: " + ex.Message);
+                await DialogHost.Show(new ErrorDialog("Lỗi", "Cập nhật không thành công: " + GetFullExceptionMessage(ex)), "RootDialog_SuaAccount");
             }
         }
+        private string GetFullExceptionMessage(Exception ex)
+        {
+            var sb = new StringBuilder();
+            while (ex != null)
+            {
+                sb.AppendLine(ex.Message);
+                ex = ex.InnerException;
+            }
+            return sb.ToString();
+        }
+
 
         private void CancelEdit()
         {
