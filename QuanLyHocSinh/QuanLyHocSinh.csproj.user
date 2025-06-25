@@ -14,7 +14,16 @@
     <Compile Update="View\Controls\QuyDinh\QuyDinhSuaUC.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="View\Dialogs\DiemDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="View\Dialogs\DoiMatKhauDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="View\Dialogs\MessageBox\ConfirmDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="View\Dialogs\MessageBox\ErrorDialog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="View\Dialogs\MessageBox\NotifyDialog.xaml.cs">
