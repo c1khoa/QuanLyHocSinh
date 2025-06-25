@@ -172,5 +172,25 @@ namespace QuanLyHocSinh.Model.Entities
                 }
             }
         }
+
+        public async Task<string> GetMonHocIdByNameAsync(string tenMonHoc)
+        {
+            string monHocID = null;
+            string query = "SELECT MonHocID FROM MONHOC WHERE TenMonHoc = @TenMonHoc";
+            using (MySqlConnection conn = GetConnection())
+            {
+                await conn.OpenAsync();
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@TenMonHoc", tenMonHoc);
+                    var result = await cmd.ExecuteScalarAsync();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        monHocID = result.ToString();
+                    }
+                }
+            }
+            return monHocID;
+        }
     }
 }

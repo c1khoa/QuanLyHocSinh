@@ -8,10 +8,10 @@ namespace QuanLyHocSinh.Model.Relationships
 {
     public class HoSoHocSinh
     {
-        public string HoSoHocSinhID { get; set; } // CHAR(8), e.g., HHS001
+        public string HoSoHocSinhID { get; set; } 
         public string HocSinhID { get; set; } 
         public string HoSoID { get; set; }    
-        public string LopHocID { get; set; }  // CHAR(4) for LOP.LopID
+        public string LopHocID { get; set; } 
         public int NienKhoa { get; set; }
 
         // Navigation properties

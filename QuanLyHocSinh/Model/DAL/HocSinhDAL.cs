@@ -155,9 +155,10 @@ namespace QuanLyHocSinh.Model.Entities
         public static void UpdateHocSinh(HocSinh hocSinh)
         {
             string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
-            string query = @"UPDATE HOSO h
+                            string query = @"UPDATE HOSO h
                              JOIN HOSOHOCSINH hhs ON h.HoSoID = hhs.HoSoID
                              SET h.HoTen = @HoTen, h.GioiTinh = @GioiTinh, h.NgaySinh = @NgaySinh, h.Email = @Email, h.DiaChi = @DiaChi,
+                                 h.NgayCapNhatGanNhat = NOW(),
                                  hhs.LopHocID = (SELECT LopID FROM LOP WHERE TenLop = @TenLop), hhs.NienKhoa = @NienKhoa
                              WHERE hhs.HocSinhID = @HocSinhID";
             using (var conn = new MySql.Data.MySqlClient.MySqlConnection(connectionString))

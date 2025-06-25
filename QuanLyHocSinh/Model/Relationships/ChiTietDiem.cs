@@ -8,9 +8,9 @@ namespace QuanLyHocSinh.Model.Relationships
 {
     public class ChiTietDiem
     {
-        public string ChiTietDiemID { get; set; }
+        public string ChiTietDiemID { get; set; } 
         public string DiemID { get; set; }
-        public string LoaiDiemID { get; set; }
+        public string LoaiDiemID { get; set; } 
         public float GiaTri { get; set; }
 
         // Navigation properties (tùy chọn)

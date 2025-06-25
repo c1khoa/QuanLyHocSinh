@@ -105,7 +105,13 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
 
             if (!Email.Contains("@") || (!Email.EndsWith(".com") && !Email.EndsWith(".vn")))
             {
-                MessageBox.Show("Email không hợp lệ!");
+                MessageBox.Show("Email phải có định dạng @student.com hoặc @student.vn!");
+                return;
+            }
+
+            if (!Email.Contains("@student."))
+            {
+                MessageBox.Show("Email học sinh phải có định dạng @student.com hoặc @student.vn!");
                 return;
             }
 
