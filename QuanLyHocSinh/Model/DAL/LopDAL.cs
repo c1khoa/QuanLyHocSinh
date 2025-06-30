@@ -557,5 +557,25 @@ namespace QuanLyHocSinh.Model.Entities
                 }
             }
         }
+
+        public async Task<string> GetLopIdByNameAsync(string tenLop)
+        {
+            string lopID = null;
+            string query = "SELECT LopID FROM LOP WHERE TenLop = @TenLop";
+            using (MySqlConnection conn = GetConnection())
+            {
+                await conn.OpenAsync();
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@TenLop", tenLop);
+                    var result = await cmd.ExecuteScalarAsync();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        lopID = result.ToString();
+                    }
+                }
+            }
+            return lopID;
+        }
     }
 }

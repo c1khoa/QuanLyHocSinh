@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -7,6 +8,45 @@ using System.Windows;
 using System.Windows.Input;
 using QuanLyHocSinh.Model.Entities;
 using System.Configuration;
+
+namespace QuanLyHocSinh.ViewModel.TraCuu
+{
+    public class LopItem : INotifyPropertyChanged
+    {
+        public string TenLop { get; set; }
+        
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set { _isSelected = value; OnPropertyChanged(); }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    public class MonHocItem : INotifyPropertyChanged
+    {
+        public string TenMonHoc { get; set; }
+        
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set { _isSelected = value; OnPropertyChanged(); }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+}
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
@@ -33,13 +73,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _ngaySinh = value; OnPropertyChanged(); }
         }
 
-        private string _lopDayID;
-        public string LopDayID
-        {
-            get => _lopDayID;
-            set { _lopDayID = value; OnPropertyChanged(); }
-        }
-
         private string _email;
         public string Email
         {
@@ -54,19 +87,12 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _diaChi = value; OnPropertyChanged(); }
         }
         
-        private string _boMon;
-        public string BoMon
-        {
-            get => _boMon;
-            set { _boMon = value; OnPropertyChanged(); }
-        }
-
         public ObservableCollection<string> DanhSachGioiTinh { get; } = 
             new ObservableCollection<string>(new[] { "Nam", "Nữ" });
 
-        public ObservableCollection<string> DanhSachLop { get; set; }
-
-        public ObservableCollection<string> DanhSachBoMon { get; set; }
+        // Danh sách items cho việc chọn lớp và môn
+        public ObservableCollection<LopItem> DanhSachLopItems { get; set; }
+        public ObservableCollection<MonHocItem> DanhSachMonItems { get; set; }
 
         public ICommand SaveCommandGV { get; }
         public ICommand CancelCommandGV { get; }
@@ -83,53 +109,120 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             GioiTinh = giaoVien.GioiTinh;
             NgaySinh = giaoVien.NgaySinh;
             Email = giaoVien.Email;
-            LopDayID = giaoVien.LopDayID;
             DiaChi = giaoVien.DiaChi;
-            BoMon = giaoVien.BoMon;
 
-            DanhSachLop = new ObservableCollection<string>(
-                GiaoVienDAL.GetAllLop()
-            );
+            // Khởi tạo danh sách lớp items
+            var tatCaLop = GiaoVienDAL.GetAllLop();
+            var lopDaDuocChon = new List<string>();
+            
+            if (!string.IsNullOrEmpty(giaoVien.LopDayID) && giaoVien.LopDayID != "Chưa phân công")
+            {
+                lopDaDuocChon = giaoVien.LopDayID.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries)
+                                                 .Select(l => l.Trim()).ToList();
+            }
+            
+            DanhSachLopItems = new ObservableCollection<LopItem>();
+            foreach (var lop in tatCaLop)
+            {
+                DanhSachLopItems.Add(new LopItem 
+                { 
+                    TenLop = lop, 
+                    IsSelected = lopDaDuocChon.Contains(lop) 
+                });
+            }
 
-            DanhSachBoMon = new ObservableCollection<string>(
-                GiaoVienDAL.GetAllGiaoVien()
-                    .Select(gv => gv.BoMon)
-                    .Distinct()
-                    .OrderBy(bm => bm)
-
-            );
+            // Khởi tạo danh sách môn học items
+            InitializeMonHocItemsAsync(giaoVien.BoMon);
 
             SaveCommandGV = new RelayCommand(Save);
             CancelCommandGV = new RelayCommand(Cancel);
         }
+
+        private async void InitializeMonHocItemsAsync(string currentBoMon)
+        {
+            try
+            {
+                var tatCaMonHoc = await GetAllMonHocAsync();
+                var monDaDuocChon = new List<string>();
+                
+                if (!string.IsNullOrEmpty(currentBoMon) && currentBoMon != "Chưa phân công")
+                {
+                    monDaDuocChon = currentBoMon.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries)
+                                                   .Select(m => m.Trim()).ToList();
+                }
+                
+                DanhSachMonItems = new ObservableCollection<MonHocItem>();
+                foreach (var mon in tatCaMonHoc)
+                {
+                    DanhSachMonItems.Add(new MonHocItem 
+                    { 
+                        TenMonHoc = mon, 
+                        IsSelected = monDaDuocChon.Contains(mon) 
+                    });
+                }
+                OnPropertyChanged(nameof(DanhSachMonItems));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi khởi tạo danh sách môn học: {ex.Message}");
+                DanhSachMonItems = new ObservableCollection<MonHocItem>();
+            }
+        }
         
+        private async System.Threading.Tasks.Task<List<string>> GetAllMonHocAsync()
+        {
+            try
+            {
+                var monHocDAL = new QuanLyHocSinh.Model.Entities.MonHocDAL();
+                var monHocList = await monHocDAL.GetAllMonHocAsync();
+                return monHocList.Select(mh => mh.TenMonHoc).ToList();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi tải danh sách môn học: {ex.Message}");
+                return new List<string>();
+            }
+        }
+
         private void Save()
         {
             if (string.IsNullOrWhiteSpace(HoTen) || string.IsNullOrWhiteSpace(GioiTinh) ||
-                string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(DiaChi) ||
-                string.IsNullOrWhiteSpace(BoMon) || string.IsNullOrWhiteSpace(LopDayID))
+                string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(DiaChi))
             {
-                MessageBox.Show("Vui lòng nhập đầy đủ thông tin!");
+                MessageBox.Show("Vui lòng nhập đầy đủ thông tin cơ bản!");
                 return;
             }
 
             if (!Email.Contains("@") || (!Email.EndsWith(".com") && !Email.EndsWith(".vn")))
             {
-                MessageBox.Show("Email không hợp lệ!");
+                MessageBox.Show("Email phải có định dạng @teacher.com hoặc @teacher.vn!");
                 return;
             }
 
+            if (!Email.Contains("@teacher."))
+            {
+                MessageBox.Show("Email giáo viên phải có định dạng @teacher.com hoặc @teacher.vn!");
+                return;
+            }
+
+            // Cập nhật thông tin cá nhân
             _giaoVienGoc.HoTen = HoTen;
             _giaoVienGoc.GioiTinh = GioiTinh;
             _giaoVienGoc.NgaySinh = NgaySinh;
             _giaoVienGoc.Email = Email;
             _giaoVienGoc.DiaChi = DiaChi;
-            _giaoVienGoc.BoMon = BoMon;
-            _giaoVienGoc.LopDayID = LopDayID;
 
             try
             {
+                // Cập nhật thông tin cá nhân
                 GiaoVienDAL.UpdateGiaoVien(_giaoVienGoc);
+                
+                // Cập nhật phân công dạy (lớp và môn)
+                var lopDuocChon = DanhSachLopItems.Where(l => l.IsSelected).Select(l => l.TenLop).ToList();
+                var monDuocChon = DanhSachMonItems.Where(m => m.IsSelected).Select(m => m.TenMonHoc).ToList();
+                
+                GiaoVienDAL.UpdatePhanCongDay(_giaoVienGoc.MaGV, lopDuocChon, monDuocChon);
+                
                 MessageBox.Show("Cập nhật thông tin thành công!");
                 CloseDialog?.Invoke(true);
             }
@@ -138,6 +231,8 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                 MessageBox.Show($"Lỗi khi cập nhật: {ex.Message}");
             }
         }
+
+
 
         private void Cancel()
         {

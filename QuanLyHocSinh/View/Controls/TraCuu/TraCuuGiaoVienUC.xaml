@@ -111,8 +111,8 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Mã GV" 
                                       Binding="{Binding MaGV}" 
-                                      Width="80"
-                                      MinWidth="80"
+                                      Width="100"
+                                      MinWidth="100"
                                       ElementStyle="{StaticResource CenterAlignStyle}"/>
                     <DataGridTextColumn Header="Họ và Tên" 
                                       Binding="{Binding HoTen}" 
@@ -131,15 +131,15 @@
                     <DataGridTextColumn Header="Email" 
                                       Binding="{Binding Email}" 
                                       Width="*"
-                                      MinWidth="180"/>
+                                      MinWidth="160"/>
                     <DataGridTextColumn Header="Địa chỉ" 
                                       Binding="{Binding DiaChi}" 
                                       Width="*"
                                       MinWidth="120"/>
                     <DataGridTextColumn Header="Lớp dạy" 
                                       Binding="{Binding LopDayID}" 
-                                      Width="80"
-                                      MinWidth="80"
+                                      Width="160"
+                                      MinWidth="160"
                                       ElementStyle="{StaticResource CenterAlignStyle}"/>
                     <DataGridTextColumn Header="Bộ môn" 
                                       Binding="{Binding BoMon}" 

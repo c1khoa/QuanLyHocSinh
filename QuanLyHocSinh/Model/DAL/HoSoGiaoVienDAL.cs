@@ -45,14 +45,13 @@ namespace QuanLyHocSinh.Model.Relationships
                     {
                         hoSoGiaoVien.HoSoGiaoVienID = await GenerateNewHoSoGiaoVienIDAsync(conn, transaction);
                         string query = @"INSERT INTO HOSOGIAOVIEN 
-                                         (HoSoGiaoVienID, GiaoVienID, HoSoID, LopDayID, NgayBatDauLamViec) 
-                                         VALUES (@HoSoGiaoVienID, @GiaoVienID, @HoSoID, @LopDayID, @NgayBatDauLamViec)";
+                                         (HoSoGiaoVienID, GiaoVienID, HoSoID, NgayBatDauLamViec) 
+                                         VALUES (@HoSoGiaoVienID, @GiaoVienID, @HoSoID, @NgayBatDauLamViec)";
                         using (MySqlCommand cmd = new MySqlCommand(query, conn, transaction))
                         {
                             cmd.Parameters.AddWithValue("@HoSoGiaoVienID", hoSoGiaoVien.HoSoGiaoVienID);
                             cmd.Parameters.AddWithValue("@GiaoVienID", hoSoGiaoVien.GiaoVienID);
                             cmd.Parameters.AddWithValue("@HoSoID", hoSoGiaoVien.HoSoID);
-                            cmd.Parameters.AddWithValue("@LopDayID", (object)hoSoGiaoVien.LopDayID ?? DBNull.Value); // LopDayID can be null if not GVCN
                             cmd.Parameters.AddWithValue("@NgayBatDauLamViec", hoSoGiaoVien.NgayBatDauLamViec);
                             await cmd.ExecuteNonQueryAsync();
                         }
@@ -78,13 +77,12 @@ namespace QuanLyHocSinh.Model.Relationships
                     {
                         string query = @"UPDATE HOSOGIAOVIEN SET 
                                          GiaoVienID = @GiaoVienID, HoSoID = @HoSoID, 
-                                         LopDayID = @LopDayID, NgayBatDauLamViec = @NgayBatDauLamViec 
+                                         NgayBatDauLamViec = @NgayBatDauLamViec 
                                          WHERE HoSoGiaoVienID = @HoSoGiaoVienID";
                         using (MySqlCommand cmd = new MySqlCommand(query, conn, transaction))
                         {
                             cmd.Parameters.AddWithValue("@GiaoVienID", hoSoGiaoVien.GiaoVienID);
                             cmd.Parameters.AddWithValue("@HoSoID", hoSoGiaoVien.HoSoID);
-                            cmd.Parameters.AddWithValue("@LopDayID", (object)hoSoGiaoVien.LopDayID ?? DBNull.Value);
                             cmd.Parameters.AddWithValue("@NgayBatDauLamViec", hoSoGiaoVien.NgayBatDauLamViec);
                             cmd.Parameters.AddWithValue("@HoSoGiaoVienID", hoSoGiaoVien.HoSoGiaoVienID);
                             int rowsAffected = await cmd.ExecuteNonQueryAsync();
@@ -135,7 +133,6 @@ namespace QuanLyHocSinh.Model.Relationships
                 HoSoGiaoVienID = reader.GetString(ordinals["HoSoGiaoVienID"]),
                 GiaoVienID = reader.GetString(ordinals["GiaoVienID"]),
                 HoSoID = reader.GetString(ordinals["HoSoID"]),
-                LopDayID = reader.IsDBNull(ordinals["LopDayID"]) ? null : reader.GetString(ordinals["LopDayID"]),
                 NgayBatDauLamViec = reader.GetDateTime(ordinals["NgayBatDauLamViec"])
             };
         }
@@ -146,7 +143,6 @@ namespace QuanLyHocSinh.Model.Relationships
                 {"HoSoGiaoVienID", reader.GetOrdinal("HoSoGiaoVienID")},
                 {"GiaoVienID", reader.GetOrdinal("GiaoVienID")},
                 {"HoSoID", reader.GetOrdinal("HoSoID")},
-                {"LopDayID", reader.GetOrdinal("LopDayID")},
                 {"NgayBatDauLamViec", reader.GetOrdinal("NgayBatDauLamViec")}
             };
         }

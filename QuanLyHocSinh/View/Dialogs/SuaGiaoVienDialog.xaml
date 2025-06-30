@@ -4,7 +4,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:viewmodel="clr-namespace:QuanLyHocSinh.ViewModel.TraCuu"
         xmlns:converters="clr-namespace:QuanLyHocSinh.View.Converters"
-        Title="Sửa thông tin giáo viên" Height="700" Width="600"
+        Title="Sửa thông tin giáo viên" Height="800" Width="650"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Style x:Key="ImageBorderStyle" TargetType="Border">
@@ -48,12 +48,6 @@
                                 SelectedDate="{Binding NgaySinh}"
                                 Margin="0,5"/>
                     
-                    <TextBlock Text="Lớp dạy" Margin="0,5,0,0"/>
-                    <ComboBox materialDesign:HintAssist.Hint="Lớp dạy"
-                              ItemsSource="{Binding DanhSachLop}"
-                              SelectedItem="{Binding LopDayID}"
-                              Margin="0,5"/>
-                              
                     <TextBlock Text="Email" Margin="0,5,0,0"/>
                     <TextBox materialDesign:HintAssist.Hint="Email"
                              Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"
@@ -63,12 +57,66 @@
                     <TextBox materialDesign:HintAssist.Hint="Địa chỉ"
                              Text="{Binding DiaChi, UpdateSourceTrigger=PropertyChanged}"
                              Margin="0,5"/>
-                                
-                    <TextBlock Text="Bộ môn" Margin="0,5,0,0"/>
-                    <ComboBox materialDesign:HintAssist.Hint="Bộ môn"
-                              ItemsSource="{Binding DanhSachBoMon}"
-                              SelectedItem="{Binding BoMon}"
-                              Margin="0,5"/>
+
+                    <!-- Lựa chọn lớp dạy -->
+                    <TextBlock Text="Lớp dạy (chọn nhiều lớp)" Margin="0,15,0,5" FontWeight="Bold"/>
+                    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" MaxHeight="120" Padding="10">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ListBox ItemsSource="{Binding DanhSachLopItems}" 
+                                     SelectionMode="Multiple"
+                                     Background="Transparent" 
+                                     BorderThickness="0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding TenLop}" 
+                                                  IsChecked="{Binding IsSelected}"
+                                                  Margin="5,2"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListBoxItem">
+                                                    <ContentPresenter/>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                            </ListBox>
+                        </ScrollViewer>
+                    </Border>
+
+                    <!-- Lựa chọn môn học -->
+                    <TextBlock Text="Môn học dạy (chọn nhiều môn)" Margin="0,15,0,5" FontWeight="Bold"/>
+                    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" MaxHeight="120" Padding="10">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ListBox ItemsSource="{Binding DanhSachMonItems}" 
+                                     SelectionMode="Multiple"
+                                     Background="Transparent" 
+                                     BorderThickness="0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding TenMonHoc}" 
+                                                  IsChecked="{Binding IsSelected}"
+                                                  Margin="5,2"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListBoxItem">
+                                                    <ContentPresenter/>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                            </ListBox>
+                        </ScrollViewer>
+                    </Border>
                 </StackPanel>
             </ScrollViewer>
         </Border>
