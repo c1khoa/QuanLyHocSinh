@@ -11,7 +11,9 @@
                     xmlns:viewbc="clr-namespace:QuanLyHocSinh.View.Controls.BaoCao"
                     xmlns:viewtc="clr-namespace:QuanLyHocSinh.View.Controls.TraCuu"
                     xmlns:viewqd="clr-namespace:QuanLyHocSinh.View.Controls.QuyDinh" 
-                    xmlns:local="clr-namespace:QuanLyHocSinh.View.Converters">
+                    xmlns:viewds="clr-namespace:QuanLyHocSinh.View.Controls.DanhSachLop"
+                    xmlns:local="clr-namespace:QuanLyHocSinh.View.Converters" 
+                    xmlns:vmDanhSachLop="clr-namespace:QuanLyHocSinh.ViewModel.DanhSachLop">
     <local:EyeIconConverter x:Key="EyeIconConverter"/>
     <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     <local:RoleToVisibilityConverter x:Key="RoleToVisibilityConverter"/>
@@ -72,6 +74,10 @@
 
     <DataTemplate DataType="{x:Type vmTraCuu:TraCuuHocSinhViewModel}">
         <viewtc:TraCuuHocSinhUC />
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type vmDanhSachLop:DanhSachLopViewModel}">
+        <viewds:DanhSachLopUC />
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type vmTraCuu:TraCuuGiaoVienViewModel}">

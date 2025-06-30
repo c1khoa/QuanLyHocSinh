@@ -180,6 +180,23 @@
                                            FontSize="20"/>
                             </StackPanel>
                         </Button>
+                        <Button Command="{Binding ShowDanhSachLopCommand}"
+                            Style="{StaticResource MenuButtonStyle}">
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.Click">
+                                    <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                </EventTrigger>
+                            </Button.Triggers>
+                            <StackPanel Orientation="Horizontal" 
+                                        Margin="15,0,0,0">
+                                <materialDesign:PackIcon Kind="DoorOpen"
+                                                         VerticalAlignment="Stretch"/>
+                                <TextBlock Text="Danh sách lớp" 
+                                           Margin="10 0 0 0" 
+                                           FontWeight="Regular"
+                                           FontSize="20"/>
+                            </StackPanel>
+                        </Button>
 
                         <Expander Background="Transparent" Margin="10 0 0 0">
                             <Expander.Header>
