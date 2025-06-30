@@ -414,16 +414,11 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 
                 if (VaiTroID == "VT01") // Học sinh
                 {
-                    if (!string.IsNullOrEmpty(SelectedLopHocID) && tuoi < 15)
+                    if (!string.IsNullOrEmpty(SelectedLopHocID) && (tuoi < 15 || tuoi > 20))
                     {
-                        var tenLop = DanhSachLop?.FirstOrDefault(l => l.LopID == SelectedLopHocID)?.TenLop;
+                        await DialogHost.Show(new ErrorDialog("Thất bại", "Học sinh chỉ có thể từ 15 đến 20 tuổi"), "RootDialog_Add");
+                        return;
 
-                        var _ = await DialogHost.Show(
-                            new ConfirmDialog($"⚠️ Học sinh chỉ mới {tuoi} tuổi, quá nhỏ để học lớp {tenLop}. Bạn có muốn tiếp tục không?"),
-                            "RootDialog_Add");
-
-                        if (_?.ToString() == "False")
-                            return;
                     }
                 }
                 else

@@ -13,6 +13,7 @@ using QuanLyHocSinh.View.Controls.TraCuu;
 using QuanLyHocSinh.View.Converters;
 using QuanLyHocSinh.View.Windows;
 using QuanLyHocSinh.ViewModel.BaoCao;
+using QuanLyHocSinh.ViewModel.DanhSachLop;
 using QuanLyHocSinh.ViewModel.QuanLyTaiKhoan;
 using QuanLyHocSinh.ViewModel.QuyDinh;
 using QuanLyHocSinh.ViewModel.TraCuu;
@@ -28,6 +29,7 @@ namespace QuanLyHocSinh.ViewModel
         // Các ViewModel con dùng cho điều hướng
         public TrangChuViewModel TrangChuVM { get; set; }
         public QuanLyTaiKhoanMainViewModel TaiKhoanVM { get; set; }
+        public DanhSachLopViewModel DanhSachLopVM { get; set; }
         public TraCuuHocSinhViewModel HocSinhVM { get; set; }
         public TraCuuGiaoVienViewModel GiaoVienVM { get; set; }
         public TraCuuDiemHocSinhViewModel DiemHocSinhVM { get; set; }
@@ -176,6 +178,7 @@ namespace QuanLyHocSinh.ViewModel
         public ICommand ShowTrangChuCommand { get; set; }
         public ICommand ShowTaiKhoanCaNhanCommand { get; set; }
         public ICommand ShowQuanLyTaiKhoanCommand { get; set; }
+        public ICommand ShowDanhSachLopCommand { get; set; }
         public ICommand ShowThongTinHocSinhCommand { get; set; }
         public ICommand ShowThongTinGiaoVienCommand { get; set; }
         public ICommand ShowDiemHocSinhCommand { get; set; }
@@ -247,6 +250,7 @@ namespace QuanLyHocSinh.ViewModel
             ShowTrangChuCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TrangChuViewModel(this));
             ShowQuanLyTaiKhoanCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuanLyTaiKhoanMainViewModel(this));
             ShowTaiKhoanCaNhanCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuanLyTaiKhoanCaNhanViewModel(this));
+            ShowDanhSachLopCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new DanhSachLopViewModel(this));
             ShowThongTinHocSinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuHocSinhViewModel(this));
             ShowThongTinGiaoVienCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuGiaoVienViewModel(this));
             ShowDiemHocSinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuDiemHocSinhViewModel(this));
