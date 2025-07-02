@@ -29,7 +29,7 @@ public class TestConnection
             }
             catch (Exception ex)
             {
-                await DialogHost.Show(new ErrorDialog("Lỗi", "Kết nối MySQL thất bại, vui lòng kiểm tra lại!!"), "RootDialog_Begin");
+                Console.WriteLine($"Lỗi kết nối MySQL: {ex.Message}");
             }
         }
     }

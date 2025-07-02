@@ -11,7 +11,7 @@ namespace QuanLyHocSinh.Model.Entities
         public string LopID { get; set; }
         public string TenLop { get; set; }
         public int SiSo { get; set; }
-        public string GVCNID { get; set; }
+        public string GVCNID { get; set; }  
         public GiaoVien GVCN { get; set; }
     }
 }
