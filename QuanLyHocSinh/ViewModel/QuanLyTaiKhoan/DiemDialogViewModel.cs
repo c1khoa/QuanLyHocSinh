@@ -82,22 +82,27 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             // Gán mặc định bộ lọc
             SelectedHocKyFilter = dsHocKy.FirstOrDefault();         // ✅ kiểu int
             SelectedNamHocFilter = dsNamHoc.FirstOrDefault();       // ✅ kiểu string
+            FilterData();
+            OnPropertyChanged(nameof(SelectedHocKyFilter));
+            OnPropertyChanged(nameof(SelectedNamHocFilter));
 
-            // Gán ban đầu
-            FilteredDiem = new ObservableCollection<DiemTongHopHocSinh>(_allDiem);
         }
 
         private void FilterData()
         {
             if (_allDiem == null) return;
 
-            var filtered = _allDiem.Where(d =>
-                (!SelectedHocKyFilter.HasValue || d.HocKy == SelectedHocKyFilter.Value) &&
-                (string.IsNullOrEmpty(SelectedNamHocFilter) || d.NamHocID == SelectedNamHocFilter)
-            );
+            IEnumerable<DiemTongHopHocSinh> filtered = _allDiem;
+
+            if (SelectedHocKyFilter.HasValue)
+                filtered = filtered.Where(d => d.HocKy == SelectedHocKyFilter.Value);
+
+            if (!string.IsNullOrEmpty(SelectedNamHocFilter))
+                filtered = filtered.Where(d => d.NamHocID == SelectedNamHocFilter);
 
             FilteredDiem = new ObservableCollection<DiemTongHopHocSinh>(filtered);
         }
+
 
         public static List<DiemTongHopHocSinh> GetDiemTongHopCuaHocSinh(string hocSinhID)
         {
