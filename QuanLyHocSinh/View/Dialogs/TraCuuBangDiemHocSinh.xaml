@@ -37,9 +37,9 @@
         <Border Grid.Row="1" Background="#f8f9fa" CornerRadius="15" Padding="15" Margin="0,0,0,12">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <TextBlock Text="Năm học: " FontWeight="Bold" VerticalAlignment="Center"/>
-                <ComboBox Width="120" Margin="0,0,16,0" ItemsSource="{Binding DanhSachNamHoc}" SelectedItem="{Binding SelectedNamHoc, Mode=TwoWay}" SelectedIndex="-1"/>
+                <ComboBox Width="120" Margin="0,0,16,0" ItemsSource="{Binding DanhSachNamHoc}" SelectedItem="{Binding SelectedNamHoc, Mode=TwoWay}"/>
                 <TextBlock Text="Học kỳ: " FontWeight="Bold" VerticalAlignment="Center"/>
-                <ComboBox Width="80" ItemsSource="{Binding DanhSachHocKy}" SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}" SelectedIndex="-1"/>
+                <ComboBox Width="80" ItemsSource="{Binding DanhSachHocKy}" SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}"/>
             </StackPanel>
         </Border>
         <!-- Thông tin học sinh -->
@@ -73,14 +73,47 @@
                       BorderBrush="Transparent"
                       Background="Transparent">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Môn học" Binding="{Binding MonHoc}" Width="*" ElementStyle="{StaticResource CenterAlignStyle}" IsReadOnly="True"/>
-                <DataGridTextColumn Header="Điểm miệng" Binding="{Binding DiemMieng, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
-                <DataGridTextColumn Header="Điểm 15p" Binding="{Binding Diem15Phut, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
-                <DataGridTextColumn Header="Điểm 1 tiết" Binding="{Binding Diem1Tiet, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
-                <DataGridTextColumn Header="Điểm thi" Binding="{Binding DiemThi, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
-                <DataGridTextColumn Header="Điểm TB" Binding="{Binding DiemTrungBinh, StringFormat=F2}" Width="*" ElementStyle="{StaticResource CenterAlignStyle}" IsReadOnly="True"/>
-                <DataGridTextColumn Header="Xếp loại" Binding="{Binding XepLoai}" Width="*" ElementStyle="{StaticResource CenterAlignStyle}" IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Chức năng" Width="*">
+                <DataGridTextColumn Header="Môn học" 
+                                  Binding="{Binding MonHoc}" 
+                                  Width="*" 
+                                  ElementStyle="{StaticResource CenterAlignStyle}" 
+                                  HeaderStyle="{StaticResource CenterHeaderStyle}"
+                                  IsReadOnly="True"/>
+                <DataGridTextColumn Header="Điểm miệng" 
+                                  Binding="{Binding DiemMieng, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" 
+                                  Width="*"
+                                  ElementStyle="{StaticResource CenterAlignStyle}"
+                                  HeaderStyle="{StaticResource CenterHeaderStyle}"/>
+                <DataGridTextColumn Header="Điểm 15p" 
+                                  Binding="{Binding Diem15Phut, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" 
+                                  Width="*"
+                                  ElementStyle="{StaticResource CenterAlignStyle}"
+                                  HeaderStyle="{StaticResource CenterHeaderStyle}"/>
+                <DataGridTextColumn Header="Điểm 1 tiết" 
+                                  Binding="{Binding Diem1Tiet, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" 
+                                  Width="*"
+                                  ElementStyle="{StaticResource CenterAlignStyle}"
+                                  HeaderStyle="{StaticResource CenterHeaderStyle}"/>
+                <DataGridTextColumn Header="Điểm thi" 
+                                  Binding="{Binding DiemThi, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" 
+                                  Width="*"
+                                  ElementStyle="{StaticResource CenterAlignStyle}"
+                                  HeaderStyle="{StaticResource CenterHeaderStyle}"/>
+                <DataGridTextColumn Header="Điểm TB" 
+                                  Binding="{Binding DiemTrungBinh, StringFormat=F2}" 
+                                  Width="*" 
+                                  ElementStyle="{StaticResource CenterAlignStyle}" 
+                                  HeaderStyle="{StaticResource CenterHeaderStyle}"
+                                  IsReadOnly="True"/>
+                <DataGridTextColumn Header="Xếp loại" 
+                                  Binding="{Binding XepLoai}" 
+                                  Width="*" 
+                                  ElementStyle="{StaticResource CenterAlignStyle}" 
+                                  HeaderStyle="{StaticResource CenterHeaderStyle}"
+                                  IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="Chức năng" 
+                                      Width="*"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource MaterialDesignToolButton}"

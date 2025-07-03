@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.Model.DAL;
 using QuanLyHocSinh.View.Dialogs;
 using System.Configuration;
 using QuanLyHocSinh.ViewModel;
@@ -17,15 +18,15 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
     public class TraCuuHocSinhViewModel : BaseViewModel
     {
         //Danh sách học sinh
-        private ObservableCollection<HocSinh> _danhSachHocSinh;
-        public ObservableCollection<HocSinh> DanhSachHocSinh
+        private ObservableCollection<HocSinhDanhSachItem> _danhSachHocSinh;
+        public ObservableCollection<HocSinhDanhSachItem> DanhSachHocSinh
         {
             get => _danhSachHocSinh;
             set { _danhSachHocSinh = value; OnPropertyChanged(nameof(DanhSachHocSinh)); }
         }
 
         //Tất cả học sinh
-        private ObservableCollection<HocSinh> _allHocSinh;
+        private List<HocSinhDanhSachItem> _allHocSinh;
 
         //Lọc theo search
         private string _searchText;
@@ -43,22 +44,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _selectedLop = value; OnPropertyChanged(nameof(SelectedLop)); Filter(); }
         }
 
-        //Lọc theo giới tính
-        private string _selectedGioiTinh;
-        public string SelectedGioiTinh
-        {
-            get => _selectedGioiTinh;
-            set { _selectedGioiTinh = value; OnPropertyChanged(nameof(SelectedGioiTinh)); Filter(); }
-        }
-
-        //Lọc theo niên khóa
-        private string _selectedNienKhoa;
-        public string SelectedNienKhoa
-        {
-            get => _selectedNienKhoa;
-            set { _selectedNienKhoa = value; OnPropertyChanged(nameof(SelectedNienKhoa)); Filter(); }
-        }
-
         //Danh sách lớp
         private ObservableCollection<string> _danhSachLop;
         public ObservableCollection<string> DanhSachLop
@@ -67,129 +52,113 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _danhSachLop = value; OnPropertyChanged(nameof(DanhSachLop)); }
         }
 
-        //Danh sách giới tính
-        private ObservableCollection<string> _danhSachGioiTinh;
-        public ObservableCollection<string> DanhSachGioiTinh
-        {
-            get => _danhSachGioiTinh;
-            set { _danhSachGioiTinh = value; OnPropertyChanged(nameof(DanhSachGioiTinh)); }
-        }
-
-        //Danh sách niên khóa
-        private ObservableCollection<string> _danhSachNienKhoa;
-        public ObservableCollection<string> DanhSachNienKhoa
-        {
-            get => _danhSachNienKhoa;
-            set { _danhSachNienKhoa = value; OnPropertyChanged(nameof(DanhSachNienKhoa)); }
-        }
-
-        private HocSinh _selectedHocSinh;
-        public HocSinh SelectedHocSinh
+        //Học sinh được chọn
+        private HocSinhDanhSachItem _selectedHocSinh;
+        public HocSinhDanhSachItem SelectedHocSinh
         {
             get => _selectedHocSinh;
             set { _selectedHocSinh = value; OnPropertyChanged(nameof(SelectedHocSinh)); }
         }
 
-        //Lệnh edit và filter
-        public ICommand EditCommand { get; }
         public ICommand FilterCommand { get; }
         public ICommand XemBangDiemCommand { get; }
 
-        //Khởi tạo ViewModel
         private MainViewModel _mainVM;
         public TraCuuHocSinhViewModel(MainViewModel mainVM)
         {
             _mainVM = mainVM;
+            LoadData();
+
+            FilterCommand = new RelayCommand(Filter);
+            XemBangDiemCommand = new RelayCommand<HocSinhDanhSachItem>(XemBangDiem);
+
+            SelectedLop = "Tất cả";
+        }
+
+        private void LoadData()
+        {
+            string currentNamHoc = GetCurrentNamHoc();
+            
             if (_mainVM.CurrentUser.VaiTro.VaiTroID == "VT02")
             {
-                // Lấy danh sách lớp mà giáo viên đang dạy
                 var danhSachLopCuaGV = GiaoVienDAL.GetLopDayCuaUser(_mainVM.CurrentUser.UserID);
-
-                // Lấy học sinh chỉ trong các lớp đó
-                _allHocSinh = new ObservableCollection<HocSinh>(
-                    HocSinhDAL.GetAllHocSinh().Where(hs => danhSachLopCuaGV.Contains(hs.TenLop))
-                );
                 
+                _allHocSinh = HocSinhDAL.GetDanhSachHocSinhWithDiemTB(null, null, null, currentNamHoc)
+                    .Where(hs => danhSachLopCuaGV.Contains(hs.TenLop)).ToList();
             }
             else if (_mainVM.CurrentUser.VaiTro.VaiTroID == "VT01")
             {
-                // Lấy danh sách lớp mà giáo viên đang dạy
                 var danhSachLopCuaHS = HocSinhDAL.GetLopHocCuaUser(_mainVM.CurrentUser.UserID);
-
-                // Lấy học sinh chỉ trong các lớp đó
-                _allHocSinh = new ObservableCollection<HocSinh>(
-                    HocSinhDAL.GetAllHocSinh().Where(hs => danhSachLopCuaHS.Contains(hs.TenLop))
-                );
-
+                
+                _allHocSinh = HocSinhDAL.GetDanhSachHocSinhWithDiemTB(null, null, null, currentNamHoc)
+                    .Where(hs => danhSachLopCuaHS.Contains(hs.TenLop)).ToList();
             }
             else
             {
-                // Nếu là giáo vụ hoặc admin, load toàn bộ học sinh
-                _allHocSinh = new ObservableCollection<HocSinh>(HocSinhDAL.GetAllHocSinh());
+                _allHocSinh = HocSinhDAL.GetDanhSachHocSinhWithDiemTB(null, null, null, currentNamHoc);
             }
 
-            // Lấy danh sách lớp duy nhất từ danh sách học sinh
             var dsLop = _allHocSinh.Select(hs => hs.TenLop).Distinct().OrderBy(l => l).ToList();
-            dsLop.Insert(0, "Tất cả"); // Thêm giá trị "Tất cả" vào đầu danh sách
+            dsLop.Insert(0, "Tất cả");
             DanhSachLop = new ObservableCollection<string>(dsLop);
 
-            //Lấy danh sách giới tính duy nhất từ danh sách học sinh
-            var dsGioiTinh = _allHocSinh.Select(hs => hs.GioiTinh).Distinct().OrderBy(gt => gt).ToList();
-            dsGioiTinh.Insert(0, "Tất cả");
-            DanhSachGioiTinh = new ObservableCollection<string>(dsGioiTinh);
+            Filter();
+        }
 
-            //Lấy danh sách niên khóa duy nhất từ danh sách học sinh
-            DanhSachNienKhoa = new ObservableCollection<string>(HocSinhDAL.GetAllNienKhoa());
-            DanhSachNienKhoa.Insert(0, "Tất cả");
-
-            //Khởi tạo các lệnh
-            EditCommand = new RelayCommand(EditHocSinh, () => SelectedHocSinh != null);
-            FilterCommand = new RelayCommand(Filter);
-            XemBangDiemCommand = new RelayCommand<HocSinh>(XemBangDiem);
-
-            // Mặc định chọn "Tất cả"
-            SelectedLop = "Tất cả";
-            SelectedGioiTinh = "Tất cả";
-            SelectedNienKhoa = "Tất cả";
+        private string GetCurrentNamHoc()
+        {
+            var allNamHoc = HocSinhDAL.GetAllNamHoc();
+            return allNamHoc.OrderByDescending(x => x).FirstOrDefault() ?? DateTime.Now.Year.ToString();
         }
 
         //Lọc học sinh theo tên và lớp
         private void Filter()
         {
+            if (_allHocSinh == null) return;
+
             var filtered = _allHocSinh.Where(hs =>
                 (string.IsNullOrEmpty(SearchText) || hs.HoTen.ToLower().Contains(SearchText.ToLower()))
                 && (SelectedLop == "Tất cả" || string.IsNullOrEmpty(SelectedLop) || hs.TenLop == SelectedLop)
-                && (SelectedGioiTinh == "Tất cả" || string.IsNullOrEmpty(SelectedGioiTinh) || hs.GioiTinh == SelectedGioiTinh)
-                && (SelectedNienKhoa == "Tất cả" || string.IsNullOrEmpty(SelectedNienKhoa) || hs.NienKhoa.ToString() == SelectedNienKhoa)
             ).ToList();
 
-            DanhSachHocSinh = new ObservableCollection<HocSinh>(filtered);
-        }
-
-        private void EditHocSinh()
-        {
-            if (SelectedHocSinh == null) return;
-
-            var dialog = new SuaHocSinhDialog(SelectedHocSinh);
-            if (dialog.ShowDialog() == true)
+            int stt = 1;
+            foreach (var item in filtered)
             {
-                // Refresh danh sách sau khi sửa
-                _allHocSinh = new ObservableCollection<HocSinh>(HocSinhDAL.GetAllHocSinh());
-                Filter();
+                item.STT = stt++;
             }
+
+            DanhSachHocSinh = new ObservableCollection<HocSinhDanhSachItem>(filtered);
         }
 
-        private void XemBangDiem(HocSinh hs)
+        private void XemBangDiem(HocSinhDanhSachItem hsItem)
         {
-            if (hs == null) return;
+            if (hsItem == null) return;
 
-            string namHoc = SelectedNienKhoa != null && SelectedNienKhoa != "Tất cả" ? SelectedNienKhoa : null;
+            var hocSinh = new HocSinh
+            {
+                HocSinhID = hsItem.HocSinhID,
+                HoTen = hsItem.HoTen,
+                GioiTinh = hsItem.GioiTinh,
+                NgaySinh = hsItem.NgaySinh,
+                Email = hsItem.Email,
+                DiaChi = hsItem.DiaChi,
+                TenLop = hsItem.TenLop,
+                NienKhoa = hsItem.NienKhoa
+            };
+
+            string namHoc = null;
             int? hocKy = null;
 
-            var dialog = new BangDiemHocSinh(); // assuming using directive is present
-            dialog.DataContext = new TraCuuBangDiemHocSinhViewModel(hs, _mainVM, namHoc, hocKy);
+            var dialog = new BangDiemHocSinh();
+            var viewModel = new TraCuuBangDiemHocSinhViewModel(hocSinh, _mainVM, namHoc, hocKy);
+            
+            
+            viewModel.RequestMainWindowRefresh += () => {
+                LoadData();
+            };
+            
+            dialog.DataContext = viewModel;
             dialog.ShowDialog();
         }
-
     }
 }

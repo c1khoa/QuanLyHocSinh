@@ -27,4 +27,31 @@ namespace QuanLyHocSinh.Model.Entities
         public string Diem1TietStr => double.IsNaN(Diem1Tiet) ? "-" : Diem1Tiet.ToString();
         public string DiemThiStr => double.IsNaN(DiemThi) ? "-" : DiemThi.ToString();
     }
+
+    // Entity mới cho tổng kết theo lớp
+    public class TongKetLopItem
+    {
+        public int STT { get; set; }
+        public string TenLop { get; set; } = "";
+        public string MonHoc { get; set; } = "";
+        public string NamHoc { get; set; } = "";
+        public int HocKy { get; set; }
+        public int SiSo { get; set; }
+        public int SoLuongDat { get; set; }
+        public double TiLeDat { get; set; }
+    }
+
+    // Entity cho chi tiết học sinh trong lớp
+    public class HocSinhChiTietItem
+    {
+        public int STT { get; set; }
+        public string HocSinhID { get; set; } = "";
+        public string HoTen { get; set; } = "";
+        public int HocKy { get; set; }
+        public double Diem15Phut { get; set; }
+        public double Diem1Tiet { get; set; }
+        public double DiemTrungBinh { get; set; }
+        public string XepLoai { get; set; } = "";
+        public bool DaDat => DiemTrungBinh >= 5.0;
+    }
 }

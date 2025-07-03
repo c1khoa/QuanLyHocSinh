@@ -314,5 +314,175 @@ namespace QuanLyHocSinh.Model.Entities
             }
             return list;
         }
+
+        public static List<HocSinhDanhSachItem> GetDanhSachHocSinhWithDiemTB(string? lop = null, string? gioiTinh = null, int? nienKhoa = null, string? namHoc = null)
+        {
+            List<HocSinhDanhSachItem> list = new List<HocSinhDanhSachItem>();
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+            
+            string whereClause = "WHERE 1=1";
+            if (!string.IsNullOrEmpty(lop) && lop != "Tất cả")
+                whereClause += " AND l.TenLop = @Lop";
+            if (!string.IsNullOrEmpty(gioiTinh) && gioiTinh != "Tất cả")
+                whereClause += " AND ho.GioiTinh = @GioiTinh";
+            if (nienKhoa.HasValue)
+                whereClause += " AND hhs.NienKhoa = @NienKhoa";
+            if (!string.IsNullOrEmpty(namHoc) && namHoc != "Tất cả")
+                whereClause += " AND d.NamHocID = @NamHoc";
+
+            string query = $@"
+                SELECT DISTINCT
+                    hs.HocSinhID,
+                    ho.HoTen,
+                    l.TenLop,
+                    ho.GioiTinh,
+                    ho.NgaySinh,
+                    ho.Email,
+                    ho.DiaChi,
+                    hhs.NienKhoa,
+                    COALESCE(d.NamHocID, (SELECT MAX(NamHocID) FROM DIEM)) as NamHoc,
+                    -- Điểm TB HK1 (trung bình của tất cả môn trong HK1)
+                    (SELECT AVG(d1.DiemTrungBinh) 
+                     FROM DIEM d1 
+                     WHERE d1.HocSinhID = hs.HocSinhID 
+                       AND d1.HocKy = 1 
+                       AND d1.NamHocID = COALESCE(d.NamHocID, (SELECT MAX(NamHocID) FROM DIEM))
+                       AND d1.DiemTrungBinh IS NOT NULL
+                       AND d1.DiemTrungBinh > 0) as DiemTBHK1,
+                    -- Điểm TB HK2 (trung bình của tất cả môn trong HK2)
+                    (SELECT AVG(d2.DiemTrungBinh) 
+                     FROM DIEM d2 
+                     WHERE d2.HocSinhID = hs.HocSinhID 
+                       AND d2.HocKy = 2 
+                       AND d2.NamHocID = COALESCE(d.NamHocID, (SELECT MAX(NamHocID) FROM DIEM))
+                       AND d2.DiemTrungBinh IS NOT NULL
+                       AND d2.DiemTrungBinh > 0) as DiemTBHK2
+                FROM HOCSINH hs
+                JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
+                JOIN HOSO ho ON hhs.HoSoID = ho.HoSoID
+                JOIN LOP l ON hhs.LopHocID = l.LopID
+                LEFT JOIN DIEM d ON d.HocSinhID = hs.HocSinhID
+                {whereClause}
+                ORDER BY l.TenLop, ho.HoTen";
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    if (!string.IsNullOrEmpty(lop) && lop != "Tất cả")
+                        cmd.Parameters.AddWithValue("@Lop", lop);
+                    if (!string.IsNullOrEmpty(gioiTinh) && gioiTinh != "Tất cả")
+                        cmd.Parameters.AddWithValue("@GioiTinh", gioiTinh);
+                    if (nienKhoa.HasValue)
+                        cmd.Parameters.AddWithValue("@NienKhoa", nienKhoa);
+                    if (!string.IsNullOrEmpty(namHoc) && namHoc != "Tất cả")
+                        cmd.Parameters.AddWithValue("@NamHoc", namHoc);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        int stt = 1;
+                        while (reader.Read())
+                        {
+                            HocSinhDanhSachItem item = new HocSinhDanhSachItem
+                            {
+                                STT = stt++,
+                                HocSinhID = reader["HocSinhID"]?.ToString() ?? "",
+                                HoTen = reader["HoTen"]?.ToString() ?? "",
+                                TenLop = reader["TenLop"]?.ToString() ?? "",
+                                GioiTinh = reader["GioiTinh"]?.ToString() ?? "",
+                                NgaySinh = Convert.ToDateTime(reader["NgaySinh"]),
+                                Email = reader["Email"]?.ToString() ?? "",
+                                DiaChi = reader["DiaChi"]?.ToString() ?? "",
+                                NienKhoa = Convert.ToInt32(reader["NienKhoa"]),
+                                NamHoc = reader["NamHoc"]?.ToString() ?? "",
+                                DiemTBHK1 = reader["DiemTBHK1"] == DBNull.Value ? null : Math.Round(Convert.ToDouble(reader["DiemTBHK1"]), 2),
+                                DiemTBHK2 = reader["DiemTBHK2"] == DBNull.Value ? null : Math.Round(Convert.ToDouble(reader["DiemTBHK2"]), 2)
+                            };
+                            list.Add(item);
+                        }
+                    }
+                }
+            }
+            return list;
+        }
+
+        public static List<HocSinhLopItem> GetDanhSachHocSinhTheoLop(string tenLop)
+        {
+            List<HocSinhLopItem> list = new List<HocSinhLopItem>();
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+            
+            string query = @"
+                SELECT 
+                    hs.HocSinhID,
+                    ho.HoTen,
+                    ho.GioiTinh,
+                    ho.NgaySinh,
+                    YEAR(ho.NgaySinh) as NamSinh,
+                    ho.Email,
+                    ho.DiaChi,
+                    l.TenLop,
+                    hhs.NienKhoa
+                FROM HOCSINH hs
+                JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
+                JOIN HOSO ho ON hhs.HoSoID = ho.HoSoID
+                JOIN LOP l ON hhs.LopHocID = l.LopID
+                WHERE l.TenLop = @TenLop
+                ORDER BY ho.HoTen";
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@TenLop", tenLop);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        int stt = 1;
+                        while (reader.Read())
+                        {
+                            HocSinhLopItem item = new HocSinhLopItem
+                            {
+                                STT = stt++,
+                                HocSinhID = reader["HocSinhID"]?.ToString() ?? "",
+                                HoTen = reader["HoTen"]?.ToString() ?? "",
+                                GioiTinh = reader["GioiTinh"]?.ToString() ?? "",
+                                NgaySinh = Convert.ToDateTime(reader["NgaySinh"]),
+                                NamSinh = Convert.ToInt32(reader["NamSinh"]),
+                                Email = reader["Email"]?.ToString() ?? "",
+                                DiaChi = reader["DiaChi"]?.ToString() ?? "",
+                                TenLop = reader["TenLop"]?.ToString() ?? "",
+                                NienKhoa = Convert.ToInt32(reader["NienKhoa"])
+                            };
+                            list.Add(item);
+                        }
+                    }
+                }
+            }
+            return list;
+        }
+
+        public static int GetSiSoLop(string tenLop)
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+            
+            string query = @"
+                SELECT COUNT(*) as SiSo
+                FROM HOCSINH hs
+                JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
+                JOIN LOP l ON hhs.LopHocID = l.LopID
+                WHERE l.TenLop = @TenLop";
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@TenLop", tenLop);
+                    var result = cmd.ExecuteScalar();
+                    return result != null ? Convert.ToInt32(result) : 0;
+                }
+            }
+        }
     }
 }

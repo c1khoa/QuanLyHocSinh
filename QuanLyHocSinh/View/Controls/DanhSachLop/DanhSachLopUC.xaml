@@ -4,173 +4,168 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.DanhSachLop"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              Background="White"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
-             xmlns:viewmodel="clr-namespace:QuanLyHocSinh.ViewModel"
-             Name="ucDanhSachLop"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-	<Grid Margin="30">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="*"/>
-		</Grid.RowDefinitions>
+             FontSize="13"
+             mc:Ignorable="d"
+             MinHeight="600" MinWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <Style x:Key="ImageBorderStyle" TargetType="Border">
+                <Setter Property="BorderBrush" Value="Gray"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="CornerRadius" Value="30"/>
+                <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Margin" Value="20 80 20 80"/>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
-		<TextBlock Grid.Row="0"
-                   Text="DANH SÁCH LỚP HỌC"
-                   FontSize="24"
-                   FontWeight="Bold"
-                   Foreground="#333"
-                   HorizontalAlignment="Center"
-                   Margin="0,0,0,25"/>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Tiêu đề -->
+        <TextBlock Text="THÔNG TIN DANH SÁCH LỚP" 
+                   FontSize="24" 
+                   FontWeight="Bold" 
+                   HorizontalAlignment="Center" 
+                   VerticalAlignment="Center"
+                   Margin="10 10 0 10"
+                   Grid.Row="0"/>
 
-		<Grid Grid.Row="1" Margin="0,0,0,20">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="Auto"/>
-			</Grid.ColumnDefinitions>
+        <!-- Thanh lọc -->
+        <Border Grid.Row="1" Background="#85b6ff" CornerRadius="15" Padding="15" Margin="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MinWidth="200"/>
+                    <ColumnDefinition Width="Auto" MinWidth="150"/>
+                    <ColumnDefinition Width="Auto" MinWidth="120"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Margin="10" VerticalAlignment="Center">
+                    <TextBlock Text="Lớp" FontSize="13" Margin="0,0,0,5"/>
+                    <ComboBox materialDesign:HintAssist.Hint="Chọn lớp"
+                              IsEditable="False"
+                              FontSize="13"
+                              MinWidth="180"
+                              ItemsSource="{Binding DanhSachLop}" 
+                              SelectedItem="{Binding SelectedLop, Mode=TwoWay}"/>
+                </StackPanel>
 
-			<Border Grid.Column="0"
-                    Background="White"
-                    CornerRadius="5"
-                    BorderBrush="#E0E0E0"
-                    BorderThickness="1">
-				<Grid>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*"/>
-						<ColumnDefinition Width="Auto"/>
-					</Grid.ColumnDefinitions>
-					<TextBox Grid.Column="0"
-                             Padding="10,0"
-                             VerticalContentAlignment="Center"
-                             BorderThickness="0"
-                             FontSize="14"
-                             Background="Transparent"
-                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                             Tag="Tìm kiếm theo tên lớp, giáo viên..."/>
-					<Button Grid.Column="1"
-                            Content="&#xE721;"
-                            FontFamily="Segoe MDL2 Assets"
-                            FontSize="16"
-                            Padding="12,10"
-                            BorderThickness="0"
+                <StackPanel Grid.Column="1" Margin="10" VerticalAlignment="Center">
+                    <TextBlock Text="" FontSize="13" Margin="0,0,0,5"/>
+                    <TextBlock FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="Sỉ số: {0} học sinh">
+                                <Binding Path="SiSoLop"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </StackPanel>
+
+                <Border Grid.Column="2" 
+                        Style="{StaticResource ImageBorderStyle}"
+                        Margin="10 0 0 0"
+                        Background="#4CAF50">
+                    <Button Content="Xuất Excel" 
+                            Command="{Binding ExportExcelCommand}"
+                            BorderBrush="Transparent"
+                            Style="{StaticResource MaterialDesignRaisedLightButton}"
                             Background="Transparent"
-                            Foreground="#555"
-                            Cursor="Hand"/>
-				</Grid>
-			</Border>
+                            HorizontalAlignment="Center"/>
+                </Border>
+            </Grid>
+        </Border>
 
-		</Grid>
-
-		<DataGrid Grid.Row="2"
-                  ItemsSource="{Binding DanhSachLop}"
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  IsReadOnly="True"
-                  Background="White"
-                  BorderThickness="0"
-                  HeadersVisibility="Column"
-                  GridLinesVisibility="Horizontal"
-                  HorizontalGridLinesBrush="#E0E0E0">
-
-			<DataGrid.Resources>
-				<Style TargetType="DataGridColumnHeader">
-					<Setter Property="Background" Value="#F0F5FD"/>
-					<Setter Property="Foreground" Value="#333"/>
-					<Setter Property="FontWeight" Value="SemiBold"/>
-					<Setter Property="FontSize" Value="14"/>
-					<Setter Property="Padding" Value="10,12"/>
-					<Setter Property="HorizontalContentAlignment" Value="Left"/>
-					<Setter Property="BorderThickness" Value="0"/>
-				</Style>
-
-				<Style TargetType="DataGridCell">
-					<Setter Property="Padding" Value="10"/>
-					<Setter Property="VerticalAlignment" Value="Center"/>
-					<Setter Property="FontSize" Value="14"/>
-					<Setter Property="BorderThickness" Value="0"/>
-					<Style.Triggers>
-						<Trigger Property="IsSelected" Value="True">
-							<Setter Property="Background" Value="#E6F7FF"/>
-							<Setter Property="Foreground" Value="#333"/>
-						</Trigger>
-					</Style.Triggers>
-				</Style>
-
-				<Style TargetType="DataGridRow">
-					<Setter Property="Background" Value="White"/>
-					<Style.Triggers>
-						<Trigger Property="IsMouseOver" Value="True">
-							<Setter Property="Background" Value="#F9F9F9"/>
-						</Trigger>
-						<Trigger Property="AlternationIndex" Value="1">
-							<Setter Property="Background" Value="#FCFCFC"/>
-						</Trigger>
-					</Style.Triggers>
-				</Style>
-			</DataGrid.Resources>
-
-			<DataGrid.Columns>
-				<DataGridTextColumn Header="MÃ LỚP" Binding="{Binding LopID}" Width="1.5*"/>
-
-				<DataGridTextColumn Header="TÊN LỚP" Binding="{Binding TenLop}" Width="2.5*"/>
-
-				<DataGridTextColumn Header="SĨ SỐ" Binding="{Binding SiSo}" Width="1*">
-					<DataGridTextColumn.ElementStyle>
-						<Style TargetType="TextBlock">
-							<Setter Property="HorizontalAlignment" Value="Center"/>
-						</Style>
-					</DataGridTextColumn.ElementStyle>
-				</DataGridTextColumn>
-
-				<DataGridTextColumn Header="GVCN" Binding="{Binding GVCN.HoTen}" Width="3*"/>
-
-				<DataGridTemplateColumn Header="CHỨC NĂNG" Width="1.2*">
-					<DataGridTemplateColumn.CellTemplate>
-						<DataTemplate>
-							<Button HorizontalAlignment="Center"
-									ToolTip="Xem danh sách học sinh của lớp này"
-									Cursor="Hand"
-									Command="{Binding DataContext.SelectLopCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-									CommandParameter="{Binding}">
-								<Button.ContentTemplate>
-									<DataTemplate>
-										<Path Data="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"
-											Fill="#555"
-											Width="20"
-											Height="20"
-											Stretch="Uniform"/>
-									</DataTemplate>
-								</Button.ContentTemplate>
-								<Button.Style>
-									<Style TargetType="Button">
-										<Setter Property="Background" Value="Transparent"/>
-										<Setter Property="BorderThickness" Value="0"/>
-										<Style.Triggers>
-											<Trigger Property="IsMouseOver" Value="True">
-												<Setter Property="ContentTemplate">
-													<Setter.Value>
-														<DataTemplate>
-															<Path Data="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"
-																Fill="#007ACC"
-																Width="20"
-																Height="20"
-																Stretch="Uniform"/>
-														</DataTemplate>
-													</Setter.Value>
-												</Setter>
-											</Trigger>
-										</Style.Triggers>
-									</Style>
-								</Button.Style>
-							</Button>
-						</DataTemplate>
-					</DataGridTemplateColumn.CellTemplate>
-				</DataGridTemplateColumn>
-			</DataGrid.Columns>
-		</DataGrid>
-	</Grid>
-</UserControl>
+        <!-- Bảng dữ liệu -->
+        <Border Grid.Row="2" Background="White" CornerRadius="15" Padding="10" Margin="10" BorderBrush="#e0e0e0" BorderThickness="1">
+            <DataGrid ItemsSource="{Binding DanhSachHocSinhLop}" 
+                      Style="{StaticResource CommonDataGridStyle}"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      ScrollViewer.CanContentScroll="True"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling"
+                      EnableRowVirtualization="True"
+                      EnableColumnVirtualization="True"
+                      BorderBrush="Transparent"
+                      Background="Transparent">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="STT" 
+                                      Binding="{Binding STT}" 
+                                      Width="70"
+                                      MinWidth="60"
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
+                    <DataGridTextColumn Header="Họ tên" 
+                                      Binding="{Binding HoTen}" 
+                                      Width="*"
+                                      MinWidth="200"
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
+                    <DataGridTextColumn Header="Giới tính" 
+                                      Binding="{Binding GioiTinh}" 
+                                      Width="*"
+                                      MinWidth="100"
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
+                    <DataGridTextColumn Header="Ngày sinh" 
+                                      Binding="{Binding NgaySinh, StringFormat=dd/MM/yyyy}" 
+                                      Width="*"
+                                      MinWidth="120"
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
+                    <DataGridTextColumn Header="Email" 
+                                      Binding="{Binding Email}" 
+                                      Width="*"
+                                      MinWidth="200"
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
+                    <DataGridTextColumn Header="Địa chỉ" 
+                                      Binding="{Binding DiaChi}" 
+                                      Width="2*"
+                                      MinWidth="250"
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
+                    <DataGridTemplateColumn Header="Chức năng" Width="80" MinWidth="80"
+                                          HeaderStyle="{StaticResource CenterHeaderStyle}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding DataContext.SuaHocSinhCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        Width="32" Height="32"
+                                        ToolTip="Sửa thông tin học sinh"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                    <materialDesign:PackIcon Kind="Pencil" 
+                                                           Width="16" 
+                                                           Height="16" 
+                                                           Foreground="#0078D7"/>
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignIconButton}">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#E3F2FD"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</UserControl> 

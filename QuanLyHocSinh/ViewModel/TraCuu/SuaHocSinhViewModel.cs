@@ -1,11 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using QuanLyHocSinh.Model.DAL;
 using QuanLyHocSinh.Model.Entities;
+using MaterialDesignThemes.Wpf;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
 using System.Configuration;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
@@ -81,10 +87,10 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             GioiTinh = hocSinh.GioiTinh;
             NgaySinh = hocSinh.NgaySinh;
             Email = hocSinh.Email;
-            DiaChi = hocSinh.DiaChi;            TenLop = hocSinh.TenLop;
+            DiaChi = hocSinh.DiaChi;            
+            TenLop = hocSinh.TenLop;
             NienKhoa = hocSinh.NienKhoa;
 
-            // Lấy tất cả lớp từ database, không chỉ lớp có học sinh
             DanhSachLop = new ObservableCollection<string>(
                 HocSinhDAL.GetAllLop()
             );
@@ -93,25 +99,27 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             CancelCommand = new RelayCommand(Cancel);
         }
 
-        private void Save()
+        private async void Save()
+        {
+            try
         {
             if (string.IsNullOrWhiteSpace(HoTen) || string.IsNullOrWhiteSpace(GioiTinh) ||
                 string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(DiaChi) ||
                 string.IsNullOrWhiteSpace(TenLop) || NienKhoa <= 0)
             {
-                MessageBox.Show("Vui lòng nhập đầy đủ thông tin!");
+                    await ShowNotificationAsync("Cảnh báo", "⚠️ Vui lòng nhập đầy đủ thông tin!");
                 return;
             }
 
             if (!Email.Contains("@") || (!Email.EndsWith(".com") && !Email.EndsWith(".vn")))
             {
-                MessageBox.Show("Email phải có định dạng @student.com hoặc @student.vn!");
+                    await ShowNotificationAsync("Cảnh báo", "⚠️ Email phải có định dạng @student.com hoặc @student.vn!");
                 return;
             }
 
             if (!Email.Contains("@student."))
             {
-                MessageBox.Show("Email học sinh phải có định dạng @student.com hoặc @student.vn!");
+                    await ShowNotificationAsync("Cảnh báo", "⚠️ Email học sinh phải có định dạng @student.com hoặc @student.vn!");
                 return;
             }
 
@@ -123,15 +131,13 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             _hocSinhGoc.TenLop = TenLop;
             _hocSinhGoc.NienKhoa = NienKhoa;
 
-            try
-            {
                 HocSinhDAL.UpdateHocSinh(_hocSinhGoc);
-                MessageBox.Show("Cập nhật thông tin thành công!");
+                await ShowNotificationAsync("Thành công", "✅ Cập nhật thông tin thành công!");
                 CloseDialog?.Invoke(true);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi cập nhật: {ex.Message}");
+                await ShowNotificationAsync("Lỗi", $"❌ Lỗi khi cập nhật: {ex.Message}");
             }
         }
 
@@ -139,6 +145,20 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         {
             CloseDialog?.Invoke(false);
         }
+
+        private async Task ShowNotificationAsync(string title, string message)
+        {
+            try
+            {
+                await DialogHost.Show(new NotifyDialog(title, message), "RootDialog_Main");
+            }
+            catch
+            {
+                MessageBox.Show(message, title, MessageBoxButton.OK, 
+                    title.Contains("Lỗi") ? MessageBoxImage.Error : MessageBoxImage.Information);
+            }
+        }
+
 
     }
 }

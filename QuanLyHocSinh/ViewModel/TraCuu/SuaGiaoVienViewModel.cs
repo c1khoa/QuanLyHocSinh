@@ -8,6 +8,9 @@ using System.Windows;
 using System.Windows.Input;
 using QuanLyHocSinh.Model.Entities;
 using System.Configuration;
+using MaterialDesignThemes.Wpf;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
+using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
@@ -90,7 +93,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         public ObservableCollection<string> DanhSachGioiTinh { get; } = 
             new ObservableCollection<string>(new[] { "Nam", "Nữ" });
 
-        // Danh sách items cho việc chọn lớp và môn
         public ObservableCollection<LopItem> DanhSachLopItems { get; set; }
         public ObservableCollection<MonHocItem> DanhSachMonItems { get; set; }
 
@@ -111,7 +113,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             Email = giaoVien.Email;
             DiaChi = giaoVien.DiaChi;
 
-            // Khởi tạo danh sách lớp items
             var tatCaLop = GiaoVienDAL.GetAllLop();
             var lopDaDuocChon = new List<string>();
             
@@ -131,7 +132,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                 });
             }
 
-            // Khởi tạo danh sách môn học items
             InitializeMonHocItemsAsync(giaoVien.BoMon);
 
             SaveCommandGV = new RelayCommand(Save);
@@ -164,12 +164,12 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi khởi tạo danh sách môn học: {ex.Message}");
+                await ShowNotificationAsync("Lỗi", $"❌ Lỗi khi khởi tạo danh sách môn học: {ex.Message}");
                 DanhSachMonItems = new ObservableCollection<MonHocItem>();
             }
         }
         
-        private async System.Threading.Tasks.Task<List<string>> GetAllMonHocAsync()
+        private async Task<List<string>> GetAllMonHocAsync()
         {
             try
             {
@@ -179,60 +179,55 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi tải danh sách môn học: {ex.Message}");
+                await ShowNotificationAsync("Lỗi", $"❌ Lỗi khi tải danh sách môn học: {ex.Message}");
                 return new List<string>();
             }
         }
 
-        private void Save()
+        private async void Save()
+        {
+            try
         {
             if (string.IsNullOrWhiteSpace(HoTen) || string.IsNullOrWhiteSpace(GioiTinh) ||
                 string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(DiaChi))
             {
-                MessageBox.Show("Vui lòng nhập đầy đủ thông tin cơ bản!");
+                    await ShowNotificationAsync("Cảnh báo", "⚠️ Vui lòng nhập đầy đủ thông tin cơ bản!");
                 return;
             }
 
             if (!Email.Contains("@") || (!Email.EndsWith(".com") && !Email.EndsWith(".vn")))
             {
-                MessageBox.Show("Email phải có định dạng @teacher.com hoặc @teacher.vn!");
+                    await ShowNotificationAsync("Cảnh báo", "⚠️ Email phải có định dạng @teacher.com hoặc @teacher.vn!");
                 return;
             }
 
             if (!Email.Contains("@teacher."))
             {
-                MessageBox.Show("Email giáo viên phải có định dạng @teacher.com hoặc @teacher.vn!");
+                    await ShowNotificationAsync("Cảnh báo", "⚠️ Email giáo viên phải có định dạng @teacher.com hoặc @teacher.vn!");
                 return;
             }
 
-            // Cập nhật thông tin cá nhân
             _giaoVienGoc.HoTen = HoTen;
             _giaoVienGoc.GioiTinh = GioiTinh;
             _giaoVienGoc.NgaySinh = NgaySinh;
             _giaoVienGoc.Email = Email;
             _giaoVienGoc.DiaChi = DiaChi;
 
-            try
-            {
-                // Cập nhật thông tin cá nhân
                 GiaoVienDAL.UpdateGiaoVien(_giaoVienGoc);
                 
-                // Cập nhật phân công dạy (lớp và môn)
                 var lopDuocChon = DanhSachLopItems.Where(l => l.IsSelected).Select(l => l.TenLop).ToList();
                 var monDuocChon = DanhSachMonItems.Where(m => m.IsSelected).Select(m => m.TenMonHoc).ToList();
                 
                 GiaoVienDAL.UpdatePhanCongDay(_giaoVienGoc.MaGV, lopDuocChon, monDuocChon);
                 
-                MessageBox.Show("Cập nhật thông tin thành công!");
+                await ShowNotificationAsync("Thành công", "✅ Cập nhật thông tin thành công!");
                 CloseDialog?.Invoke(true);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi cập nhật: {ex.Message}");
+                await ShowNotificationAsync("Lỗi", $"❌ Lỗi khi cập nhật: {ex.Message}");
             }
         }
-
-
 
         private void Cancel()
         {
@@ -243,6 +238,19 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private async Task ShowNotificationAsync(string title, string message)
+        {
+            try
+            {
+                await DialogHost.Show(new NotifyDialog(title, message), "RootDialog_Main");
+            }
+            catch
+            {
+                MessageBox.Show(message, title, MessageBoxButton.OK, 
+                    title.Contains("Lỗi") ? MessageBoxImage.Error : MessageBoxImage.Information);
+            }
         }
     }
 }

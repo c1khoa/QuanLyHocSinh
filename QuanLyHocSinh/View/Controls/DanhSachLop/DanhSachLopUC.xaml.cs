@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using QuanLyHocSinh.ViewModel.DanhSachLop;
+using QuanLyHocSinh.ViewModel;
 
 namespace QuanLyHocSinh.View.Controls.DanhSachLop
 {
@@ -24,5 +26,10 @@ namespace QuanLyHocSinh.View.Controls.DanhSachLop
         {
             InitializeComponent();
         }
+        public DanhSachLopUC(MainViewModel mainVM)
+        {
+            InitializeComponent();
+            DataContext = new DanhSachLopViewModel(mainVM);
+        }
     }
-}
+} 

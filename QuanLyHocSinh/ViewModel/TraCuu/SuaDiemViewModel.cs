@@ -8,6 +8,9 @@ using System.Windows.Input;
 using QuanLyHocSinh.Model.Entities;
 using MySql.Data.MySqlClient;
 using System.Configuration;
+using MaterialDesignThemes.Wpf;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
+using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
@@ -130,8 +133,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
 
         public ObservableCollection<string> DanhSachNamHoc { get; } =
             new ObservableCollection<string>(DiemDAL.GetAllNamHoc());
-        //public ObservableCollection<int> DanhSachHocKy { get; } =
-        //    new ObservableCollection<int>(DiemDAL.GetAllHocKy());
 
         public ICommand SaveCommandDiem { get; }
         public ICommand CancelCommandDiem { get; }
@@ -140,7 +141,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
 
         private readonly Diem _diemGoc;
         
-        //Phần sửa điểm này dù không báo lỗi nhưng mà điểm không sửa được, tui sẽ tìm cách sau.
         public SuaDiemViewModel(Diem diem)
         {
             _diemGoc = diem;
@@ -160,7 +160,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             CancelCommandDiem = new RelayCommand(Cancel);
         }
 
-        private void TinhDiemTrungBinh()
+        private async void TinhDiemTrungBinh()
         {
             try
             {
@@ -220,26 +220,26 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi tính điểm trung bình: {ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                await ShowNotificationAsync("Lỗi", $"❌ Lỗi khi tính điểm trung bình: {ex.Message}");
             }
         }
 
-        private bool ValidateDiem()
+        private async Task<bool> ValidateDiem()
         {
             if ((DiemMieng.HasValue && (DiemMieng < 0 || DiemMieng > 10)) ||
                 (Diem15p.HasValue && (Diem15p < 0 || Diem15p > 10)) ||
                 (Diem1Tiet.HasValue && (Diem1Tiet < 0 || Diem1Tiet > 10)) ||
                 (DiemThi.HasValue && (DiemThi < 0 || DiemThi > 10)))
             {
-                MessageBox.Show("Điểm phải nằm trong khoảng từ 0 đến 10 hoặc để trống!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                            await ShowNotificationAsync("Lỗi", "⚠️ Điểm phải nằm trong khoảng từ 0 đến 10 hoặc để trống!");
                 return false;
             }
             return true;
         }
 
-        private void Save()
+        private async void Save()
         {
-            if (!ValidateDiem())
+            if (!await ValidateDiem())
                 return;
 
             try
@@ -257,18 +257,31 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                 _diemGoc.DiemTB = DiemTB;
 
                 DiemDAL.UpdateDiem(_diemGoc);
-                MessageBox.Show("Cập nhật điểm thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                await ShowNotificationAsync("Thông báo", "✅ Cập nhật điểm thành công!");
                 CloseDialog?.Invoke(true);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi cập nhật điểm: {ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                await ShowNotificationAsync("Lỗi", $"❌ Lỗi khi cập nhật điểm: {ex.Message}");
             }
         }
 
         private void Cancel()
         {
             CloseDialog?.Invoke(false);
+        }
+
+        private async Task ShowNotificationAsync(string title, string message)
+        {
+            try
+            {
+                await DialogHost.Show(new NotifyDialog(title, message), "RootDialog_Main");
+            }
+            catch
+            {
+                MessageBox.Show(message, title, MessageBoxButton.OK, 
+                    title.Contains("Lỗi") ? MessageBoxImage.Error : MessageBoxImage.Information);
+            }
         }
     }
 }

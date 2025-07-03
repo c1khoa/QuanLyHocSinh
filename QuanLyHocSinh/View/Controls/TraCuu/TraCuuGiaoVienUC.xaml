@@ -72,21 +72,213 @@
                 </StackPanel>
                 
                 <StackPanel Grid.Column="2" Margin="10" VerticalAlignment="Center">
-                    <TextBlock Text="Lớp" FontSize="13"/>
-                    <ComboBox materialDesign:HintAssist.Hint="Lớp"
-                              IsEditable="False"
-                              FontSize="13"
-                              ItemsSource="{Binding DanhSachLop}"
-                              SelectedItem="{Binding SelectedLop, Mode=TwoWay}"/>
+                    <TextBlock Text="Bộ môn" FontSize="13"/>
+                    <Grid>
+                        <!-- Custom dropdown button with Material Design style -->
+                        <Button Name="BoMonDropdownButton"
+                                Background="White"
+                                BorderBrush="#D4C5A9"
+                                BorderThickness="1"
+                                Padding="12,8"
+                                FontSize="13"
+                                HorizontalContentAlignment="Left"
+                                VerticalContentAlignment="Center"
+                                Height="32"
+                                Click="BoMonDropdownButton_Click"
+                                materialDesign:ButtonAssist.CornerRadius="4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- Display text -->
+                                <TextBlock Grid.Column="0" 
+                                           Text="{Binding SelectedBoMonsText, FallbackValue='Tất cả'}"
+                                           VerticalAlignment="Center"
+                                           Foreground="#333"
+                                           TextTrimming="CharacterEllipsis"/>
+                                
+                                <!-- Dropdown arrow -->
+                                <materialDesign:PackIcon Grid.Column="1" 
+                                                         Kind="ChevronDown" 
+                                                         VerticalAlignment="Center"
+                                                         Width="16" Height="16"
+                                                         Foreground="#666"
+                                                         Margin="4,0,0,0"/>
+                            </Grid>
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                                    <Setter Property="BorderBrush" Value="#D4C5A9"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                    <Setter Property="Background" Value="White"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#FFF8E1"/>
+                                            <Setter Property="BorderBrush" Value="#C8B568"/>
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter Property="Background" Value="#F9F4E6"/>
+                                            <Setter Property="BorderBrush" Value="#B8A558"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        
+                        <!-- Popup -->
+                        <Popup Name="BoMonPopup"
+                               IsOpen="False"
+                               PlacementTarget="{Binding ElementName=BoMonDropdownButton}"
+                               Placement="Bottom"
+                               StaysOpen="True"
+                               AllowsTransparency="True"
+                               MinWidth="{Binding ActualWidth, ElementName=BoMonDropdownButton}">
+                            <Border Background="White" 
+                                    BorderBrush="#D4C5A9" 
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    MaxHeight="200"
+                                    Effect="{StaticResource MaterialDesignShadowDepth1}">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                              HorizontalScrollBarVisibility="Disabled">
+                                    <ItemsControl ItemsSource="{Binding DanhSachBoMonCheckbox}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="Transparent" 
+                                                        Padding="12,6"
+                                                        Margin="0">
+                                                    <CheckBox Content="{Binding TenBoMon}" 
+                                                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                              FontSize="12"
+                                                              Margin="0"
+                                                              Padding="4,0"
+                                                              HorizontalAlignment="Stretch"
+                                                              VerticalAlignment="Center"
+                                                              Click="BoMonCheckBox_Click"
+                                                              Style="{StaticResource MaterialDesignCheckBox}"/>
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Style.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Background" Value="#FFF8E1"/>
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
                 </StackPanel>
                 
                 <StackPanel Grid.Column="3" Margin="10" VerticalAlignment="Center">
-                    <TextBlock Text="Bộ môn" FontSize="13"/>
-                    <ComboBox materialDesign:HintAssist.Hint="Bộ môn"
-                              IsEditable="False"
-                              FontSize="13"
-                              ItemsSource="{Binding DanhSachBoMon}"
-                              SelectedItem="{Binding SelectedBoMon, Mode=TwoWay}"/>
+                    <TextBlock Text="Lớp" FontSize="13"/>
+                    <Grid>
+                        <!-- Custom dropdown button with Material Design style -->
+                        <Button Name="LopDropdownButton"
+                                Background="White"
+                                BorderBrush="#D4C5A9"
+                                BorderThickness="1"
+                                Padding="12,8"
+                                FontSize="13"
+                                HorizontalContentAlignment="Left"
+                                VerticalContentAlignment="Center"
+                                Height="32"
+                                Click="LopDropdownButton_Click"
+                                materialDesign:ButtonAssist.CornerRadius="4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- Display text -->
+                                <TextBlock Grid.Column="0" 
+                                           Text="{Binding SelectedLopsText, FallbackValue='Tất cả'}"
+                                           VerticalAlignment="Center"
+                                           Foreground="#333"
+                                           TextTrimming="CharacterEllipsis"/>
+                                
+                                <!-- Dropdown arrow -->
+                                <materialDesign:PackIcon Grid.Column="1" 
+                                                         Kind="ChevronDown" 
+                                                         VerticalAlignment="Center"
+                                                         Width="16" Height="16"
+                                                         Foreground="#666"
+                                                         Margin="4,0,0,0"/>
+                            </Grid>
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                                    <Setter Property="BorderBrush" Value="#D4C5A9"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                    <Setter Property="Background" Value="White"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#FFF8E1"/>
+                                            <Setter Property="BorderBrush" Value="#C8B568"/>
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter Property="Background" Value="#F9F4E6"/>
+                                            <Setter Property="BorderBrush" Value="#B8A558"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        
+                        <!-- Popup -->
+                        <Popup Name="LopPopup"
+                               IsOpen="False"
+                               PlacementTarget="{Binding ElementName=LopDropdownButton}"
+                               Placement="Bottom"
+                               StaysOpen="True"
+                               AllowsTransparency="True"
+                               MinWidth="{Binding ActualWidth, ElementName=LopDropdownButton}">
+                            <Border Background="White" 
+                                    BorderBrush="#D4C5A9" 
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    MaxHeight="200"
+                                    Effect="{StaticResource MaterialDesignShadowDepth1}">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                              HorizontalScrollBarVisibility="Disabled">
+                                    <ItemsControl ItemsSource="{Binding DanhSachLopCheckbox}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="Transparent" 
+                                                        Padding="12,6"
+                                                        Margin="0">
+                                                    <CheckBox Content="{Binding TenLop}" 
+                                                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                              FontSize="12"
+                                                              Margin="0"
+                                                              Padding="4,0"
+                                                              HorizontalAlignment="Stretch"
+                                                              VerticalAlignment="Center"
+                                                              Click="LopCheckBox_Click"
+                                                              Style="{StaticResource MaterialDesignCheckBox}"/>
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Style.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Background" Value="#FFF8E1"/>
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
                 </StackPanel>
             </Grid>
                  </Border>
@@ -113,40 +305,52 @@
                                       Binding="{Binding MaGV}" 
                                       Width="100"
                                       MinWidth="100"
-                                      ElementStyle="{StaticResource CenterAlignStyle}"/>
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
                     <DataGridTextColumn Header="Họ và Tên" 
                                       Binding="{Binding HoTen}" 
                                       Width="*"
-                                      MinWidth="150"/>
+                                      MinWidth="150"
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
                     <DataGridTextColumn Header="Ngày sinh" 
                                       Binding="{Binding NgaySinh, StringFormat=dd/MM/yyyy}" 
                                       Width="100"
                                       MinWidth="100"
-                                      ElementStyle="{StaticResource CenterAlignStyle}"/>
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
                     <DataGridTextColumn Header="Giới tính" 
                                       Binding="{Binding GioiTinh}" 
                                       Width="80"
                                       MinWidth="80"
-                                      ElementStyle="{StaticResource CenterAlignStyle}"/>
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
                     <DataGridTextColumn Header="Email" 
                                       Binding="{Binding Email}" 
                                       Width="*"
-                                      MinWidth="160"/>
+                                      MinWidth="160"
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
                     <DataGridTextColumn Header="Địa chỉ" 
                                       Binding="{Binding DiaChi}" 
                                       Width="*"
-                                      MinWidth="120"/>
+                                      MinWidth="120"
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
                     <DataGridTextColumn Header="Lớp dạy" 
                                       Binding="{Binding LopDayID}" 
                                       Width="160"
                                       MinWidth="160"
-                                      ElementStyle="{StaticResource CenterAlignStyle}"/>
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
                     <DataGridTextColumn Header="Bộ môn" 
                                       Binding="{Binding BoMon}" 
                                       Width="*"
                                       MinWidth="100"
-                                      ElementStyle="{StaticResource CenterAlignStyle}"/>
-                    <DataGridTemplateColumn Header="Chức năng" Width="80" MinWidth="80">
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
+                    <DataGridTemplateColumn Header="Chức năng" Width="80" MinWidth="80"
+                                          HeaderStyle="{StaticResource CenterHeaderStyle}">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button Style="{StaticResource MaterialDesignFlatButton}"

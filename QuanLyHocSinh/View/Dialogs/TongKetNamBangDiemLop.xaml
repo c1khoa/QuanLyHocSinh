@@ -20,7 +20,6 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="BẢNG ĐIỂM LỚP" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,16"/>
-            <!-- Thông tin lớp -->
             <Border Grid.Row="1" Background="#e8f5e8" CornerRadius="15" Padding="15" Margin="0,0,0,16">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock Text="Lớp: " FontWeight="Bold" FontSize="18" VerticalAlignment="Center"/>
@@ -41,7 +40,6 @@
                     </Border>
                 </StackPanel>
             </Border>
-            <!-- Bảng điểm lớp -->
             <Border Grid.Row="2" Background="White" CornerRadius="15" Padding="10" Margin="0,0,0,16" BorderBrush="#e0e0e0" BorderThickness="1">
                 <DataGrid ItemsSource="{Binding BangDiemLop}" 
                           AutoGenerateColumns="False" 
@@ -75,13 +73,11 @@
                     <DataGridTextColumn Header="STT" Binding="{Binding STT}" Width="50" ElementStyle="{StaticResource {x:Type TextBlock}}"/>
                     <DataGridTextColumn Header="Mã HS" Binding="{Binding HocSinhID}" Width="80" ElementStyle="{StaticResource {x:Type TextBlock}}"/>
                     <DataGridTextColumn Header="Họ tên" Binding="{Binding HoTen}" Width="*" ElementStyle="{StaticResource {x:Type TextBlock}}"/>
-                    <!-- Các cột môn học sẽ được binding động từ ViewModel (AutoGenerateColumns=False, nhưng sẽ thêm bằng code) -->
                     <DataGridTextColumn Header="Điểm TB học kỳ" Binding="{Binding DiemTrungBinh, StringFormat=F2}" Width="*" ElementStyle="{StaticResource {x:Type TextBlock}}"/>
                     <DataGridTextColumn Header="Xếp loại học kỳ" Binding="{Binding XepLoai}" Width="*" ElementStyle="{StaticResource {x:Type TextBlock}}"/>
                 </DataGrid.Columns>
                 </DataGrid>
             </Border>
-            <!-- Thống kê tổng quát dưới bảng điểm lớp -->
             <StackPanel Grid.Row="3" Orientation="Vertical" Margin="10,0,10,10">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
                     <TextBlock Text="Điểm trung bình của lớp: " FontWeight="Bold" FontSize="16"/>
@@ -101,9 +97,18 @@
                 </StackPanel>
                 <TextBlock Text="Điểm trung bình từng môn:" FontWeight="Bold" Margin="0,8,0,0" FontSize="16" HorizontalAlignment="Center"/>
                 <DataGrid ItemsSource="{Binding DiemTrungBinhTungMon}" AutoGenerateColumns="False" HeadersVisibility="Column" CanUserAddRows="False" Margin="0,0,0,8" Height="120">
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        </Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGrid.Resources>
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Môn học" Binding="{Binding MonHoc}" Width="*"/>
-                        <DataGridTextColumn Header="Điểm TB" Binding="{Binding DiemTB, StringFormat={}{0:F2}}" Width="*"/>
+                        <DataGridTextColumn Header="Môn học" Binding="{Binding MonHoc}" Width="*" ElementStyle="{StaticResource {x:Type TextBlock}}"/>
+                        <DataGridTextColumn Header="Điểm TB" Binding="{Binding DiemTB, StringFormat={}{0:F2}}" Width="*" ElementStyle="{StaticResource {x:Type TextBlock}}"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </StackPanel>

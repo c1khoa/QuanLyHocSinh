@@ -13,6 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.ViewModel.BaoCao;
+using MaterialDesignThemes.Wpf;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
 
 namespace QuanLyHocSinh.View.Controls.BaoCao
 {
@@ -23,12 +26,50 @@ namespace QuanLyHocSinh.View.Controls.BaoCao
             InitializeComponent();
         }
 
-        private void XemChiTiet_Click(object sender, RoutedEventArgs e)
+        private async void ChiTietButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.DataContext is TongKetMonItem item)
+            try
+        {
+                if (sender is Button button && button.CommandParameter is TongKetLopItem lopItem)
             {
-                var dialog = new QuanLyHocSinh.View.Dialogs.TongKetMonDetailDialog(item);
+                    var mainViewModel = this.DataContext as TongKetMonViewModel;
+                    if (mainViewModel == null)
+                    {
+                        await ShowNotificationAsync("❌ Lỗi: Không thể truy cập thông tin chính.");
+                        return;
+                    }
+
+                    if (mainViewModel.SelectedMonHoc == "Tất cả")
+                    {
+                        await ShowNotificationAsync("⚠️ Vui lòng chọn môn học cụ thể để xem chi tiết.");
+                        return;
+                    }
+
+                    var dialog = new View.Dialogs.TongKetMonDetailDialog();
+                    dialog.DataContext = new TongKetMonDetailDialogViewModel(
+                        lopItem.TenLop, 
+                        mainViewModel.SelectedMonHoc, 
+                        mainViewModel.SelectedHocKy == "Tất cả" ? null : (int?)int.Parse(mainViewModel.SelectedHocKy),
+                        lopItem.NamHoc
+                    );
                 dialog.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowNotificationAsync($"❌ Lỗi khi mở chi tiết: {ex.Message}");
+            }
+        }
+
+        private async Task ShowNotificationAsync(string message)
+        {
+            try
+            {
+                await DialogHost.Show(new NotifyDialog("Lỗi", message), "RootDialog_Main");
+            }
+            catch
+            {
+                MessageBox.Show(message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
