@@ -2,6 +2,9 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup />
   <ItemGroup>
+    <Compile Update="View\Controls\DanhSachLop\DanhSachLopUC.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="View\Controls\QuanLyTaiKhoan\QuanLyTaiKhoanCaNhanUC.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -14,7 +17,16 @@
     <Compile Update="View\Controls\QuyDinh\QuyDinhSuaUC.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="View\Dialogs\DiemDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="View\Dialogs\DoiMatKhauDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="View\Dialogs\MessageBox\ConfirmDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="View\Dialogs\MessageBox\ErrorDialog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="View\Dialogs\MessageBox\NotifyDialog.xaml.cs">

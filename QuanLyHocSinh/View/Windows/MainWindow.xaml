@@ -11,7 +11,8 @@
        Height="600"
        
        xmlns:uc="clr-namespace:QuanLyHocSinh.View.Controls"
-       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:viewmodel="clr-namespace:QuanLyHocSinh.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
+       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+       xmlns:viewmodel="clr-namespace:QuanLyHocSinh.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
        TextElement.FontWeight="Regular"
        TextElement.FontSize="20"
@@ -174,6 +175,23 @@
                                 <materialDesign:PackIcon Kind="Account" 
                                                          VerticalAlignment="Stretch"/>
                                 <TextBlock Text="Tài khoản cá nhân" 
+                                           Margin="10 0 0 0" 
+                                           FontWeight="Regular"
+                                           FontSize="20"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding ShowDanhSachLopCommand}"
+                            Style="{StaticResource MenuButtonStyle}">
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.Click">
+                                    <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                </EventTrigger>
+                            </Button.Triggers>
+                            <StackPanel Orientation="Horizontal" 
+                                        Margin="15,0,0,0">
+                                <materialDesign:PackIcon Kind="DoorOpen"
+                                                         VerticalAlignment="Stretch"/>
+                                <TextBlock Text="Danh sách lớp" 
                                            Margin="10 0 0 0" 
                                            FontWeight="Regular"
                                            FontSize="20"/>

@@ -3,9 +3,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using MaterialDesignThemes.Wpf;
 using QuanLyHocSinh.Model.Entities;
 using QuanLyHocSinh.Service;
 using QuanLyHocSinh.View.Dialogs;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
 
 namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 {
@@ -240,33 +242,57 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             dialog.ShowDialog();
         }
 
-        private void XoaTaiKhoan(User user)
+        private async void XoaTaiKhoan(User user)
         {
             if (user == null)
             {
-                MessageBox.Show("Không tìm thấy tài khoản để xóa");
+                await DialogHost.Show(new ErrorDialog
+                {
+                    Title = "Lỗi",
+                    Message = "Không tìm thấy tài khoản để xóa."
+                }, "RootDialog_Account");
                 return;
             }
 
             if (_mainVM.CurrentUser?.UserID == user.UserID)
             {
-                MessageBox.Show("Không thể xóa tài khoản đang đăng nhập!");
+                await DialogHost.Show(new ErrorDialog
+                {
+                    Title = "Cảnh báo",
+                    Message = "Không thể xóa tài khoản đang đăng nhập!"
+                }, "RootDialog_Account");
                 return;
             }
 
             bool hasRel = UserService.HasRelatedStudents(user.UserID);
             string msg = hasRel
-                ? "Tài khoản này có dữ liệu liên quan (điểm, hồ sơ ...).\nBạn có chắc muốn xóa tất cả?"
-                : $"Bạn chắc muốn xóa tài khoản \"{user.TenDangNhap}\"?";
+                ? "⚠️ Tài khoản này có dữ liệu liên quan (điểm, hồ sơ ...).\nBạn có chắc muốn xóa tất cả không?"
+                : $"❓ Bạn chắc muốn xóa tài khoản \"{user.TenDangNhap}\"?";
 
-            if (MessageBox.Show(msg, "Xác nhận", MessageBoxButton.YesNo,
-                hasRel ? MessageBoxImage.Warning : MessageBoxImage.Question) != MessageBoxResult.Yes)
+            var confirm = await DialogHost.Show(new ConfirmDialog(msg), "RootDialog_Account");
+            if (confirm?.ToString() != "True") return;
+
+            string error = UserService.XoaTaiKhoanVaLienQuan(user.UserID);
+            if (!string.IsNullOrEmpty(error))
+            {
+                await DialogHost.Show(new ErrorDialog
+                {
+                    Title = "Lỗi",
+                    Message = error
+                }, "RootDialog_Account");
                 return;
+            }
 
-            UserService.XoaTaiKhoanVaLienQuan(user.UserID);
             Users.Remove(user);
             LoadDanhSachTaiKhoan();
+            await DialogHost.Show(new NotifyDialog
+            {
+                Title = "Thành công",
+                Message = "Đã xóa tài khoản!!"
+            }, "RootDialog_Account");
         }
+
+
         #endregion
     }
 }

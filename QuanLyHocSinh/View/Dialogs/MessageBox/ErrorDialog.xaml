@@ -1,18 +1,19 @@
-﻿<UserControl x:Class="QuanLyHocSinh.View.Dialogs.MessageBox.ConfirmDialog"
+﻿<UserControl x:Class="QuanLyHocSinh.View.Dialogs.MessageBox.ErrorDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             Background="#03a9f4"
-             d:DesignHeight="250" d:DesignWidth="500">
+             Background="#EF9A9A"
+             d:DesignHeight="200" d:DesignWidth="400">
+
     <Control.Resources>
         <Style x:Key="RoundedOuterBorder" TargetType="Border">
             <Setter Property="BorderBrush" Value="White"/>
             <Setter Property="BorderThickness" Value="2"/>
             <Setter Property="CornerRadius" Value="30"/>
-            <Setter Property="Background" Value="#D0F0FD"/>
+            <Setter Property="Background" Value="#F8D7DA"/>
             <Setter Property="Margin" Value="20"/>
         </Style>
         <Style x:Key="ImageBorderStyle" TargetType="Border">
@@ -21,7 +22,7 @@
             <Setter Property="CornerRadius" Value="30"/>
             <Setter Property="Background" Value="#03a9f4"/>
             <Setter Property="Padding" Value="10"/>
-            <Setter Property="Margin" Value="20 80 20 80"/>
+            <Setter Property="Margin" Value="20 40 20 40"/>
         </Style>
     </Control.Resources>
 
@@ -33,47 +34,33 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Icon & tiêu đề -->
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0 10 0 10" HorizontalAlignment="Center">
-                <TextBlock Text="❓" FontSize="28" Margin="0 0 10 0"/>
-                <TextBlock Text="Xác nhận" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
+            <!-- Tiêu đề -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10" HorizontalAlignment="Center">
+                <TextBlock Text="❌" FontSize="26" Margin="0 0 10 0" Foreground="Red"/>
+                <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           x:Name="TitleTextBlock" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
             </StackPanel>
 
             <!-- Nội dung -->
-            <TextBlock Grid.Row="1"
-                       Text="{Binding Message}"
+            <TextBlock x:Name="MessageTextBlock"
+                       Text="{Binding Message, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       Grid.Row="1"
                        FontSize="16"
                        TextWrapping="Wrap"
                        TextAlignment="Center"
-                       Margin="20"
+                       Margin="20 0 20 0"
                        HorizontalAlignment="Stretch"
                        VerticalAlignment="Top"
-                       MaxWidth="440"/>
+                       MaxWidth="360"/>
 
             <!-- Nút hành động -->
-            <Grid Grid.Row="2" Margin="0,10,0,20">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <Border Grid.Column="0" Style="{StaticResource ImageBorderStyle}" Background="#90CAF9" Margin="30,0,30,0">
-                    <Button Content="Đồng ý"
-                            Margin="-10"
+            <Grid Grid.Row="2" Margin="0">
+                <Border HorizontalAlignment="Center"
+                        Style="{StaticResource ImageBorderStyle}" Background="#EF9A9A" Margin="0">
+                    <Button Content="OK"
                             Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                            CommandParameter="True"
+                            CommandParameter="OK"
                             Style="{StaticResource MaterialDesignRaisedLightButton}"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            FontWeight="Bold"/>
-                </Border>
-
-                <Border Grid.Column="1" Style="{StaticResource ImageBorderStyle}" Background="#EF9A9A" Margin="30,0,30,0">
-                    <Button Content="Hủy"
-                            Margin="-10"
-                            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                            CommandParameter="False"
-                            Style="{StaticResource MaterialDesignRaisedLightButton}" 
                             Background="Transparent"
                             BorderBrush="Transparent"
                             FontWeight="Bold"/>

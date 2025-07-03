@@ -10,26 +10,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using QuanLyHocSinh.ViewModel.DanhSachLop;
-using QuanLyHocSinh.ViewModel;
 
-namespace QuanLyHocSinh.View.Controls.DanhSachLop
+namespace QuanLyHocSinh.View.Dialogs
 {
     /// <summary>
-    /// Interaction logic for DanhSachLopUC.xaml
+    /// Interaction logic for DoiMatKhauDialog.xaml
     /// </summary>
-    public partial class DanhSachLopUC : UserControl
+    public partial class DoiMatKhauDialog : Window
     {
-        public DanhSachLopUC()
+        public DoiMatKhauDialog()
         {
             InitializeComponent();
-        }
-        public DanhSachLopUC(MainViewModel mainVM)
-        {
-            InitializeComponent();
-            DataContext = new DanhSachLopViewModel(mainVM);
         }
     }
-} 
+}

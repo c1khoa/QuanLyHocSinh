@@ -10,6 +10,7 @@ namespace QuanLyHocSinh.View.Dialogs.MessageBox
 
         public static readonly DependencyProperty MessageProperty =
             DependencyProperty.Register("Message", typeof(string), typeof(NotifyDialog), new PropertyMetadata(string.Empty));
+        private string v;
 
         public string Title
         {
@@ -32,6 +33,11 @@ namespace QuanLyHocSinh.View.Dialogs.MessageBox
         {
             Title = title;
             Message = message;
+        }
+
+        public NotifyDialog(string v)
+        {
+            this.v = v;
         }
     }
 }

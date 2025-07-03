@@ -11,12 +11,14 @@ namespace QuanLyHocSinh;
 /// </summary>  
 /// using System;
 using System.Configuration;
+using MaterialDesignThemes.Wpf;
 using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
 
 public class TestConnection
 {
-    public static void RunTest()
+    public async static void RunTest()
     {
         string connStr = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
         using (MySqlConnection conn = new MySqlConnection(connStr))
@@ -27,7 +29,7 @@ public class TestConnection
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Kết nối MySQL thất bại, vui lòng kiểm tra lại!!");
+                Console.WriteLine($"Lỗi kết nối MySQL: {ex.Message}");
             }
         }
     }

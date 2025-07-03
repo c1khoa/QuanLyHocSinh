@@ -75,6 +75,10 @@
             </Style.Triggers>
         </Style>
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="Enter"
+                Command="{Binding LoginCommand}" />
+    </Window.InputBindings>
     <materialDesign:DialogHost Identifier="RootDialog_Login">
         <Grid>
         <Grid.ColumnDefinitions>
@@ -128,20 +132,20 @@
 
                                 <!-- PasswordBox -->
                                 <PasswordBox x:Name="passwordBox"
-                                 Grid.Column="0" 
-                                 Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
-                                 materialDesign:HintAssist.Hint="Mật khẩu"
-                                 helpers:PasswordHelper.BindPassword="True"
-                                 helpers:PasswordHelper.BoundPassword="{Binding Password, Mode=TwoWay}"
-                                 Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter},ConverterParameter=True}" />
+                                             Grid.Column="0" 
+                                             Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
+                                             materialDesign:HintAssist.Hint="Mật khẩu"
+                                             helpers:PasswordHelper.BindPassword="True"
+                                             helpers:PasswordHelper.BoundPassword="{Binding Password, Mode=TwoWay}"
+                                             Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter},ConverterParameter=True}" />
 
                                 <!-- TextBox để hiện mật khẩu -->
                                 <TextBox x:Name="plainTextPasswordBox"
-                             Grid.Column="0" 
-                             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                             materialDesign:HintAssist.Hint="Mật khẩu"
-                             Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}"
-                             Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                         Grid.Column="0" 
+                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                         materialDesign:HintAssist.Hint="Mật khẩu"
+                                         Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}"
+                                         Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                                 <!-- ToggleButton hiện/ẩn -->
                                 <ToggleButton Grid.Column="1" 

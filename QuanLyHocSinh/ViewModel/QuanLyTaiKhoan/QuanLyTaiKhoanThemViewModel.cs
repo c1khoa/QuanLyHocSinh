@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -25,10 +26,10 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
         private string _vaiTroID = string.Empty;
         private string _maHoSo;
         private string _maHoSoCaNhan;
-        private string _lopDayID1 = string.Empty;
-        private string _lopDayID2 = string.Empty;
-        private string _lopDayID3 = string.Empty;
-        private string _lopDayIDCN = string.Empty;
+        private string _lopDayID1;
+        private string _lopDayID2;
+        private string _lopDayID3;
+        private string _lopDayIDCN;
         private string _gioiTinh;
         private string _boMon = string.Empty;
         private string _selectedTenChucVu;
@@ -96,22 +97,6 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             get => _email;
             set { _email = value; OnPropertyChanged(); }
         }
-        public string LopDayID1
-        {
-            get => _lopDayID1;
-            set { _lopDayID1 = value; OnPropertyChanged(); }
-        }
-        public string LopDayID2
-        {
-            get => _lopDayID2;
-            set { _lopDayID2 = value; OnPropertyChanged(); }
-        }
-        public string LopDayID3
-        {
-            get => _lopDayID3;
-            set { _lopDayID3 = value; OnPropertyChanged(); }
-        }
-
         public string BoMonID
         {
             get => _boMon;
@@ -124,6 +109,90 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                 }
             }
         }
+
+        private ObservableCollection<Lop> _danhSachLop1;
+        public ObservableCollection<Lop> DanhSachLop1
+        {
+            get => _danhSachLop1;
+            set
+            {
+                _danhSachLop1 = value;
+                OnPropertyChanged();
+            }
+        }
+        private ObservableCollection<Lop> _danhSachLop2;
+        public ObservableCollection<Lop> DanhSachLop2
+        {
+            get => _danhSachLop2;
+            set
+            {
+                _danhSachLop2 = value;
+                OnPropertyChanged();
+            }
+        }
+        private ObservableCollection<Lop> _danhSachLop3;
+        public ObservableCollection<Lop> DanhSachLop3
+        {
+            get => _danhSachLop3;
+            set
+            {
+                _danhSachLop3 = value;
+                OnPropertyChanged();
+            }
+        }
+        private ObservableCollection<Lop> _danhSachLopCN;
+        public ObservableCollection<Lop> DanhSachLopCN
+        {
+            get => _danhSachLopCN;
+            set
+            {
+                _danhSachLopCN = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string LopDayID1
+        {
+            get => _lopDayID1;
+            set
+            {
+                if (_lopDayID1 != value)
+                {
+                    _lopDayID1 = value;
+                    OnPropertyChanged();
+                    CapNhatDanhSachLop();
+                }
+            }
+        }
+
+        public string LopDayID2
+        {
+            get => _lopDayID2;
+            set
+            {
+                if (_lopDayID2 != value)
+                {
+                    _lopDayID2 = value;
+                    OnPropertyChanged();
+                    CapNhatDanhSachLop();
+                }
+            }
+        }
+
+        public string LopDayID3
+        {
+            get => _lopDayID3;
+            set
+            {
+                if (_lopDayID3 != value)
+                {
+                    _lopDayID3 = value;
+                    OnPropertyChanged();
+                    CapNhatDanhSachLop();
+                }
+            }
+        }
+
         public string LopDayIDCN
         {
             get => _lopDayIDCN;
@@ -133,10 +202,10 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                 {
                     _lopDayIDCN = value;
                     OnPropertyChanged();
+                    CapNhatDanhSachLop();
                 }
             }
         }
-
 
 
         public bool LaHocSinhHoacGiaoVien => VaiTroID == "VT01" || VaiTroID == "VT02";
@@ -158,6 +227,8 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 
                     OnPropertyChanged(nameof(LaGiaoVienBoMon));
                     OnPropertyChanged(nameof(LaGiaoVienChuNhiem));
+                    LopDayID3 = null;
+                    LopDayIDCN = null;
                 }
             }
         }
@@ -238,6 +309,39 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 
         public event Action<User>? AccountAddedSuccessfully;
         public event Action? CancelRequested;
+        private void CapNhatDanhSachLop()
+        {
+            var allLop = DanhSachLop ?? new ObservableCollection<Lop>();
+
+            DanhSachLop1 = new ObservableCollection<Lop>(
+                allLop.Where(l =>
+                    l.LopID != LopDayID2 && l.LopID != LopDayID3 && l.LopID != LopDayIDCN
+                )
+            );
+
+            DanhSachLop2 = new ObservableCollection<Lop>(
+                allLop.Where(l =>
+                    l.LopID != LopDayID1 && l.LopID != LopDayID3 && l.LopID != LopDayIDCN
+                )
+            );
+
+            DanhSachLop3 = new ObservableCollection<Lop>(
+                allLop.Where(l =>
+                    l.LopID != LopDayID1 && l.LopID != LopDayID2 && l.LopID != LopDayIDCN
+                )
+            );
+
+            DanhSachLopCN = new ObservableCollection<Lop>(
+                allLop.Where(l =>
+                    l.LopID != LopDayID1 && l.LopID != LopDayID2 && l.LopID != LopDayID3
+                )
+            );
+
+            OnPropertyChanged(nameof(DanhSachLop1));
+            OnPropertyChanged(nameof(DanhSachLop2));
+            OnPropertyChanged(nameof(DanhSachLop3));
+            OnPropertyChanged(nameof(DanhSachLopCN));
+        }
 
         private async void LoadBoMon()
         {
@@ -252,7 +356,7 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             }
             catch (Exception ex)
             {
-                await DialogHost.Show(new NotifyDialog("Lỗi", $"❌ Lỗi khi tải danh sách bộ môn: {ex.Message}"), "RootDialog");
+                await DialogHost.Show(new ErrorDialog("Lỗi", $"Lỗi khi tải danh sách bộ môn: {ex.Message}"), "RootDialog");
             }
         }
         public QuanLyTaiKhoanThemViewModel(MainViewModel? mainVM = null)
@@ -262,12 +366,13 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             LoadRoles();
             MaHoSo = UserService.LayHoSoIDMoi();
             DanhSachLop = new ObservableCollection<Lop>(UserService.LayDanhSachLopHoc());
+            CapNhatDanhSachLop();
 
             UserID = UserService.LayUserIDMoi();
             MatKhau = "123456";
             MaHoSoCaNhan = UserService.LayMaHoSoCaNhanMoi(VaiTroID);
 
-            NgaySinh = DateTime.Today.AddYears(-15); // Mặc định 15 tuổi
+            NgaySinh = DateTime.Today.AddYears(0); // Mặc định 0 tuổi
 
             AddAccountCommand = new RelayCommand(ExecuteAddAccount, CanExecuteAddAccount);
             CancelCommand = new RelayCommand(ExecuteCancel);
@@ -304,6 +409,44 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
         {
             try
             {
+                var tuoi = DateTime.Today.Year - NgaySinh.Year;
+                if (NgaySinh > DateTime.Today.AddYears(-tuoi)) tuoi--;
+
+                if (VaiTroID == "VT01") // Học sinh
+                {
+                    if (!string.IsNullOrEmpty(SelectedLopHocID) && (tuoi < 15 || tuoi > 20))
+                    {
+                        await DialogHost.Show(new ErrorDialog("Thất bại", "Học sinh chỉ có thể từ 15 đến 20 tuổi"), "RootDialog_Add");
+                        return;
+
+                    }
+                }
+                else
+                {
+                    if (tuoi < 22)
+                    {
+                        if (VaiTroID == "VT02")
+                        {
+                            var _ = await DialogHost.Show(
+                            new ConfirmDialog($"⚠️Giáo viên chưa đủ 22 tuổi. Bạn có muốn tiếp tục không?"),
+                            "RootDialog_Add");
+                            if (_?.ToString() == "False")
+                                return;
+                        }
+                        else
+                        {
+                            var _ = await DialogHost.Show(
+                            new ConfirmDialog($"⚠️Giáo vụ chưa đủ 22 tuổi. Bạn có muốn tiếp tục không?"),
+                            "RootDialog_Add");
+                            if (_?.ToString() == "False")
+                                return;
+                        }
+                    }
+                }
+
+
+
+                // Tạo tài khoản mới
                 var userMoi = new User
                 {
                     UserID = UserID,
@@ -334,16 +477,15 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                 if (!result)
                 {
                     var err = UserService.LastErrorMessage;
-                    await DialogHost.Show(new NotifyDialog("Thất bại", $"❌ Thêm tài khoản thất bại: {err}"), "RootDialog_Add");
+                    await DialogHost.Show(new ErrorDialog("Thất bại", $"{err}"), "RootDialog_Add");
                     return;
                 }
 
-                // Nếu thành công
-                await DialogHost.Show(new NotifyDialog("Thành công", "✅ Thêm tài khoản thành công!"), "RootDialog_Add");
+                await DialogHost.Show(new NotifyDialog("Thành công", " Đã thêm tài khoản!!"), "RootDialog_Add");
 
                 AccountAddedSuccessfully?.Invoke(userMoi);
 
-                // Reset dữ liệu cho form
+                // Reset form
                 UserID = UserService.LayUserIDMoi();
                 MaHoSo = UserService.LayHoSoIDMoi();
                 MaHoSoCaNhan = UserService.LayMaHoSoCaNhanMoi(VaiTroID);
@@ -355,19 +497,50 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             }
             catch (Exception ex)
             {
-                await DialogHost.Show(new NotifyDialog("Lỗi", $"⚠️ Lỗi khi thêm tài khoản: {ex.Message}"), "RootDialog_Add");
+                await DialogHost.Show(new ErrorDialog("Lỗi", $"{ex.Message}"), "RootDialog_Add");
             }
         }
 
 
+
         public bool CanExecuteAddAccount()
         {
-            return !string.IsNullOrWhiteSpace(UserID) &&
-                   !string.IsNullOrWhiteSpace(HoTen) &&
-                   !string.IsNullOrWhiteSpace(TenDangNhap) &&
-                   !string.IsNullOrWhiteSpace(MatKhau) &&
-                   !string.IsNullOrWhiteSpace(VaiTroID);
+            // Các trường bắt buộc chung
+            var requiredFields = new[]
+            {
+        UserID, HoTen, TenDangNhap, MatKhau, VaiTroID,
+        GioiTinh, SelectedTenChucVu, MaHoSoCaNhan, MaHoSo
+    };
+
+            if (requiredFields.Any(string.IsNullOrWhiteSpace))
+                return false;
+
+            // Học sinh: phải chọn lớp học
+            if (VaiTroID == "VT01" && string.IsNullOrWhiteSpace(SelectedLopHocID))
+                return false;
+
+            // Giáo viên: phải có BoMon + (ít nhất 1 lớp dạy hoặc là GVCN có lớp chủ nhiệm)
+            if (VaiTroID == "VT02")
+            {
+                if (string.IsNullOrWhiteSpace(BoMon))
+                    return false;
+
+                bool isGVCN = SelectedTenChucVu == "Giáo viên chủ nhiệm";
+                bool hasLopDay = !string.IsNullOrWhiteSpace(LopDayID1) ||
+                                 !string.IsNullOrWhiteSpace(LopDayID2) ||
+                                 !string.IsNullOrWhiteSpace(LopDayID3);
+
+                if (!isGVCN && !hasLopDay)
+                    return false;
+
+                if (isGVCN && string.IsNullOrWhiteSpace(LopDayIDCN))
+                    return false;
+            }
+
+            return true;
         }
+
+
 
 
         public void ExecuteCancel()

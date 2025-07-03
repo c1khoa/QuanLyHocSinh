@@ -26,7 +26,6 @@
             <Setter Property="Margin" Value="20,0"/>
             <Setter Property="Padding" Value="10"/>
         </Style>
-
         <Style x:Key="ImageBorderStyle" TargetType="Border">
             <Setter Property="BorderBrush" Value="Gray"/>
             <Setter Property="BorderThickness" Value="2"/>
@@ -35,6 +34,8 @@
             <Setter Property="Padding" Value="10"/>
             <Setter Property="Margin" Value="20 80 20 80"/>
         </Style>
+
+
     </UserControl.Resources>
     <Border Style="{StaticResource RoundedOuterBorder}">
         <Grid>
@@ -118,9 +119,9 @@
 
                             <!-- Lớp dạy 1 -->
                             <StackPanel Margin="10">
-                                <ComboBox ItemsSource="{Binding DanhSachLop}"
+                                <ComboBox ItemsSource="{Binding DanhSachLop1}"
                                           SelectedValue="{Binding LopDayID1, Mode=TwoWay}"
-                                          SelectedValuePath="LopHocID"
+                                          SelectedValuePath="LopID"
                                           DisplayMemberPath="TenLop"
                                           Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                                           materialDesign:HintAssist.Hint="Lớp dạy 1"
@@ -129,9 +130,9 @@
 
                             <!-- Lớp dạy 2 -->
                             <StackPanel Margin="10">
-                                <ComboBox ItemsSource="{Binding DanhSachLop}"
+                                <ComboBox ItemsSource="{Binding DanhSachLop2}"
                                           SelectedValue="{Binding LopDayID2, Mode=TwoWay}"
-                                          SelectedValuePath="LopHocID"
+                                          SelectedValuePath="LopID"
                                           DisplayMemberPath="TenLop"
                                           Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                                           materialDesign:HintAssist.Hint="Lớp dạy 2"
@@ -141,9 +142,9 @@
                             <!-- Ô lớp dạy/chủ nhiệm thứ ba -->
                             <StackPanel Margin="10">
                                 <!-- Nếu là giáo viên chủ nhiệm -->
-                                <ComboBox ItemsSource="{Binding DanhSachLop}"
-                                          SelectedValue="{Binding LopDayID3, Mode=TwoWay}"
-                                          SelectedValuePath="LopHocID"
+                                <ComboBox ItemsSource="{Binding DanhSachLopCN}"
+                                          SelectedValue="{Binding LopDayIDCN, Mode=TwoWay}"
+                                          SelectedValuePath="LopID"
                                           DisplayMemberPath="TenLop"
                                           Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                                           materialDesign:HintAssist.Hint="Chủ nhiệm"
@@ -151,9 +152,9 @@
                                           Visibility="{Binding LaGiaoVienChuNhiem, Converter={StaticResource BoolToVisibility}}"/>
 
                                 <!-- Nếu là giáo viên bộ môn thì hiện lớp dạy 3 ở cùng vị trí -->
-                                <ComboBox ItemsSource="{Binding DanhSachLop}"
-                                          SelectedValue="{Binding LopDayIDCN, Mode=TwoWay}"
-                                          SelectedValuePath="LopHocID"
+                                <ComboBox ItemsSource="{Binding DanhSachLop3}"
+                                          SelectedValue="{Binding LopDayID3, Mode=TwoWay}"
+                                          SelectedValuePath="LopID"
                                           DisplayMemberPath="TenLop"
                                           Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                                           materialDesign:HintAssist.Hint="Lớp dạy 3"
@@ -164,9 +165,9 @@
 
                         </StackPanel>
                         <ComboBox ItemsSource="{Binding DanhSachLop}"
-                                          SelectedValue="{Binding SelectedLopDay2ID}"
+                                          SelectedValue="{Binding SelectedLopHocID, Mode=TwoWay}"
                                           Visibility="{Binding LaHocSinh, Converter={StaticResource BoolToVisibility}}"
-                                          SelectedValuePath="LopHocID"
+                                          SelectedValuePath="LopID"
                                           DisplayMemberPath="TenLop"
                                           Margin="10"
                                           Style="{StaticResource MaterialDesignFloatingHintComboBox}"

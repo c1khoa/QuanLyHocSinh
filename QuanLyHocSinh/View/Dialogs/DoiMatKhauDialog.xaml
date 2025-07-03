@@ -1,15 +1,16 @@
-﻿<Window x:Class="QuanLyHocSinh.View.Dialogs.SuaTaiKhoanDiaLog"
+﻿<Window x:Class="QuanLyHocSinh.View.Dialogs.DoiMatKhauDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:helpers="clr-namespace:QuanLyHocSinh.Helpers"
         xmlns:conv="clr-namespace:QuanLyHocSinh.View.Converters"
-        xmlns:helpers="clr-namespace:QuanLyHocSinh.Helpers"      
+        xmlns:viewmodel1="clr-namespace:QuanLyHocSinh.ViewModel"
+        d:DataContext="{d:DesignInstance Type=viewmodel1:MainViewModel}"
         mc:Ignorable="d"
-        Title="Sửa thông tin tài khoản" Height="600" Width="500"
-        WindowStartupLocation="CenterScreen">
-
+        WindowStartupLocation="CenterScreen"
+        Title="Đổi mật khẩu" Height="600" Width="500">
     <Window.Resources>
         <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <conv:BoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
@@ -42,9 +43,9 @@
         </Style>
     </Window.Resources>
 
-    <materialDesign:DialogHost Identifier="RootDialog_SuaAccount">
+    <materialDesign:DialogHost Identifier="RootDialog_ChangePass">
         <Border Style="{StaticResource RoundedOuterBorder}">
-            <Grid>
+            <Grid Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="5*"/>
@@ -55,17 +56,15 @@
                            HorizontalAlignment="Center" Foreground="#2C3E50"
                            Margin="0 20"/>
 
-                <Border Grid.Row="1" VerticalAlignment="Center"
+                <Border Grid.Row="1" Margin="0"
                         Background="#f8f9fa" Style="{StaticResource InnerFieldBorder}">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -74,24 +73,44 @@
 
                         <!-- USER INFO -->
                         <TextBlock Text="User ID:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
-                        <TextBox Text="{Binding EditedUser.UserID}" IsReadOnly="True" 
+                        <TextBox Text="{Binding CurrentUser.UserID}" IsReadOnly="True" 
                                  Grid.Row="0" Grid.Column="1" Style="{StaticResource MaterialDesignOutlinedTextBox}" />
 
-                        <TextBlock Text="Họ và tên:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
-                        <TextBox Text="{Binding EditedUser.HoTen, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"
+                        <TextBlock Text="Tên đăng nhập:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                        <TextBox Text="{Binding CurrentUser.TenDangNhap}" IsReadOnly="True" 
                                  Grid.Row="1" Grid.Column="1" Style="{StaticResource MaterialDesignOutlinedTextBox}" />
 
-                        <TextBlock Text="Tên đăng nhập:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
-                        <TextBox Text="{Binding EditedUser.TenDangNhap}" IsReadOnly="True" 
-                                 Grid.Row="2" Grid.Column="1" Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                        <TextBlock Text="Nhập mật khẩu cũ:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                        <Grid Grid.Row="2" Grid.Column="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="Vai trò:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
-                        <TextBox Text="{Binding EditedUser.VaiTro.TenVaiTro}" IsReadOnly="True" 
-                                 Grid.Row="3" Grid.Column="1" Style="{StaticResource MaterialDesignOutlinedTextBox}" />
+                            <PasswordBox x:Name="pwdOldPassword"
+                                         Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                                         Visibility="{Binding IsOldPasswordVisible, Converter={StaticResource InverseBoolToVisibilityConverter}, ConverterParameter=True}"
+                                         helpers:PasswordHelper.BindPassword="True"
+                                        helpers:PasswordHelper.BoundPassword="{Binding OldPassword, Mode=TwoWay}"/>
+
+                            <TextBox x:Name="txtOldPasswordVisible"
+                                             Text="{Binding OldPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Visibility="{Binding IsOldPasswordVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}"
+                                             Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+
+
+                            <ToggleButton Grid.Column="1"
+                                          Margin="0,0,0,0"
+                                          VerticalAlignment="Center"
+                                          IsChecked="{Binding IsOldPasswordVisible, Mode=TwoWay}"
+                                          Background="Transparent" BorderThickness="0">
+                                <materialDesign:PackIcon Kind="{Binding IsOldPasswordVisible, Converter={StaticResource EyeIconConverter}}" Width="20" Height="20"/>
+                            </ToggleButton>
+                        </Grid>
 
                         <!-- NEW PASSWORD -->
-                        <TextBlock Text="Mật khẩu mới:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
-                        <Grid Grid.Row="4" Grid.Column="1">
+                        <TextBlock Text="Mật khẩu mới:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                        <Grid Grid.Row="3" Grid.Column="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="Auto"/>
@@ -110,7 +129,7 @@
 
 
                             <ToggleButton Grid.Column="1"
-                                          Margin="5,0,0,0"
+                                          Margin="0,0,0,0"
                                           VerticalAlignment="Center"
                                           IsChecked="{Binding IsPasswordVisible, Mode=TwoWay}"
                                           Background="Transparent" BorderThickness="0">
@@ -119,8 +138,8 @@
                         </Grid>
 
                         <!-- CONFIRM PASSWORD -->
-                        <TextBlock Text="Xác nhận mật khẩu:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
-                        <Grid Grid.Row="5" Grid.Column="1">
+                        <TextBlock Text="Xác nhận mật khẩu:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,8"/>
+                        <Grid Grid.Row="4" Grid.Column="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="Auto"/>
@@ -130,20 +149,20 @@
                                          Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
                                              helpers:PasswordHelper.BindPassword="True"
                                                 helpers:PasswordHelper.BoundPassword="{Binding ConfirmPassword, Mode=TwoWay}"
-                                                Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter},ConverterParameter=True}"/>
+                                                Visibility="{Binding IsConfirmPasswordVisible, Converter={StaticResource BoolToVisibilityConverter},ConverterParameter=True}"/>
 
                             <TextBox x:Name="txtConfirmPasswordVisible"
                                      Text="{Binding ConfirmPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}"
+                                     Visibility="{Binding IsConfirmPasswordVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
 
                             <ToggleButton Grid.Column="1"
-                                          Margin="5,0,0,0"
+                                          Margin="0,0,0,0"
                                           VerticalAlignment="Center"
-                                          IsChecked="{Binding IsPasswordVisible, Mode=TwoWay}"
+                                          IsChecked="{Binding IsConfirmPasswordVisible, Mode=TwoWay}"
                                           Background="Transparent" BorderThickness="0">
-                                <materialDesign:PackIcon Kind="{Binding IsPasswordVisible, Converter={StaticResource EyeIconConverter}}" Width="20" Height="20"/>
+                                <materialDesign:PackIcon Kind="{Binding IsConfirmPasswordVisible, Converter={StaticResource EyeIconConverter}}" Width="20" Height="20"/>
                             </ToggleButton>
                         </Grid>
                     </Grid>
@@ -164,6 +183,7 @@
                                 CommandParameter="{Binding ElementName=passwordfield, Path=Password}"
                                 Style="{StaticResource MaterialDesignRaisedLightButton}"
                                 Background="Transparent"
+                                IsEnabled="{Binding CanSave}"
                                 BorderBrush="Transparent"
                                 FontWeight="Regular"
                                 Content="Lưu"/>
