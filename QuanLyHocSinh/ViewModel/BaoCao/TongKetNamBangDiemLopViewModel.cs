@@ -7,6 +7,10 @@ using ClosedXML.Excel;
 using System.IO;
 using Microsoft.Win32;
 using System.Linq;
+using MaterialDesignThemes.Wpf;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
+using System.Threading.Tasks;
+using QuanLyHocSinh.ViewModel.TraCuu;
 
 namespace QuanLyHocSinh.ViewModel.BaoCao
 {
@@ -117,7 +121,7 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
 
         public TongKetNamBangDiemLopViewModel()
         {
-            ExportExcelCommand = new RelayCommand(ExportExcel);
+            ExportExcelCommand = new RelayCommand(ExportToExcel);
         }
 
         private void LoadData()
@@ -139,7 +143,20 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
             DiemTrungBinhTungMon = new ObservableCollection<(string MonHoc, double DiemTB)>(result.DiemTrungBinhTungMon);
         }
 
-        private void ExportExcel()
+        private async Task ShowNotificationAsync(string title, string message)
+        {
+            try
+            {
+                await DialogHost.Show(new NotifyDialog(title, message), "RootDialog_Main");
+            }
+            catch
+            {
+                MessageBox.Show(message, title, MessageBoxButton.OK, 
+                    title.Contains("Lỗi") ? MessageBoxImage.Error : MessageBoxImage.Information);
+            }
+        }
+
+        private async void ExportToExcel()
         {
             var dialog = new SaveFileDialog
             {
@@ -153,14 +170,12 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
                 {
                     var worksheet = workbook.Worksheets.Add("Bảng điểm lớp");
 
-                    //Vẽ tiêu đề
                     worksheet.Cell("A1").Value = "BÁO CÁO TỔNG KẾT BẢNG ĐIỂM LỚP";
                     worksheet.Range("A1:N1").Merge();
                     worksheet.Cell("A1").Style.Font.Bold = true;
                     worksheet.Cell("A1").Style.Font.FontSize = 16;
                     worksheet.Cell("A1").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-                    //Tạo header
                     var headers = new[] { "STT", "Mã HS", "Họ tên", "Điểm miệng", "Điểm 15p", "Điểm 1 tiết", "Điểm thi", "Điểm TB", "Xếp loại" };
                     for (int i = 0; i < headers.Length; i++)
                     {
@@ -168,18 +183,15 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
                         worksheet.Cell(3, i + 1).Style.Font.Bold = true;
                     }
 
-                    // Thêm header cho từng môn học
                     int col = 4;
                     foreach (var mon in DanhSachMonHoc)
                     {
                         worksheet.Cell(1, col++).Value = mon;
                     }
 
-                    // Thêm header cho điểm TB và xếp loại
                     worksheet.Cell(1, col).Value = "Điểm TB";
                     worksheet.Cell(1, col + 1).Value = "Xếp loại";
 
-                    // Data
                     int row = 4;
                     foreach (var item in BangDiemLop)
                     {
@@ -187,7 +199,6 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
                         worksheet.Cell(row, 2).Value = item.HocSinhID;
                         worksheet.Cell(row, 3).Value = item.HoTen;
 
-                        // Điểm từng môn
                         col = 4;
                         foreach (var mon in DanhSachMonHoc)
                         {
@@ -196,13 +207,11 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
                             col++;
                         }
 
-                        // Điểm TB và xếp loại
                         worksheet.Cell(row, col).Value = item.DiemTrungBinh;
                         worksheet.Cell(row, col + 1).Value = item.XepLoai;
                         row++;
                     }
 
-                    // Thêm thống kê dưới bảng điểm
                     row += 2;
                     worksheet.Cell(row, 1).Value = "THỐNG KÊ";
                     worksheet.Cell(row, 1).Style.Font.Bold = true;
@@ -242,12 +251,12 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
                     }
 
                     //Tự động chỉnh cột
-                    worksheet.Columns().AdjustToContents();
+                    worksheet.ColumnsUsed().AdjustToContents();
 
                     workbook.SaveAs(dialog.FileName);
                 }
 
-                MessageBox.Show("Xuất Excel thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                await ShowNotificationAsync("Thông báo", "✅ Xuất Excel thành công!");
             }
         }
     }

@@ -5,6 +5,9 @@ using System.Windows.Input;
 using QuanLyHocSinh.Model.Entities;
 using System.Windows;
 using ClosedXML.Excel;
+using MaterialDesignThemes.Wpf;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
+using System.Threading.Tasks;
 
 namespace QuanLyHocSinh.ViewModel.BaoCao
 {
@@ -47,9 +50,6 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
             ExportExcelCommand = new RelayCommand(ExportExcel);
         }
 
-        // Thêm property cho điểm TB cả năm vào BangDiemMonHocItem
-        // (nếu chưa có, bạn cần bổ sung vào model)
-
         private string XepLoaiHocLuc(ObservableCollection<BangDiemMonHocItem> bangDiem, double? tbChung)
         {
             if (!tbChung.HasValue) return "-";
@@ -68,7 +68,7 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
             return "-";
         }
 
-        private void ExportExcel()
+        private async void ExportExcel()
         {
             var dialog = new Microsoft.Win32.SaveFileDialog
             {
@@ -118,7 +118,20 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
                     ws.Columns().AdjustToContents();
                     workbook.SaveAs(dialog.FileName);
                 }
-                MessageBox.Show("Xuất Excel thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                await ShowNotificationAsync("Thông báo", "✅ Xuất Excel thành công!");
+            }
+        }
+
+        private async Task ShowNotificationAsync(string title, string message)
+        {
+            try
+            {
+                await DialogHost.Show(new NotifyDialog(title, message), "RootDialog_Main");
+            }
+            catch
+            {
+                MessageBox.Show(message, title, MessageBoxButton.OK, 
+                    title.Contains("Lỗi") ? MessageBoxImage.Error : MessageBoxImage.Information);
             }
         }
     }

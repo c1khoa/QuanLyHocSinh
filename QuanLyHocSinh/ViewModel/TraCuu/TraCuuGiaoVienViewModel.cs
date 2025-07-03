@@ -8,11 +8,48 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.Model.DAL;
 using QuanLyHocSinh.View.Dialogs;
 using System.Configuration;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
+    public class LopCheckboxItem : BaseViewModel
+    {
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set { _isSelected = value; OnPropertyChanged(); }
+        }
+
+        public string TenLop { get; set; }
+
+        public LopCheckboxItem(string tenLop)
+        {
+            TenLop = tenLop;
+            IsSelected = false;
+        }
+    }
+
+    public class BoMonCheckboxItem : BaseViewModel
+    {
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set { _isSelected = value; OnPropertyChanged(); }
+        }
+
+        public string TenBoMon { get; set; }
+
+        public BoMonCheckboxItem(string tenBoMon)
+        {
+            TenBoMon = tenBoMon;
+            IsSelected = false;
+        }
+    }
+
     public class TraCuuGiaoVienViewModel : BaseViewModel
     {
         private ObservableCollection<GiaoVien> _danhSachGiaoVien;
@@ -48,14 +85,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _selectedGioiTinh = value; OnPropertyChanged(nameof(SelectedGioiTinh)); Filter(); }
         }
 
-        //Lọc theo lớp
-        private string _selectedLop;
-        public string SelectedLop
-        {
-            get => _selectedLop;
-            set { _selectedLop = value; OnPropertyChanged(nameof(SelectedLop)); Filter(); }
-        }
-
         //Danh sách bộ môn
         private ObservableCollection<string> _danhSachBoMon;
         public ObservableCollection<string> DanhSachBoMon
@@ -64,12 +93,48 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _danhSachBoMon = value; OnPropertyChanged(nameof(DanhSachBoMon)); }
         }
 
-        //Danh sách lớp
-        private ObservableCollection<string> _danhSachLop;
-        public ObservableCollection<string> DanhSachLop
+        //Danh sách lớp checkbox
+        private ObservableCollection<LopCheckboxItem> _danhSachLopCheckbox;
+        public ObservableCollection<LopCheckboxItem> DanhSachLopCheckbox
         {
-            get => _danhSachLop;
-            set { _danhSachLop = value; OnPropertyChanged(nameof(DanhSachLop)); }
+            get => _danhSachLopCheckbox;
+            set { _danhSachLopCheckbox = value; OnPropertyChanged(nameof(DanhSachLopCheckbox)); }
+        }
+
+        //Text hiển thị các lớp đã chọn
+        public string SelectedLopsText
+        {
+            get
+            {
+                var selectedLops = DanhSachLopCheckbox?.Where(x => x.IsSelected).Select(x => x.TenLop).ToList();
+                if (selectedLops == null || selectedLops.Count == 0)
+                    return "Tất cả";
+                if (selectedLops.Count == 1)
+                    return selectedLops[0];
+                return $"{selectedLops.Count} lớp đã chọn";
+            }
+        }
+
+        //Danh sách bộ môn checkbox
+        private ObservableCollection<BoMonCheckboxItem> _danhSachBoMonCheckbox;
+        public ObservableCollection<BoMonCheckboxItem> DanhSachBoMonCheckbox
+        {
+            get => _danhSachBoMonCheckbox;
+            set { _danhSachBoMonCheckbox = value; OnPropertyChanged(nameof(DanhSachBoMonCheckbox)); }
+        }
+
+        //Text hiển thị các bộ môn đã chọn
+        public string SelectedBoMonsText
+        {
+            get
+            {
+                var selectedBoMons = DanhSachBoMonCheckbox?.Where(x => x.IsSelected).Select(x => x.TenBoMon).ToList();
+                if (selectedBoMons == null || selectedBoMons.Count == 0)
+                    return "Tất cả";
+                if (selectedBoMons.Count == 1)
+                    return selectedBoMons[0];
+                return $"{selectedBoMons.Count} bộ môn đã chọn";
+            }
         }
 
         //Danh sách giới tính
@@ -90,6 +155,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         //Lệnh edit và filter
         public ICommand EditCommand { get; }
         public ICommand FilterCommand { get; }
+        public ICommand LopCheckboxChangedCommand { get; }
 
         private MainViewModel _mainVM;
         public TraCuuGiaoVienViewModel(MainViewModel mainVM)
@@ -98,42 +164,145 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             _allGiaoVien = new ObservableCollection<GiaoVien>(GiaoVienDAL.GetAllGiaoVien());
             DanhSachGiaoVien = new ObservableCollection<GiaoVien>(_allGiaoVien);
 
-            //Lấy danh sách bộ môn duy nhất
-            var dsBoMon = _allGiaoVien.Select(gv => gv.BoMon).Distinct().OrderBy(bm => bm).ToList();
-            dsBoMon.Insert(0, "Tất cả");
-            DanhSachBoMon = new ObservableCollection<string>(dsBoMon);
+            var allLopList = new List<string>();
+            foreach (var gv in _allGiaoVien)
+            {
+                if (!string.IsNullOrEmpty(gv.LopDayID))
+                {
+                    var lopArray = gv.LopDayID.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var lop in lopArray)
+                    {
+                        var lopTrimmed = lop.Trim();
+                        if (!allLopList.Contains(lopTrimmed))
+                        {
+                            allLopList.Add(lopTrimmed);
+                        }
+                    }
+                }
+            }
+            allLopList.Sort();
+            
+            if (_allGiaoVien.Any(gv => string.IsNullOrEmpty(gv.LopDayID) || gv.LopDayID.Trim() == ""))
+            {
+                allLopList.Add("Chưa phân công");
+            }
+            
+            DanhSachLopCheckbox = new ObservableCollection<LopCheckboxItem>();
+            foreach (var lop in allLopList)
+            {
+                var checkboxItem = new LopCheckboxItem(lop);
+                checkboxItem.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(LopCheckboxItem.IsSelected))
+                    {
+                        Filter();
+                        OnPropertyChanged(nameof(SelectedLopsText));
+                    }
+                };
+                DanhSachLopCheckbox.Add(checkboxItem);
+            }
+            
+            OnPropertyChanged(nameof(SelectedLopsText));
 
-            //Lấy danh sách lớp duy nhất
-            var dsLop = _allGiaoVien.Select(gv => gv.LopDayID).Distinct().OrderBy(l => l).ToList();
-            dsLop.Insert(0, "Tất cả");
-            DanhSachLop = new ObservableCollection<string>(dsLop);
+            var allBoMonSet = new HashSet<string>();
+            foreach (var gv in _allGiaoVien)
+            {
+                if (!string.IsNullOrEmpty(gv.BoMon))
+                {   
+                    var monHocList = gv.BoMon.Split(',').Select(m => m.Trim()).Where(m => !string.IsNullOrEmpty(m));
+                    foreach (var mon in monHocList)
+                    {
+                        allBoMonSet.Add(mon);
+                    }
+                }
+            }
+            
+            var sortedBoMon = allBoMonSet.OrderBy(x => x).ToList();
+            if (_allGiaoVien.Any(gv => string.IsNullOrEmpty(gv.BoMon) || gv.BoMon.Trim() == ""))
+            {
+                sortedBoMon.Add("Chưa phân công");
+            }
+            
+            DanhSachBoMonCheckbox = new ObservableCollection<BoMonCheckboxItem>();
+            foreach (var boMon in sortedBoMon)
+            {
+                var checkboxItem = new BoMonCheckboxItem(boMon);
+                checkboxItem.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(BoMonCheckboxItem.IsSelected))
+                    {
+                        Filter();
+                        OnPropertyChanged(nameof(SelectedBoMonsText));
+                    }
+                };
+                DanhSachBoMonCheckbox.Add(checkboxItem);
+            }
+            
+            OnPropertyChanged(nameof(SelectedBoMonsText));
 
-            //Lấy danh sách giới tính duy nhất
             var dsGioiTinh = _allGiaoVien.Select(gv => gv.GioiTinh).Distinct().OrderBy(gt => gt).ToList();
             dsGioiTinh.Insert(0, "Tất cả");
             DanhSachGioiTinh = new ObservableCollection<string>(dsGioiTinh);
 
-            //Khởi tạo các lệnh
             EditCommand = new RelayCommand(EditGiaoVien, () => SelectedGiaoVien != null);
             FilterCommand = new RelayCommand(Filter);
+            LopCheckboxChangedCommand = new RelayCommand(Filter);
 
-            //Mặc định chọn "Tất cả"
             SelectedBoMon = "Tất cả";
             SelectedGioiTinh = "Tất cả";
-            SelectedLop = "Tất cả";
             _mainVM = mainVM;
         }
 
         private void Filter()
         {
+            var selectedLops = DanhSachLopCheckbox?.Where(x => x.IsSelected).Select(x => x.TenLop).ToList() ?? new List<string>();
+            var selectedBoMons = DanhSachBoMonCheckbox?.Where(x => x.IsSelected).Select(x => x.TenBoMon).ToList() ?? new List<string>();
+
             var filtered = _allGiaoVien.Where(gv =>
                 (string.IsNullOrEmpty(SearchText) || gv.HoTen.ToLower().Contains(SearchText.ToLower()))
-                && (SelectedBoMon == "Tất cả" || string.IsNullOrEmpty(SelectedBoMon) || gv.BoMon == SelectedBoMon)
+                && (selectedBoMons.Count == 0 || IsGiaoVienTeachesAllSelectedBoMons(gv, selectedBoMons))
                 && (SelectedGioiTinh == "Tất cả" || string.IsNullOrEmpty(SelectedGioiTinh) || gv.GioiTinh == SelectedGioiTinh)
-                && (SelectedLop == "Tất cả" || string.IsNullOrEmpty(SelectedLop) || gv.LopDayID == SelectedLop)
+                && (selectedLops.Count == 0 || IsGiaoVienTeachesAllSelectedLops(gv, selectedLops))
             ).ToList();
 
             DanhSachGiaoVien = new ObservableCollection<GiaoVien>(filtered);
+            OnPropertyChanged(nameof(SelectedLopsText));
+            OnPropertyChanged(nameof(SelectedBoMonsText));
+        }
+
+        private bool IsGiaoVienTeachesAllSelectedLops(GiaoVien gv, List<string> selectedLops)
+        {
+            if (selectedLops.Contains("Chưa phân công"))
+            {
+                return string.IsNullOrEmpty(gv.LopDayID) || gv.LopDayID.Trim() == "";
+            }
+            
+            if (string.IsNullOrEmpty(gv.LopDayID))
+                return false;
+
+            var lopArrayOfGiaoVien = gv.LopDayID.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                                                .Select(l => l.Trim())
+                                                .ToList();
+
+            return selectedLops.All(selectedLop => lopArrayOfGiaoVien.Contains(selectedLop));
+        }
+
+        private bool IsGiaoVienTeachesAllSelectedBoMons(GiaoVien gv, List<string> selectedBoMons)
+        {
+            if (selectedBoMons.Contains("Chưa phân công"))
+            {
+                return string.IsNullOrEmpty(gv.BoMon) || gv.BoMon.Trim() == "";
+            }
+            
+            if (string.IsNullOrEmpty(gv.BoMon))
+                return false;
+
+            var boMonArrayOfGiaoVien = gv.BoMon.Split(',')
+                                              .Select(m => m.Trim())
+                                              .Where(m => !string.IsNullOrEmpty(m))
+                                              .ToList();
+
+            return selectedBoMons.All(selectedBoMon => boMonArrayOfGiaoVien.Contains(selectedBoMon));
         }
 
         private void EditGiaoVien()
@@ -143,10 +312,101 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             var dialog = new SuaGiaoVienDialog(SelectedGiaoVien);
             if (dialog.ShowDialog() == true)
             {
-                // Refresh danh sách sau khi sửa
                 _allGiaoVien = new ObservableCollection<GiaoVien>(GiaoVienDAL.GetAllGiaoVien());
+                
+                RefreshLopCheckboxList();
+                RefreshBoMonCheckboxList();
+                
                 Filter();
             }
+        }
+
+        private void RefreshLopCheckboxList()
+        {
+            var currentSelectedLops = DanhSachLopCheckbox?.Where(x => x.IsSelected).Select(x => x.TenLop).ToList() ?? new List<string>();
+
+            var allLopList = new List<string>();
+            foreach (var gv in _allGiaoVien)
+            {
+                if (!string.IsNullOrEmpty(gv.LopDayID))
+                {
+                    var lopArray = gv.LopDayID.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var lop in lopArray)
+                    {
+                        var lopTrimmed = lop.Trim();
+                        if (!allLopList.Contains(lopTrimmed))
+                        {
+                            allLopList.Add(lopTrimmed);
+                        }
+                    }
+                }
+            }
+            allLopList.Sort();
+
+            if (_allGiaoVien.Any(gv => string.IsNullOrEmpty(gv.LopDayID) || gv.LopDayID.Trim() == ""))
+            {
+                allLopList.Add("Chưa phân công");
+            }
+
+            DanhSachLopCheckbox = new ObservableCollection<LopCheckboxItem>();
+            foreach (var lop in allLopList)
+            {
+                var checkboxItem = new LopCheckboxItem(lop);
+                checkboxItem.IsSelected = currentSelectedLops.Contains(lop);
+                checkboxItem.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(LopCheckboxItem.IsSelected))
+                    {
+                        Filter();
+                        OnPropertyChanged(nameof(SelectedLopsText));
+                    }
+                };
+                DanhSachLopCheckbox.Add(checkboxItem);
+            }
+            
+            OnPropertyChanged(nameof(SelectedLopsText));
+        }
+
+        private void RefreshBoMonCheckboxList()
+        {
+            var currentSelectedBoMons = DanhSachBoMonCheckbox?.Where(x => x.IsSelected).Select(x => x.TenBoMon).ToList() ?? new List<string>();
+
+            var allBoMonSet = new HashSet<string>();
+            foreach (var gv in _allGiaoVien)
+            {
+                if (!string.IsNullOrEmpty(gv.BoMon))
+                {
+                    var monHocList = gv.BoMon.Split(',').Select(m => m.Trim()).Where(m => !string.IsNullOrEmpty(m));
+                    foreach (var mon in monHocList)
+                    {
+                        allBoMonSet.Add(mon);
+                    }
+                }
+            }
+                    
+            var sortedBoMon = allBoMonSet.OrderBy(x => x).ToList();
+            if (_allGiaoVien.Any(gv => string.IsNullOrEmpty(gv.BoMon) || gv.BoMon.Trim() == ""))
+            {
+                sortedBoMon.Add("Chưa phân công");
+            }
+            
+            DanhSachBoMonCheckbox = new ObservableCollection<BoMonCheckboxItem>();
+            foreach (var boMon in sortedBoMon)
+            {
+                var checkboxItem = new BoMonCheckboxItem(boMon);
+                checkboxItem.IsSelected = currentSelectedBoMons.Contains(boMon);
+                checkboxItem.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(BoMonCheckboxItem.IsSelected))
+                    {
+                        Filter();
+                        OnPropertyChanged(nameof(SelectedBoMonsText));
+                    }
+                };
+                DanhSachBoMonCheckbox.Add(checkboxItem);
+            }
+
+            OnPropertyChanged(nameof(SelectedBoMonsText));
         }
     }
 }

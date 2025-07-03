@@ -11,6 +11,8 @@ using QuanLyHocSinh.View.Dialogs;
 using ClosedXML.Excel;
 using System.IO;
 using Microsoft.Win32;
+using MaterialDesignThemes.Wpf;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
 
 namespace QuanLyHocSinh.ViewModel.BaoCao
 {
@@ -19,11 +21,11 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
         private MainViewModel _mainVM;
 
         #region Properties for filtering
-        private ObservableCollection<TongKetNamHocItem> _danhSachTongKetNamHoc = new();
-        public ObservableCollection<TongKetNamHocItem> DanhSachTongKetNamHoc
+        private ObservableCollection<TongKetLopItem> _danhSachTongKetLop = new();
+        public ObservableCollection<TongKetLopItem> DanhSachTongKetLop
         {
-            get => _danhSachTongKetNamHoc;
-            set { _danhSachTongKetNamHoc = value; OnPropertyChanged(nameof(DanhSachTongKetNamHoc)); }
+            get => _danhSachTongKetLop;
+            set { _danhSachTongKetLop = value; OnPropertyChanged(nameof(DanhSachTongKetLop)); }
         }
 
         private ObservableCollection<string> _danhSachNamHoc = new();
@@ -31,13 +33,6 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
         {
             get => _danhSachNamHoc;
             set { _danhSachNamHoc = value; OnPropertyChanged(nameof(DanhSachNamHoc)); }
-        }
-
-        private ObservableCollection<string> _danhSachLop = new();
-        public ObservableCollection<string> DanhSachLop
-        {
-            get => _danhSachLop;
-            set { _danhSachLop = value; OnPropertyChanged(nameof(DanhSachLop)); }
         }
 
         private ObservableCollection<string> _danhSachHocKy = new();
@@ -54,13 +49,6 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
             set { _selectedNamHoc = value; OnPropertyChanged(nameof(SelectedNamHoc)); LoadData(); }
         }
 
-        private string _selectedLop;
-        public string SelectedLop
-        {
-            get => _selectedLop;
-            set { _selectedLop = value; OnPropertyChanged(nameof(SelectedLop)); LoadData(); }
-        }
-
         private string _selectedHocKy;
         public string SelectedHocKy
         {
@@ -70,229 +58,134 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
         #endregion
 
         #region Statistics Properties
-        private List<string> _dsLopGiaoVienDay = new();
-
-        private int _tongHocSinh;
-        public int TongHocSinh
+        private int _tongSoLop;
+        public int TongSoLop
         {
-            get => _tongHocSinh;
-            set { _tongHocSinh = value; OnPropertyChanged(nameof(TongHocSinh)); }
+            get => _tongSoLop;
+            set { _tongSoLop = value; OnPropertyChanged(nameof(TongSoLop)); }
         }
 
-        private int _soLuongDat;
-        public int SoLuongDat
+        private int _tongSiSo;
+        public int TongSiSo
         {
-            get => _soLuongDat;
-            set { _soLuongDat = value; OnPropertyChanged(nameof(SoLuongDat)); }
+            get => _tongSiSo;
+            set { _tongSiSo = value; OnPropertyChanged(nameof(TongSiSo)); }
         }
 
-        private int _soLuongKhongDat;
-        public int SoLuongKhongDat
+        private int _tongSoLuongDat;
+        public int TongSoLuongDat
         {
-            get => _soLuongKhongDat;
-            set { _soLuongKhongDat = value; OnPropertyChanged(nameof(SoLuongKhongDat)); }
+            get => _tongSoLuongDat;
+            set { _tongSoLuongDat = value; OnPropertyChanged(nameof(TongSoLuongDat)); }
         }
 
-        private double _tiLeDat;
-        public double TiLeDat
+        private double _tiLeDatChung;
+        public double TiLeDatChung
         {
-            get => _tiLeDat;
-            set { _tiLeDat = value; OnPropertyChanged(nameof(TiLeDat)); }
+            get => _tiLeDatChung;
+            set { _tiLeDatChung = value; OnPropertyChanged(nameof(TiLeDatChung)); }
         }
 
-        private int _soLuongGioi;
-        public int SoLuongGioi
+        private string _lopDatTiLeCaoNhat;
+        public string LopDatTiLeCaoNhat
         {
-            get => _soLuongGioi;
-            set { _soLuongGioi = value; OnPropertyChanged(nameof(SoLuongGioi)); }
+            get => _lopDatTiLeCaoNhat;
+            set { _lopDatTiLeCaoNhat = value; OnPropertyChanged(nameof(LopDatTiLeCaoNhat)); }
         }
 
-        private int _soLuongKha;
-        public int SoLuongKha
+        private double _tiLeCaoNhat;
+        public double TiLeCaoNhat
         {
-            get => _soLuongKha;
-            set { _soLuongKha = value; OnPropertyChanged(nameof(SoLuongKha)); }
-        }
-
-        private int _soLuongTrungBinh;
-        public int SoLuongTrungBinh
-        {
-            get => _soLuongTrungBinh;
-            set { _soLuongTrungBinh = value; OnPropertyChanged(nameof(SoLuongTrungBinh)); }
-        }
-
-        private int _soLuongYeu;
-        public int SoLuongYeu
-        {
-            get => _soLuongYeu;
-            set { _soLuongYeu = value; OnPropertyChanged(nameof(SoLuongYeu)); }
-        }
-
-        private int _soLuongKem;
-        public int SoLuongKem
-        {
-            get => _soLuongKem;
-            set { _soLuongKem = value; OnPropertyChanged(nameof(SoLuongKem)); }
+            get => _tiLeCaoNhat;
+            set { _tiLeCaoNhat = value; OnPropertyChanged(nameof(TiLeCaoNhat)); }
         }
         #endregion
 
         #region Commands
-        public ICommand OpenBangDiemLopCommand { get; }
-        public ICommand OpenBangDiemHocSinhCommand { get; }
         public ICommand ExportExcelCommand { get; }
         #endregion
 
         public TongKetNamViewModel(MainViewModel mainVM)
         {
             _mainVM = mainVM;
-            if (_mainVM.CurrentUser.VaiTro.VaiTroID == "VT02")
-            {
-                _dsLopGiaoVienDay = GiaoVienDAL.GetLopDayCuaUser(_mainVM.CurrentUser.UserID);
-                var dsLop = new List<string>(_dsLopGiaoVienDay);
-                dsLop.Insert(0, "Tất cả");
-                DanhSachLop = new ObservableCollection<string>(dsLop);
-            }
-            else
-            {
-                var dsLop = TongKetNamDAL.GetAllLop();
-                dsLop.Insert(0, "Tất cả");
-                DanhSachLop = new ObservableCollection<string>(dsLop);
-            }
 
-            // Khởi tạo danh sách
             var dsNamHoc = TongKetNamDAL.GetAllNamHoc();
             dsNamHoc.Insert(0, "Tất cả");
             DanhSachNamHoc = new ObservableCollection<string>(dsNamHoc);
 
-            var dsHocKy = TongKetNamDAL.GetAllHocKy().Select(h => h.ToString()).ToList();
-            dsHocKy.Insert(0, "Cả năm");
+            var dsHocKy = new List<string> { "1", "2" };
             DanhSachHocKy = new ObservableCollection<string>(dsHocKy);
 
-            // Khởi tạo commands
-            OpenBangDiemLopCommand = new RelayCommand(OpenBangDiemLop);
-            OpenBangDiemHocSinhCommand = new RelayCommand<TongKetNamHocItem>(null, OpenBangDiemHocSinh);
             ExportExcelCommand = new RelayCommand(ExportExcel);
 
-            // Mặc định chọn 'Tất cả'
-            SelectedNamHoc = "Tất cả";
-            SelectedLop = "Tất cả";
-            SelectedHocKy = "Tất cả";
+            SelectedNamHoc = DanhSachNamHoc.FirstOrDefault() ?? "Tất cả";
+            SelectedHocKy = "1";
         }
 
         private void LoadData()
         {
-            // Nếu tất cả filter đều là 'Tất cả' thì lấy toàn bộ dữ liệu
+            if (string.IsNullOrEmpty(SelectedHocKy))
+                return;
+
             string? namHoc = SelectedNamHoc == "Tất cả" ? null : SelectedNamHoc;
-            int? hocKy = (SelectedHocKy == "Tất cả" || SelectedHocKy == "Cả năm" || string.IsNullOrEmpty(SelectedHocKy)) ? null : int.Parse(SelectedHocKy);
+            int? hocKy = int.TryParse(SelectedHocKy, out int hk) ? hk : null;
 
-            List<string> lopCanLay;
-            if (SelectedLop == "Tất cả")
-            {
-                if (_mainVM.CurrentUser.VaiTro.VaiTroID == "VT02")
-                    lopCanLay = _dsLopGiaoVienDay;
-                else
-                    lopCanLay = TongKetNamDAL.GetAllLop(); // hoặc null nếu DAL hỗ trợ
-            }
-            else
-            {
-                lopCanLay = new List<string> { SelectedLop };
-            }
-
-            DanhSachTongKetNamHoc.Clear();
-            var data = TongKetNamDAL.GetTongKetNamHoc(namHoc, null, hocKy)
-                                    .Where(x => lopCanLay.Contains(x.TenLop))
-                                    .ToList();
+            DanhSachTongKetLop.Clear();
+            var data = TongKetMonDAL.GetTongKetHocKyTheoLop(namHoc, hocKy);
+            
             int stt = 1;
             foreach (var item in data)
             {
                 item.STT = stt++;
-                // Lấy điểm TB từng học kỳ
-                var diemMon = TongKetNamDAL.GetBangDiemMonHoc(item.HocSinhID, item.NamHoc);
-                // Tính điểm TB học kỳ 1
-                var tb1 = diemMon.Where(x => x.DiemTBHK1.HasValue).Select(x => x.DiemTBHK1.Value).ToList();
-                item.DiemTBHK1 = tb1.Count > 0 ? Math.Round(tb1.Average(), 2) : (double?)null;
-                // Tính điểm TB học kỳ 2
-                var tb2 = diemMon.Where(x => x.DiemTBHK2.HasValue).Select(x => x.DiemTBHK2.Value).ToList();
-                item.DiemTBHK2 = tb2.Count > 0 ? Math.Round(tb2.Average(), 2) : (double?)null;
-                // Tính điểm TB cả năm
-                if (item.DiemTBHK1.HasValue && item.DiemTBHK2.HasValue)
-                    item.DiemTBCaNam = Math.Round((item.DiemTBHK1.Value + item.DiemTBHK2.Value * 2) / 3, 2);
-                else if (item.DiemTBHK1.HasValue)
-                    item.DiemTBCaNam = item.DiemTBHK1;
-                else if (item.DiemTBHK2.HasValue)
-                    item.DiemTBCaNam = item.DiemTBHK2;
-                else
-                    item.DiemTBCaNam = null;
-                // Xếp loại
-                if (!item.DiemTBCaNam.HasValue) item.XepLoai = "-";
-                else if (item.DiemTBCaNam >= 8.5) item.XepLoai = "Giỏi";
-                else if (item.DiemTBCaNam >= 6.5) item.XepLoai = "Khá";
-                else if (item.DiemTBCaNam >= 5.0) item.XepLoai = "Trung bình";
-                else if (item.DiemTBCaNam >= 3.5) item.XepLoai = "Yếu";
-                else item.XepLoai = "Kém";
-                // Kết quả
-                item.KetQua = (item.DiemTBCaNam.HasValue && item.DiemTBCaNam >= 5.0) ? "Đạt" : "Không đạt";
-                DanhSachTongKetNamHoc.Add(item);
+                DanhSachTongKetLop.Add(item);
             }
 
-            // Cập nhật thống kê
-            TongHocSinh = DanhSachTongKetNamHoc.Count;
-            SoLuongDat = DanhSachTongKetNamHoc.Count(x => x.GhiChu == "Đạt");
-            SoLuongKhongDat = DanhSachTongKetNamHoc.Count(x => x.GhiChu == "Không đạt");
-            TiLeDat = TongHocSinh > 0 ? Math.Round(100.0 * SoLuongDat / TongHocSinh, 2) : 0;
-            SoLuongGioi = DanhSachTongKetNamHoc.Count(x => x.XepLoai == "Giỏi");
-            SoLuongKha = DanhSachTongKetNamHoc.Count(x => x.XepLoai == "Khá");
-            SoLuongTrungBinh = DanhSachTongKetNamHoc.Count(x => x.XepLoai == "Trung bình");
-            SoLuongYeu = DanhSachTongKetNamHoc.Count(x => x.XepLoai == "Yếu");
-            SoLuongKem = DanhSachTongKetNamHoc.Count(x => x.XepLoai == "Kém");
+            CalculateStatistics();
         }
 
-        private void OpenBangDiemLop()
+        private void CalculateStatistics()
         {
-            if (SelectedNamHoc == "Tất cả" || SelectedHocKy == "Tất cả" || SelectedLop == "Tất cả")
+            var data = DanhSachTongKetLop.ToList();
+            
+            TongSoLop = data.Count;
+            TongSiSo = data.Sum(x => x.SiSo);
+            TongSoLuongDat = data.Sum(x => x.SoLuongDat);
+            TiLeDatChung = TongSiSo > 0 ? Math.Round((double)TongSoLuongDat * 100 / TongSiSo, 2) : 0;
+
+            var lopCaoNhat = data.OrderByDescending(x => x.TiLeDat).FirstOrDefault();
+            if (lopCaoNhat != null)
             {
-                MessageBox.Show("Vui lòng chọn đầy đủ Năm học, Học kỳ và Lớp!", "Thiếu thông tin", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                LopDatTiLeCaoNhat = lopCaoNhat.TenLop;
+                TiLeCaoNhat = lopCaoNhat.TiLeDat;
             }
-            if (SelectedHocKy == "Cả năm")
+            else
             {
-                MessageBox.Show("Vui lòng không chọn cả năm cho học kỳ", "Sai thông tin", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                LopDatTiLeCaoNhat = "-";
+                TiLeCaoNhat = 0;
             }
-            var dialog = new TongKetNamBangDiemLop(SelectedNamHoc, int.Parse(SelectedHocKy), SelectedLop);
-            dialog.ShowDialog();
         }
 
-        private void OpenBangDiemHocSinh(TongKetNamHocItem item)
-        {
-            if (item == null) return;
-            var dialog = new QuanLyHocSinh.View.Dialogs.ChiTietHocSinhDialog(item.HocSinhID, item.NamHoc, item.TenLop);
-            dialog.ShowDialog();
-        }
-
-        private void ExportExcel()
+        private async void ExportExcel()
         {
             var dialog = new SaveFileDialog
             {
                 Filter = "Excel files (*.xlsx)|*.xlsx",
-                FileName = SelectedNamHoc == "Tất cả" ? $"TongKetNam_{SelectedLop}_HK{SelectedHocKy}" : SelectedLop == "Tất cả" ? $"TongKetNam_{SelectedNamHoc}_HK{SelectedHocKy}" : SelectedHocKy == "Tất cả" ? $"TongKetNam_{SelectedNamHoc}_{SelectedLop}" : $"TongKetNam_{SelectedNamHoc}_{SelectedLop}_HK{SelectedHocKy}"
+                FileName = SelectedNamHoc == "Tất cả" ? $"TongKetHocKy_HK{SelectedHocKy}" : $"TongKetHocKy_{SelectedNamHoc}_HK{SelectedHocKy}"
             };
 
             if (dialog.ShowDialog() == true)
             {
                 using (var workbook = new XLWorkbook())
                 {
-                    var worksheet = workbook.Worksheets.Add("Tổng kết năm học");
+                    var worksheet = workbook.Worksheets.Add("Tổng kết học kỳ");
 
-                    //Vẽ tiêu đề
-                    worksheet.Cell("A1").Value = "BÁO CÁO TỔNG KẾT NĂM HỌC";
-                    worksheet.Range("A1:N1").Merge();
+                    worksheet.Cell("A1").Value = "BÁO CÁO TỔNG KẾT HỌC KỲ";
+                    worksheet.Range("A1:E1").Merge();
                     worksheet.Cell("A1").Style.Font.Bold = true;
                     worksheet.Cell("A1").Style.Font.FontSize = 16;
                     worksheet.Cell("A1").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-                    //Tạo header
-                    var headers = new[] { "STT", "Mã HS", "Họ tên", "Lớp", "Năm học", "Học kỳ","Điểm TB HK1", "Điểm TB HK2", "Điểm TB Cả năm", "Xếp loại", "Kết quả" };
+                    var headers = new[] { "STT", "Lớp", "Sỉ số", "Số lượng đạt", "Tỉ lệ (%)" };
                     for (int i = 0; i < headers.Length; i++)
                     {
                         worksheet.Cell(3, i + 1).Value = headers[i];
@@ -301,62 +194,59 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
 
                     //Vẽ dữ liệu
                     int row = 4;
-                    foreach (var item in DanhSachTongKetNamHoc)
+                    foreach (var item in DanhSachTongKetLop)
                     {
                         worksheet.Cell(row, 1).Value = item.STT;
-                        worksheet.Cell(row, 2).Value = item.HocSinhID;
-                        worksheet.Cell(row, 3).Value = item.HoTen;
-                        worksheet.Cell(row, 4).Value = item.TenLop;
-                        worksheet.Cell(row, 5).Value = item.NamHoc;
-                        worksheet.Cell(row, 6).Value = item.HocKy;
-                        worksheet.Cell(row, 7).Value = item.DiemTBHK1;
-                        worksheet.Cell(row, 8).Value = item.DiemTBHK2;
-                        worksheet.Cell(row, 9).Value = item.DiemTBCaNam;
-                        worksheet.Cell(row, 10).Value = item.XepLoai;
-                        worksheet.Cell(row, 11).Value = item.KetQua;
+                        worksheet.Cell(row, 2).Value = item.TenLop;
+                        worksheet.Cell(row, 3).Value = item.SiSo;
+                        worksheet.Cell(row, 4).Value = item.SoLuongDat;
+                        worksheet.Cell(row, 5).Value = $"{item.TiLeDat:F2}";
                         row++;
                     }
 
                     //Thống kê
                     row += 2;
-                    worksheet.Cell(row, 1).Value = "THỐNG KÊ";
+                    worksheet.Cell(row, 1).Value = "THỐNG KÊ TỔNG KẾT HỌC KỲ";
                     worksheet.Cell(row, 1).Style.Font.Bold = true;
                     row++;
-                    worksheet.Cell(row, 1).Value = "Tổng số học sinh:";
-                    worksheet.Cell(row, 2).Value = TongHocSinh;
+                    worksheet.Cell(row, 1).Value = "Tổng số lớp:";
+                    worksheet.Cell(row, 2).Value = TongSoLop;
                     row++;
-                    worksheet.Cell(row, 1).Value = "Số lượng đạt:";
-                    worksheet.Cell(row, 2).Value = SoLuongDat;
+                    worksheet.Cell(row, 1).Value = "Tổng sỉ số:";
+                    worksheet.Cell(row, 2).Value = TongSiSo;
                     row++;
-                    worksheet.Cell(row, 1).Value = "Số lượng không đạt:";
-                    worksheet.Cell(row, 2).Value = SoLuongKhongDat;
+                    worksheet.Cell(row, 1).Value = "Tổng số lượng đạt:";
+                    worksheet.Cell(row, 2).Value = TongSoLuongDat;
                     row++;
-                    worksheet.Cell(row, 1).Value = "Tỉ lệ đạt:";
-                    worksheet.Cell(row, 2).Value = $"{TiLeDat:F2}%";
+                    worksheet.Cell(row, 1).Value = "Tỉ lệ đạt chung:";
+                    worksheet.Cell(row, 2).Value = $"{TiLeDatChung:F2}%";
                     row++;
-                    worksheet.Cell(row, 1).Value = "Số lượng giỏi:";
-                    worksheet.Cell(row, 2).Value = SoLuongGioi;
+                    worksheet.Cell(row, 1).Value = "Lớp đạt tỉ lệ cao nhất:";
+                    worksheet.Cell(row, 2).Value = LopDatTiLeCaoNhat;
                     row++;
-                    worksheet.Cell(row, 1).Value = "Số lượng khá:";
-                    worksheet.Cell(row, 2).Value = SoLuongKha;
-                    row++;
-                    worksheet.Cell(row, 1).Value = "Số lượng trung bình:";
-                    worksheet.Cell(row, 2).Value = SoLuongTrungBinh;
-                    row++;
-                    worksheet.Cell(row, 1).Value = "Số lượng yếu:";
-                    worksheet.Cell(row, 2).Value = SoLuongYeu;
-                    row++;
-                    worksheet.Cell(row, 1).Value = "Số lượng kém:";
-                    worksheet.Cell(row, 2).Value = SoLuongKem;
-                    row++;
+                    worksheet.Cell(row, 1).Value = "Tỉ lệ đạt cao nhất:";
+                    worksheet.Cell(row, 2).Value = $"{TiLeCaoNhat:F2}%";
                     
                     //Tự động chỉnh cột
-                    worksheet.Columns().AdjustToContents();
+                    worksheet.ColumnsUsed().AdjustToContents();
 
                     workbook.SaveAs(dialog.FileName);
                 }
 
-                MessageBox.Show("Xuất Excel thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                await ShowNotificationAsync("Thông báo", "✅ Xuất Excel thành công!");
+            }
+        }
+
+        private async Task ShowNotificationAsync(string title, string message)
+        {
+            try
+            {
+                await DialogHost.Show(new NotifyDialog(title, message), "RootDialog_Main");
+            }
+            catch
+            {
+                MessageBox.Show(message, title, MessageBoxButton.OK, 
+                    title.Contains("Lỗi") ? MessageBoxImage.Error : MessageBoxImage.Information);
             }
         }
     }

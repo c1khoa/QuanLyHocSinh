@@ -24,8 +24,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         }
 
         private ObservableCollection<Diem> _allDiem;
-
-        //Lọc theo search
+    
         private string _searchText;
         public string SearchText
         {
@@ -33,7 +32,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _searchText = value; OnPropertyChanged(nameof(SearchText)); Filter(); }
         }
 
-        //Lọc theo lớp
         private string _selectedLop;
         public string SelectedLop
         {
@@ -41,7 +39,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _selectedLop = value; OnPropertyChanged(nameof(SelectedLop)); Filter(); }
         }
 
-        //Lọc theo môn học
         private string _selectedMonHoc;
         public string SelectedMonHoc
         {
@@ -49,7 +46,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _selectedMonHoc = value; OnPropertyChanged(nameof(SelectedMonHoc)); Filter(); }
         }
 
-        //Danh sách năm học
         private ObservableCollection<string> _danhSachNamHoc;
         public ObservableCollection<string> DanhSachNamHoc
         {
@@ -57,7 +53,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _danhSachNamHoc = value; OnPropertyChanged(nameof(DanhSachNamHoc)); }
         }
 
-        //Danh sách học kỳ
         private ObservableCollection<string> _danhSachHocKy;
         public ObservableCollection<string> DanhSachHocKy
         {
@@ -65,7 +60,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _danhSachHocKy = value; OnPropertyChanged(nameof(DanhSachHocKy)); }
         }
 
-        //Danh sách lớp
         private ObservableCollection<string> _danhSachLop;
         public ObservableCollection<string> DanhSachLop
         {
@@ -73,7 +67,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _danhSachLop = value; OnPropertyChanged(nameof(DanhSachLop)); }
         }
 
-        //Danh sách môn học
         private ObservableCollection<string> _danhSachMonHoc;
         public ObservableCollection<string> DanhSachMonHoc
         {
@@ -81,7 +74,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _danhSachMonHoc = value; OnPropertyChanged(nameof(DanhSachMonHoc)); }
         }
 
-        //Danh sách năm học
         private string _selectedNamHoc;
         public string SelectedNamHoc
         {
@@ -89,7 +81,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _selectedNamHoc = value; OnPropertyChanged(nameof(SelectedNamHoc)); Filter(); }
         }
 
-        //Danh sách học kỳ
         private string _selectedHocKy;
         public string SelectedHocKy
         {
@@ -104,7 +95,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _selectedDiem = value; OnPropertyChanged(nameof(SelectedDiem)); }
         }
 
-        //Lệnh edit và filter
         public ICommand EditCommand { get; }
         public ICommand FilterCommand { get; }
 
@@ -115,7 +105,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             _allDiem = new ObservableCollection<Diem>(DiemDAL.GetAllDiemHocSinh());
             DanhSachDiem = new ObservableCollection<Diem>(_allDiem);
 
-            //Lấy danh sách lớp và môn học duy nhất
             var dsLop = _allDiem.Select(d => d.Lop).Distinct().OrderBy(l => l).ToList();
             dsLop.Insert(0, "Tất cả");
             DanhSachLop = new ObservableCollection<string>(dsLop);
@@ -132,11 +121,9 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             dsHocKy.Insert(0, "Tất cả");
             DanhSachHocKy = new ObservableCollection<string>(dsHocKy);
 
-            //Khởi tạo các lệnh
             EditCommand = new RelayCommand(EditDiem, () => SelectedDiem != null);
             FilterCommand = new RelayCommand(Filter);
 
-            //Mặc định chọn "Tất cả"
             SelectedLop = "Tất cả";
             SelectedMonHoc = "Tất cả";
             SelectedNamHoc = "Tất cả";
@@ -164,7 +151,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             var dialog = new SuaDiemDialog(SelectedDiem);
             if (dialog.ShowDialog() == true)
             {
-                // Refresh danh sách sau khi sửa
                 _allDiem = new ObservableCollection<Diem>(DiemDAL.GetAllDiemHocSinh());
                 Filter();
             }

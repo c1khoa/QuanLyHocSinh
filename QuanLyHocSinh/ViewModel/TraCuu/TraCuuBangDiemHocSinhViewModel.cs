@@ -1,11 +1,15 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.Model.DAL;
 using Microsoft.Win32;
 using System.IO;
 using ClosedXML.Excel;
 using System;
 using System.Windows;
+using MaterialDesignThemes.Wpf;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
+using System.Linq;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
@@ -18,6 +22,9 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         public string HocSinhID { get; set; }
         public ObservableCollection<TongKetMonItem> BangDiemMon { get; set; }
         public ICommand ExportExcelCommand { get; set; }
+        
+        public event System.Action RequestMainWindowRefresh;
+        public event System.Action RequestDialogActivation;
 
         public ObservableCollection<string> DanhSachNamHoc { get; set; }
         public ObservableCollection<int> DanhSachHocKy { get; set; }
@@ -52,21 +59,36 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             HoTen = hs.HoTen;
             TenLop = hs.TenLop;
             HocSinhID = hs.HocSinhID;
-            // Lấy danh sách năm học và học kỳ
-            DanhSachNamHoc = new ObservableCollection<string>(HocSinhDAL.GetAllNamHoc());
-            DanhSachNamHoc.Insert(0, "Chọn");
-            DanhSachHocKy = new ObservableCollection<int>(HocSinhDAL.GetAllHocKy());
-            DanhSachHocKy.Insert(0, 0); // 0 đại diện cho "Chọn"
-            SelectedNamHoc = "Chọn";
-            SelectedHocKy = 0;
+            
+            var allNamHoc = HocSinhDAL.GetAllNamHoc();
+            DanhSachNamHoc = new ObservableCollection<string>(allNamHoc);
+            
+            var allHocKy = HocSinhDAL.GetAllHocKy().Where(hk => hk > 0).ToList(); 
+            DanhSachHocKy = new ObservableCollection<int>(allHocKy);
+            
+            if (DanhSachNamHoc.Count > 0)
+            {
+                SelectedNamHoc = DanhSachNamHoc.LastOrDefault(); 
+            }
+            
+            if (DanhSachHocKy.Contains(2))
+            {
+                SelectedHocKy = 2; 
+            }
+            else if (DanhSachHocKy.Count > 0)
+            {
+                SelectedHocKy = DanhSachHocKy.FirstOrDefault(); 
+            }
+            
             BangDiemMon = null;
             IsShowBangDiem = false;
             ExportExcelCommand = new RelayCommand(ExportExcel);
-            _mainVM = mainVM;
+            
+            OnFilterChanged();
         }
         private void OnFilterChanged()
         {
-            if (SelectedNamHoc != null && SelectedNamHoc != "Chọn" && SelectedHocKy.HasValue && SelectedHocKy.Value != 0)
+            if (!string.IsNullOrEmpty(SelectedNamHoc) && SelectedHocKy.HasValue && SelectedHocKy.Value > 0)
             {
                 NamHoc = SelectedNamHoc;
                 HocKy = SelectedHocKy.Value;
@@ -74,6 +96,8 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                 BangDiemMon = new ObservableCollection<TongKetMonItem>(list);
                 IsShowBangDiem = BangDiemMon != null && BangDiemMon.Count > 0;
                 OnPropertyChanged(nameof(BangDiemMon));
+                OnPropertyChanged(nameof(NamHoc));
+                OnPropertyChanged(nameof(HocKy));
             }
             else
             {
@@ -82,7 +106,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                 OnPropertyChanged(nameof(BangDiemMon));
             }
         }
-        private void ExportExcel()
+        private async void ExportExcel()
         {
             if (!IsShowBangDiem) return;
             try
@@ -99,7 +123,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                     {
                         var worksheet = workbook.Worksheets.Add("Bảng điểm");
 
-                        // Thêm thông tin học sinh
                         worksheet.Cell("A1").Value = "Họ tên:";
                         worksheet.Cell("B1").Value = HoTen;
                         worksheet.Cell("A2").Value = "Lớp:";
@@ -109,7 +132,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                         worksheet.Cell("A4").Value = "Học kỳ:";
                         worksheet.Cell("B4").Value = HocKy;
 
-                        // Thêm header
                         var headers = new[] { "Môn học", "Điểm miệng", "Điểm 15p", "Điểm 1 tiết", "Điểm thi", "Điểm TB", "Xếp loại" };
                         for (int i = 0; i < headers.Length; i++)
                         {
@@ -117,7 +139,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                             worksheet.Cell(6, i + 1).Style.Font.Bold = true;
                         }
 
-                        // Thêm dữ liệu
                         int row = 7;
                         foreach (var item in BangDiemMon)
                         {
@@ -131,23 +152,26 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                             row++;
                         }
 
-                        // Tự động điều chỉnh độ rộng cột
                         worksheet.Columns().AdjustToContents();
 
                         workbook.SaveAs(saveFileDialog.FileName);
                     }
 
-                    System.Windows.MessageBox.Show("Xuất Excel thành công!", "Thông báo", 
-                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                    await ShowNotificationAsync("Thông báo", "✅ Xuất Excel thành công!");
+                    
+                    // Activate dialog sau khi export để không bị ẩn đằng sau main window
+                    RequestDialogActivation?.Invoke();
                 }
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Lỗi khi xuất Excel: {ex.Message}", "Lỗi", 
-                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                await ShowNotificationAsync("Lỗi", $"❌ Lỗi khi xuất Excel: {ex.Message}");
+                
+                // Activate dialog sau khi hiển thị lỗi để không bị ẩn đằng sau main window
+                RequestDialogActivation?.Invoke();
             }
         }
-        private void SaveChanges()
+        private async void SaveChanges()
         {
             if (!IsShowBangDiem || BangDiemMon == null) return;
 
@@ -169,16 +193,15 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                     DiemDAL.UpdateDiem(diem);
                 }
 
-                // Cập nhật lại bảng điểm sau khi lưu
                 var list = HocSinhDAL.GetBangDiemHocSinh(HocSinhID, NamHoc, HocKy);
                 BangDiemMon = new ObservableCollection<TongKetMonItem>(list);
                 OnPropertyChanged(nameof(BangDiemMon));
 
-                MessageBox.Show("Lưu thay đổi thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                await ShowNotificationAsync("Thông báo", "✅ Lưu thay đổi thành công!");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi lưu thay đổi: {ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                await ShowNotificationAsync("Lỗi", $"❌ Lỗi khi lưu thay đổi: {ex.Message}");
             }
         }
         public void RefreshBangDiem()
@@ -189,6 +212,24 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                 BangDiemMon = new ObservableCollection<TongKetMonItem>(list);
                 IsShowBangDiem = BangDiemMon != null && BangDiemMon.Count > 0;
                 OnPropertyChanged(nameof(BangDiemMon));
+            }
+        }
+        
+        public void NotifyMainWindowRefresh()
+        {
+            RequestMainWindowRefresh?.Invoke();
+        }
+
+        private async Task ShowNotificationAsync(string title, string message)
+        {
+            try
+            {
+                await DialogHost.Show(new NotifyDialog(title, message), "RootDialog_Main");
+            }
+            catch
+            {
+                MessageBox.Show(message, title, MessageBoxButton.OK, 
+                    title.Contains("Lỗi") ? MessageBoxImage.Error : MessageBoxImage.Information);
             }
         }
     }

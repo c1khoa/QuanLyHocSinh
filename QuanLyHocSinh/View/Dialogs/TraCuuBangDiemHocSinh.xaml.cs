@@ -9,10 +9,45 @@ namespace QuanLyHocSinh.View.Dialogs
         public BangDiemHocSinh()
         {
             InitializeComponent();
+            
+            // Subscribe event khi DataContext thay đổi
+            this.DataContextChanged += BangDiemHocSinh_DataContextChanged;
+        }
+        
+        private void BangDiemHocSinh_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            // Unsubscribe từ ViewModel cũ nếu có
+            if (e.OldValue is TraCuuBangDiemHocSinhViewModel oldVm)
+            {
+                oldVm.RequestDialogActivation -= OnRequestDialogActivation;
+            }
+            
+            // Subscribe vào ViewModel mới
+            if (e.NewValue is TraCuuBangDiemHocSinhViewModel newVm)
+            {
+                newVm.RequestDialogActivation += OnRequestDialogActivation;
+            }
+        }
+        
+        private void OnRequestDialogActivation()
+        {
+            // Activate dialog để đưa lên trên
+            this.Activate();
+            this.Topmost = true;
+            this.Topmost = false;
         }
 
         private void BtnClose_Click(object sender, RoutedEventArgs e)
         {
+            var vm = DataContext as TraCuuBangDiemHocSinhViewModel;
+            vm?.NotifyMainWindowRefresh();
+            
+            // Unsubscribe event trước khi đóng để tránh memory leak
+            if (vm != null)
+            {
+                vm.RequestDialogActivation -= OnRequestDialogActivation;
+            }
+            
             this.Close();
         }
 
@@ -41,10 +76,15 @@ namespace QuanLyHocSinh.View.Dialogs
             };
 
             var dialog = new SuaDiemDialog(diem);
+            dialog.Owner = this;
+            dialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             if (dialog.ShowDialog() == true)
             {
-                // Refresh bảng điểm sau khi sửa
                 vm.RefreshBangDiem();
+                
+                this.Activate();
+                this.Topmost = true;
+                this.Topmost = false;
             }
         }
     }
