@@ -16,6 +16,9 @@ namespace QuanLyHocSinh.Model.Entities
         public DateTime NgaySinh { get; set; }
         public string GioiTinh { get; set; }
         public string LopDayID { get; set; }
+        public string LopChuNhiemID { get; set; }
+        public string ChucVu { get;set; }
+        public string VaiTroID { get; set; } // Khóa ngoại
         public string Email { get; set; }
         public string BoMon { get; set; }
         public string DiaChi { get; set; }

@@ -5,6 +5,7 @@ using System;
 using System.Configuration;
 using System.Windows;
 using DocumentFormat.OpenXml.Office.Word;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace QuanLyHocSinh.Service
 {
@@ -222,6 +223,43 @@ namespace QuanLyHocSinh.Service
 
 
         public static string LastErrorMessage = "";
+        public static string LayDiemIDMoi(MySqlConnection conn, MySqlTransaction transaction)
+        {
+            string query = "SELECT DiemID FROM DIEM ORDER BY DiemID DESC LIMIT 1";
+            using (var cmd = new MySqlCommand(query, conn, transaction))
+            {
+                var result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                {
+                    string lastID = result.ToString(); // ví dụ: "D00123"
+                    int number = int.Parse(lastID.Substring(1));
+                    return $"D{(number + 1):D7}";
+                }
+                else
+                {
+                    return "D0000001"; // Trường hợp chưa có bản ghi nào
+                }
+            }
+        }
+        public static string LayChiTietDiemIDMoi(MySqlConnection conn, MySqlTransaction transaction)
+        {
+            string query = "SELECT ChiTietDiemID FROM CHITIETDIEM ORDER BY ChiTietDiemID DESC LIMIT 1";
+            using (var cmd = new MySqlCommand(query, conn, transaction))
+            {
+                var result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                {
+                    string lastID = result.ToString(); // ví dụ: "CTD00057"
+                    int number = int.Parse(lastID.Substring(3));
+                    return $"CTD{(number + 1):D9}";
+                }
+                else
+                {
+                    return "CTD000000001"; // Trường hợp chưa có bản ghi nào
+                }
+            }
+        }
+
 
         public static bool ThemTaiKhoan(User user)
         {
@@ -334,6 +372,46 @@ namespace QuanLyHocSinh.Service
                                 linkCmd.Parameters.AddWithValue("@NienKhoa", 2025);
                                 linkCmd.ExecuteNonQuery();
                             }
+                            // Tạo các bản ghi điểm rỗng cho học sinh
+                            using (var monCmd = new MySqlCommand("SELECT MonHocID FROM MONHOC", conn, transaction))
+                            using (var monReader = monCmd.ExecuteReader())
+                            {
+                                List<string> monHocIDs = new List<string>();
+                                while (monReader.Read())
+                                {
+                                    monHocIDs.Add(monReader.GetString("MonHocID"));
+                                }
+                                monReader.Close();
+                                for (int i = 1; i < 3; i++)
+                                {
+                                    foreach (var monID in monHocIDs)
+                                    {
+                                        string diemID = LayDiemIDMoi(conn, transaction); // Tự tạo ID nếu cần
+                                        string[] loaiDiem = new[] { "LD01", "LD02", "LD03", "LD04" }; // Ví dụ: Miệng, 15p, 1 tiết, thi
+                                        using (var diemCmd = new MySqlCommand("INSERT INTO DIEM (DiemID, HocSinhID, MonHocID, HocKy, NamHocID, DiemTrungBinh, XepLoai) VALUES (@DiemID, @HocSinhID, @MonHocID, @HocKy, @NamHocID, NULL, NULL)", conn, transaction))
+                                        {
+                                            diemCmd.Parameters.AddWithValue("@DiemID", diemID);
+                                            diemCmd.Parameters.AddWithValue("@HocSinhID", user.HocSinhID);
+                                            diemCmd.Parameters.AddWithValue("@MonHocID", monID);
+                                            diemCmd.Parameters.AddWithValue("@HocKy", i); // hoặc thêm cả 2 học kỳ nếu muốn
+                                            diemCmd.Parameters.AddWithValue("@NamHocID", "NH2025"); // lấy theo năm học hiện tại
+                                            diemCmd.ExecuteNonQuery();
+                                        }
+                                        foreach (string loai in loaiDiem)
+                                        {
+                                            string chiTietID = LayChiTietDiemIDMoi(conn, transaction);
+                                            using (var ctCmd = new MySqlCommand("INSERT INTO CHITIETDIEM (ChiTietDiemID, DiemID, LoaiDiemID, GiaTri) VALUES (@ID, @DiemID, @LoaiDiemID, NULL)", conn, transaction))
+                                            {
+                                                ctCmd.Parameters.AddWithValue("@ID", chiTietID);
+                                                ctCmd.Parameters.AddWithValue("@DiemID", diemID);
+                                                ctCmd.Parameters.AddWithValue("@LoaiDiemID", loai);
+                                                ctCmd.ExecuteNonQuery();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                         }
                         else if (user.VaiTroID == "VT02")
                         {

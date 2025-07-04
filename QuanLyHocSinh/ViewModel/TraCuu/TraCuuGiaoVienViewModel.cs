@@ -272,11 +272,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
 
         private bool IsGiaoVienTeachesAllSelectedLops(GiaoVien gv, List<string> selectedLops)
         {
-            if (selectedLops.Contains("Chưa phân công"))
-            {
-                return string.IsNullOrEmpty(gv.LopDayID) || gv.LopDayID.Trim() == "";
-            }
-            
             if (string.IsNullOrEmpty(gv.LopDayID))
                 return false;
 
@@ -289,10 +284,6 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
 
         private bool IsGiaoVienTeachesAllSelectedBoMons(GiaoVien gv, List<string> selectedBoMons)
         {
-            if (selectedBoMons.Contains("Chưa phân công"))
-            {
-                return string.IsNullOrEmpty(gv.BoMon) || gv.BoMon.Trim() == "";
-            }
             
             if (string.IsNullOrEmpty(gv.BoMon))
                 return false;

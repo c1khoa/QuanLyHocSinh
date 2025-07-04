@@ -26,75 +26,85 @@
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        
-        <!-- Tiêu đề -->
-        <TextBlock Text="BÁO CÁO TỔNG KẾT HỌC KỲ" 
+    <Border Margin="20"
+                BorderBrush="#03a9f4"
+                BorderThickness="2"
+                Background="#D0F0FD"
+                CornerRadius="30">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="6*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Tiêu đề -->
+            <TextBlock Text="BÁO CÁO TỔNG KẾT HỌC KỲ" 
                    FontSize="24" 
                    FontWeight="Bold" 
                    HorizontalAlignment="Center" 
                    VerticalAlignment="Center"
                    Margin="10 10 0 10"
                    Grid.Row="0"/>
-                   
+
             <!-- Bộ lọc + các nút chức năng -->
-            <Border Grid.Row="1" Background="#e8f5e8" CornerRadius="15" Padding="15" Margin="10,0,10,20">
+            <Border  Grid.Row="1" Background="White" CornerRadius="15">
                 <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                
-                <StackPanel Grid.Column="0" Margin="10" VerticalAlignment="Center">
-                    <TextBlock Text="Năm học" FontSize="13" Margin="0,0,0,5"/>
-                    <ComboBox materialDesign:HintAssist.Hint="Năm học"
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Border Grid.Row="0" Background="Transparent" CornerRadius="15" Padding="15" Margin="10,0,10,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="10" VerticalAlignment="Center">
+                                <TextBlock Text="Năm học" FontSize="13" Margin="0,0,0,5"/>
+                                <ComboBox materialDesign:HintAssist.Hint="Năm học"
                               IsEditable="False"
                               FontSize="13"
                               ItemsSource="{Binding DanhSachNamHoc}"
                               SelectedItem="{Binding SelectedNamHoc, Mode=TwoWay}"/>
-                </StackPanel>
-                
-                <StackPanel Grid.Column="1" Margin="10" VerticalAlignment="Center">
-                    <TextBlock Text="Học kỳ" FontSize="13" Margin="0,0,0,5"/>
-                    <ComboBox materialDesign:HintAssist.Hint="Học kỳ"
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Margin="10" VerticalAlignment="Center">
+                                <TextBlock Text="Học kỳ" FontSize="13" Margin="0,0,0,5"/>
+                                <ComboBox materialDesign:HintAssist.Hint="Học kỳ"
                               IsEditable="False"
                               FontSize="13"
                               ItemsSource="{Binding DanhSachHocKy}"
                               SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}"/>
-                </StackPanel>
-                
-                <!-- Các nút chức năng và thông tin tổng số -->
-                <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <Border Style="{StaticResource ImageBorderStyle}"
+                            </StackPanel>
+
+                            <!-- Các nút chức năng và thông tin tổng số -->
+                            <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <Border Style="{StaticResource ImageBorderStyle}"
                                 Margin="10 0 0 0"
                                 Background="#4CAF50">
-                            <Button Content="Xuất Excel" 
+                                        <Button Content="Xuất Excel" 
                                     Command="{Binding ExportExcelCommand}"
                                     BorderBrush="Transparent"
                                     Style="{StaticResource MaterialDesignRaisedLightButton}"
                                     Background="Transparent"
                                     HorizontalAlignment="Center"/>
-                        </Border>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,10,0">
-                        <TextBlock Text="Tổng số lớp: " FontWeight="Bold" FontSize="14"/>
-                        <TextBlock Text="{Binding TongSoLop}" FontSize="14" FontWeight="Bold"/>
-                    </StackPanel>
-                </StackPanel>
-            </Grid>
-            </Border>
-            
-            <!-- Bảng dữ liệu tổng kết học kỳ -->
-            <Border Grid.Row="2" Background="White" CornerRadius="15" Padding="10" Margin="10" BorderBrush="#e0e0e0" BorderThickness="1">
-                <DataGrid ItemsSource="{Binding DanhSachTongKetLop}"
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,10,0">
+                                    <TextBlock Text="Tổng số lớp: " FontWeight="Bold" FontSize="14"/>
+                                    <TextBlock Text="{Binding TongSoLop}" FontSize="14" FontWeight="Bold"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Bảng dữ liệu tổng kết học kỳ -->
+                    <Border Grid.Row="1" Background="White" CornerRadius="15" Padding="10" Margin="10" BorderBrush="#e0e0e0" BorderThickness="1">
+                        <DataGrid ItemsSource="{Binding DanhSachTongKetLop}"
                       Style="{StaticResource CommonDataGridStyle}"
                       AutoGenerateColumns="False"
                       ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -106,70 +116,74 @@
                           EnableColumnVirtualization="True"
                           BorderBrush="Transparent"
                           Background="Transparent">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="STT" 
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="STT" 
                                       Binding="{Binding STT}" 
                                       Width="60" 
                                       ElementStyle="{StaticResource CenterAlignStyle}"
                                       HeaderStyle="{StaticResource CenterHeaderStyle}"/>
-                    <DataGridTextColumn Header="Lớp" 
+                                <DataGridTextColumn Header="Lớp" 
                                       Binding="{Binding TenLop}" 
                                       Width="*" 
                                       MinWidth="120"
                                       ElementStyle="{StaticResource CenterAlignStyle}"
                                       HeaderStyle="{StaticResource CenterHeaderStyle}"/>
-                    <DataGridTextColumn Header="Sỉ số" 
+                                <DataGridTextColumn Header="Sỉ số" 
                                       Binding="{Binding SiSo}" 
                                       Width="100" 
                                       ElementStyle="{StaticResource CenterAlignStyle}"
                                       HeaderStyle="{StaticResource CenterHeaderStyle}"/>
-                    <DataGridTextColumn Header="Số lượng đạt" 
+                                <DataGridTextColumn Header="Số lượng đạt" 
                                       Binding="{Binding SoLuongDat}" 
                                       Width="120" 
                                       ElementStyle="{StaticResource CenterAlignStyle}"
                                       HeaderStyle="{StaticResource CenterHeaderStyle}"/>
-                    <DataGridTextColumn Header="Tỉ lệ (%)" 
+                                <DataGridTextColumn Header="Tỉ lệ (%)" 
                                       Binding="{Binding TiLeDat, StringFormat={}{0:F2}}" 
                                       Width="100" 
                                       ElementStyle="{StaticResource CenterAlignStyle}"
                                       HeaderStyle="{StaticResource CenterHeaderStyle}"/>
-                </DataGrid.Columns>
-            </DataGrid>
-            </Border>
-            
-            <!-- Thống kê -->
-            <Border Grid.Row="3" Background="#fff3e0" CornerRadius="15" Padding="15" Margin="10,10,10,0">
-                <StackPanel>
-                    <TextBlock Text="THỐNG KÊ TỔNG KẾT HỌC KỲ" FontWeight="Bold" FontSize="16" Margin="0,0,0,10" HorizontalAlignment="Center"/>
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <StackPanel Margin="5,5,15,5" MinWidth="120">
-                            <TextBlock Text="Tổng số lớp:" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding TongSoLop}" Margin="0,5,0,0"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+
+                    <!-- Thống kê -->
+                    <Border Grid.Row="2" Background="Transparent" CornerRadius="15" Padding="15" Margin="10,10,10,0">
+                        <StackPanel>
+                            <TextBlock Text="THỐNG KÊ TỔNG KẾT HỌC KỲ" FontWeight="Bold" FontSize="16" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                <StackPanel Orientation="Horizontal" Margin="10">
+                                    <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                        <TextBlock Text="Tổng số lớp:" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding TongSoLop}" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                        <TextBlock Text="Tổng sỉ số:" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding TongSiSo}" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                        <TextBlock Text="Tổng số đạt:" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding TongSoLuongDat}" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                        <TextBlock Text="Tỉ lệ đạt chung:" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding TiLeDatChung, StringFormat={}{0:F2}%}" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                        <TextBlock Text="Lớp đạt tỉ lệ cao nhất:" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding LopDatTiLeCaoNhat}" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                        <TextBlock Text="Tỉ lệ cao nhất:" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding TiLeCaoNhat, StringFormat={}{0:F2}%}" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ScrollViewer>
                         </StackPanel>
-                        <StackPanel Margin="5,5,15,5" MinWidth="120">
-                            <TextBlock Text="Tổng sỉ số:" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding TongSiSo}" Margin="0,5,0,0"/>
-                        </StackPanel>
-                        <StackPanel Margin="5,5,15,5" MinWidth="120">
-                            <TextBlock Text="Tổng số đạt:" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding TongSoLuongDat}" Margin="0,5,0,0"/>
-                        </StackPanel>
-                        <StackPanel Margin="5,5,15,5" MinWidth="120">
-                            <TextBlock Text="Tỉ lệ đạt chung:" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding TiLeDatChung, StringFormat={}{0:F2}%}" Margin="0,5,0,0"/>
-                        </StackPanel>
-                        <StackPanel Margin="5,5,15,5" MinWidth="120">
-                            <TextBlock Text="Lớp đạt tỉ lệ cao nhất:" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding LopDatTiLeCaoNhat}" Margin="0,5,0,0"/>
-                        </StackPanel>
-                        <StackPanel Margin="5,5,15,5" MinWidth="120">
-                            <TextBlock Text="Tỉ lệ cao nhất:" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding TiLeCaoNhat, StringFormat={}{0:F2}%}" Margin="0,5,0,0"/>
-                        </StackPanel>
-                    </StackPanel>
-                </ScrollViewer>
-                </StackPanel>
+
+                    </Border>
+                </Grid>
             </Border>
         </Grid>
+    </Border>
 </UserControl>

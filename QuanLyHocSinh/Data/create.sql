@@ -1,3 +1,4 @@
+DROP DATABASE quanlyhocsinh;
 -- Tạo database
 CREATE DATABASE quanlyhocsinh;
 USE quanlyhocsinh;
@@ -57,7 +58,7 @@ CREATE TABLE LOP (
     LopID CHAR(4) PRIMARY KEY,
     TenLop VARCHAR(50) NOT NULL,
     SiSo INT NOT NULL CHECK(SiSo > 0),
-    GVCNID CHAR(8) NOT NULL,
+    GVCNID CHAR(8),
     FOREIGN KEY (GVCNID) REFERENCES GIAOVIEN(GiaoVienID)
 );
 
@@ -85,10 +86,10 @@ CREATE TABLE LOAIDIEM (
 
 -- Tạo bảng CHITIETDIEM
 CREATE TABLE CHITIETDIEM (
-    ChiTietDiemID CHAR(8) PRIMARY KEY,
+    ChiTietDiemID CHAR(12) PRIMARY KEY,
     DiemID CHAR(8) NOT NULL,
     LoaiDiemID CHAR(8) NOT NULL,
-    GiaTri FLOAT NOT NULL CHECK(GiaTri BETWEEN 0 AND 10),
+    GiaTri FLOAT CHECK(GiaTri BETWEEN 0 AND 10),
     FOREIGN KEY (DiemID) REFERENCES DIEM(DiemID),
     FOREIGN KEY (LoaiDiemID) REFERENCES LOAIDIEM(LoaiDiemID)
 );
@@ -109,7 +110,7 @@ CREATE TABLE CHITIETMONHOC (
 -- Tạo bảng CHUCVU
 CREATE TABLE CHUCVU (
     ChucVuID CHAR(8) PRIMARY KEY,
-    TenChucVu VARCHAR(255) NOT NULL CHECK (TenChucVu IN ('Lớp trưởng', 'Tổ trưởng', 'Giáo viên chủ nhiệm', 'Giáo viên bộ môn', 'Thành viên lớp', 'Giáo vụ')),
+    TenChucVu VARCHAR(255) NOT NULL CHECK (TenChucVu IN ('Lớp trưởng', 'Thành viên', 'Giáo viên chủ nhiệm', 'Giáo viên bộ môn', 'Giáo vụ')),
     MoTa VARCHAR(255) NOT NULL,
     VaiTroID CHAR(8) NOT NULL,
     FOREIGN KEY (VaiTroID) REFERENCES VAITRO(VaiTroID)
@@ -117,7 +118,7 @@ CREATE TABLE CHUCVU (
 
 -- Tạo bảng HOSO
 CREATE TABLE HOSO (
-    HoSoID CHAR(8) PRIMARY KEY,
+    HoSoID CHAR(12) PRIMARY KEY,
     HoTen VARCHAR(255) NOT NULL,
     GioiTinh CHAR(8) NOT NULL CHECK (GioiTinh IN ('Nam','Nữ')),
     NgaySinh DATETIME NOT NULL,
@@ -132,33 +133,44 @@ CREATE TABLE HOSO (
 
 -- Tạo bảng HOSOGIAOVIEN
 CREATE TABLE HOSOGIAOVIEN (
-    HoSoGiaoVienID CHAR(8) PRIMARY KEY,
+    HoSoGiaoVienID CHAR(10) PRIMARY KEY,
     GiaoVienID CHAR(8) NOT NULL,
-    HoSoID CHAR(8) NOT NULL,
-    LopDayID CHAR(8) NOT NULL,
+    HoSoID CHAR(12) NOT NULL,
     NgayBatDauLamViec DATETIME NOT NULL,
     FOREIGN KEY (GiaoVienID) REFERENCES GIAOVIEN(GiaoVienID),
-    FOREIGN KEY (HoSoID) REFERENCES HOSO(HoSoID),
-    FOREIGN KEY (LopDayID) REFERENCES LOP(LopID)
+    FOREIGN KEY (HoSoID) REFERENCES HOSO(HoSoID)
 );
 
 -- Tạo bảng HOSOHOCSINH
 CREATE TABLE HOSOHOCSINH (
-    HoSoHocSinhID CHAR(8) PRIMARY KEY,
+    HoSoHocSinhID CHAR(10) PRIMARY KEY,
     HocSinhID CHAR(8) NOT NULL,
-    HoSoID CHAR(8) NOT NULL,
+    HoSoID CHAR(12) NOT NULL,
     LopHocID CHAR(8) NOT NULL,
     NienKhoa INT NOT NULL CHECK (NienKhoa > 0),
     FOREIGN KEY (HocSinhID) REFERENCES HOCSINH(HocSinhID),
     FOREIGN KEY (HoSoID) REFERENCES HOSO(HoSoID),
     FOREIGN KEY (LopHocID) REFERENCES LOP(LopID)
 );
+CREATE TABLE PHANCONGDAY (
+    PhanCongDayID CHAR(12) PRIMARY KEY,
+    GiaoVienID CHAR(8) NOT NULL,
+    MonHocID CHAR(4) NOT NULL,
+    LopID CHAR(5) NOT NULL,
+    NamHocID CHAR(8) NOT NULL,
+    ChuanDauRa VARCHAR(255),
+    FOREIGN KEY (GiaoVienID) REFERENCES GIAOVIEN(GiaoVienID),
+    FOREIGN KEY (MonHocID) REFERENCES MONHOC(MonHocID),
+    FOREIGN KEY (LopID) REFERENCES LOP(LopID),
+    FOREIGN KEY (NamHocID) REFERENCES NAMHOC(NamHocID)
+);
+
 
 -- Tạo bảng HOSOGIAOVU
 CREATE TABLE HOSOGIAOVU (
-    HoSoGiaoVuID CHAR(8) PRIMARY KEY,
+    HoSoGiaoVuID CHAR(10) PRIMARY KEY,
     GiaoVuID CHAR(8) NOT NULL,
-    HoSoID CHAR(8) NOT NULL,
+    HoSoID CHAR(12) NOT NULL,
     FOREIGN KEY (GiaoVuID) REFERENCES GIAOVU(GiaoVuID),
     FOREIGN KEY (HoSoID) REFERENCES HOSO(HoSoID)
 );
@@ -224,13 +236,85 @@ CREATE TABLE CAPNHAT (
 
 -- Tạo bảng CAPNHATDIEM
 CREATE TABLE CAPNHATDIEM (
-    CapNhatDiemID CHAR(8) PRIMARY KEY,
+    CapNhatDiemID CHAR(15) PRIMARY KEY,
     GiaoVienID CHAR(8) NOT NULL,
-    ChiTietDiemID CHAR(8) NOT NULL,
+    ChiTietDiemID CHAR(12) NOT NULL,
     DiemMoi FLOAT NOT NULL CHECK (DiemMoi BETWEEN 0 AND 10),
     ThoiGianCapNhat DATETIME NOT NULL,
     TrangThaiDuyet BIT NOT NULL CHECK (TrangThaiDuyet IN (0,1)),
     FOREIGN KEY (GiaoVienID) REFERENCES GIAOVIEN(GiaoVienID),
     FOREIGN KEY (ChiTietDiemID) REFERENCES CHITIETDIEM(ChiTietDiemID)
 );
+
+DELIMITER $$
+
+CREATE TRIGGER trg_after_insert_chitietdiem
+AFTER INSERT ON CHITIETDIEM
+FOR EACH ROW
+BEGIN
+    DECLARE tb FLOAT;
+    DECLARE xeploai VARCHAR(20);
+
+    -- Tính điểm trung bình
+    SELECT 
+        IFNULL(ROUND(SUM(cd.GiaTri * ld.HeSo) / NULLIF(SUM(CASE WHEN cd.GiaTri IS NOT NULL THEN ld.HeSo ELSE 0 END), 0), 2), 0)
+    INTO tb
+    FROM CHITIETDIEM cd
+    JOIN LOAIDIEM ld ON cd.LoaiDiemID = ld.LoaiDiemID
+    WHERE cd.DiemID = NEW.DiemID;
+
+    -- Gán xếp loại
+    SET xeploai = 
+        CASE 
+            WHEN tb >= 8 THEN 'Giỏi'
+            WHEN tb >= 6.5 THEN 'Khá'
+            WHEN tb >= 5 THEN 'Trung bình'
+            ELSE 'Yếu'
+        END;
+
+    -- Cập nhật bảng DIEM
+    UPDATE DIEM
+    SET DiemTrungBinh = tb,
+        XepLoai = xeploai
+    WHERE DiemID = NEW.DiemID;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE TRIGGER trg_after_update_chitietdiem
+AFTER UPDATE ON CHITIETDIEM
+FOR EACH ROW
+BEGIN
+    DECLARE tb FLOAT;
+    DECLARE xeploai VARCHAR(20);
+
+    -- Tính điểm trung bình
+    SELECT 
+        IFNULL(ROUND(SUM(cd.GiaTri * ld.HeSo) / NULLIF(SUM(CASE WHEN cd.GiaTri IS NOT NULL THEN ld.HeSo ELSE 0 END), 0), 2), 0)
+    INTO tb
+    FROM CHITIETDIEM cd
+    JOIN LOAIDIEM ld ON cd.LoaiDiemID = ld.LoaiDiemID
+    WHERE cd.DiemID = NEW.DiemID;
+
+    -- Gán xếp loại
+    SET xeploai = 
+        CASE 
+            WHEN tb >= 8 THEN 'Giỏi'
+            WHEN tb >= 6.5 THEN 'Khá'
+            WHEN tb >= 5 THEN 'Trung bình'
+            ELSE 'Yếu'
+        END;
+
+    -- Cập nhật bảng DIEM
+    UPDATE DIEM
+    SET DiemTrungBinh = tb,
+        XepLoai = xeploai
+    WHERE DiemID = NEW.DiemID;
+END$$
+
+DELIMITER ;
+
 

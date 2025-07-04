@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.TraCuu"
-        Title="Bảng điểm học sinh" MinHeight="500" MinWidth="700" ResizeMode="CanResize" WindowStartupLocation="CenterScreen"
+        Title="Bảng điểm học sinh" Height="600" Width="700" ResizeMode="CanResize" WindowStartupLocation="CenterScreen"
         x:Name="main">
     <Window.Resources>
         <ResourceDictionary>
@@ -24,40 +24,46 @@
             </Style>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <TextBlock Text="BẢNG ĐIỂM HỌC SINH" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,16"/>
-        <!-- Bộ lọc năm học, học kỳ -->
-        <Border Grid.Row="1" Background="#f8f9fa" CornerRadius="15" Padding="15" Margin="0,0,0,12">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <TextBlock Text="Năm học: " FontWeight="Bold" VerticalAlignment="Center"/>
-                <ComboBox Width="120" Margin="0,0,16,0" ItemsSource="{Binding DanhSachNamHoc}" SelectedItem="{Binding SelectedNamHoc, Mode=TwoWay}"/>
-                <TextBlock Text="Học kỳ: " FontWeight="Bold" VerticalAlignment="Center"/>
-                <ComboBox Width="80" ItemsSource="{Binding DanhSachHocKy}" SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}"/>
-            </StackPanel>
-        </Border>
-        <!-- Thông tin học sinh -->
-        <Border Grid.Row="2" Background="#e3f2fd" CornerRadius="15" Padding="15" Margin="0,0,0,16">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <TextBlock Text="Họ tên: " FontWeight="Bold"/>
-                <TextBlock Text="{Binding HoTen}" Margin="0,0,16,0"/>
-                <TextBlock Text="Lớp: " FontWeight="Bold"/>
-                <TextBlock Text="{Binding TenLop}" Margin="0,0,16,0"/>
-                <TextBlock Text="Năm học: " FontWeight="Bold"/>
-                <TextBlock Text="{Binding NamHoc}" Margin="0,0,16,0"/>
-                <TextBlock Text="Học kỳ: " FontWeight="Bold"/>
-                <TextBlock Text="{Binding HocKy}"/>
-            </StackPanel>
-        </Border>
-        <!-- Bảng điểm các môn -->
-        <Border Grid.Row="3" Background="White" CornerRadius="15" Padding="10" Margin="0,0,0,16" BorderBrush="#e0e0e0" BorderThickness="1">
-            <DataGrid ItemsSource="{Binding BangDiemMon}" 
+    <Border Margin="20"
+                BorderBrush="#03a9f4"
+                BorderThickness="2"
+                Background="#D0F0FD"
+                CornerRadius="30">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="BẢNG ĐIỂM HỌC SINH" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,16"/>
+            <!-- Bộ lọc năm học, học kỳ -->
+            <Border Grid.Row="1" Background="White" CornerRadius="15 15 0 0" Padding="15" Margin="0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="Năm học: " FontWeight="Bold" VerticalAlignment="Center"/>
+                    <ComboBox Width="120" Margin="0,0,16,0" ItemsSource="{Binding DanhSachNamHoc}" SelectedItem="{Binding SelectedNamHoc, Mode=TwoWay}"/>
+                    <TextBlock Text="Học kỳ: " FontWeight="Bold" VerticalAlignment="Center"/>
+                    <ComboBox Width="80" ItemsSource="{Binding DanhSachHocKy}" SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}"/>
+                </StackPanel>
+            </Border>
+            <!-- Thông tin học sinh -->
+            <Border Grid.Row="2" Background="White" Padding="15" Margin="0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="Họ tên: " FontWeight="Bold"/>
+                    <TextBlock Text="{Binding HoTen}" Margin="0,0,16,0"/>
+                    <TextBlock Text="Lớp: " FontWeight="Bold"/>
+                    <TextBlock Text="{Binding TenLop}" Margin="0,0,16,0"/>
+                    <TextBlock Text="Năm học: " FontWeight="Bold"/>
+                    <TextBlock Text="{Binding NamHoc}" Margin="0,0,16,0"/>
+                    <TextBlock Text="Học kỳ: " FontWeight="Bold"/>
+                    <TextBlock Text="{Binding HocKy}"/>
+                </StackPanel>
+            </Border>
+            <!-- Bảng điểm các môn -->
+            <Border Grid.Row="3" Background="White" Padding="10" CornerRadius="0 0 15 15">
+                <Grid Margin="0,0,0,16">
+                <DataGrid ItemsSource="{Binding BangDiemMon}" 
                       Style="{StaticResource CommonDataGridStyle}" 
                       Visibility="{Binding IsShowBangDiem, Converter={StaticResource BooleanToVisibilityConverter}}"
                       CanUserAddRows="False"
@@ -72,89 +78,90 @@
                       EnableColumnVirtualization="True"
                       BorderBrush="Transparent"
                       Background="Transparent">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Môn học" 
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Môn học" 
                                   Binding="{Binding MonHoc}" 
                                   Width="*" 
                                   ElementStyle="{StaticResource CenterAlignStyle}" 
                                   HeaderStyle="{StaticResource CenterHeaderStyle}"
                                   IsReadOnly="True"/>
-                <DataGridTextColumn Header="Điểm miệng" 
+                        <DataGridTextColumn Header="Điểm miệng" 
                                   Binding="{Binding DiemMieng, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" 
                                   Width="*"
                                   ElementStyle="{StaticResource CenterAlignStyle}"
                                   HeaderStyle="{StaticResource CenterHeaderStyle}"/>
-                <DataGridTextColumn Header="Điểm 15p" 
+                        <DataGridTextColumn Header="Điểm 15p" 
                                   Binding="{Binding Diem15Phut, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" 
                                   Width="*"
                                   ElementStyle="{StaticResource CenterAlignStyle}"
                                   HeaderStyle="{StaticResource CenterHeaderStyle}"/>
-                <DataGridTextColumn Header="Điểm 1 tiết" 
+                        <DataGridTextColumn Header="Điểm 1 tiết" 
                                   Binding="{Binding Diem1Tiet, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" 
                                   Width="*"
                                   ElementStyle="{StaticResource CenterAlignStyle}"
                                   HeaderStyle="{StaticResource CenterHeaderStyle}"/>
-                <DataGridTextColumn Header="Điểm thi" 
+                        <DataGridTextColumn Header="Điểm thi" 
                                   Binding="{Binding DiemThi, Mode=TwoWay, Converter={StaticResource DiemToDisplayStringConverter}, UpdateSourceTrigger=PropertyChanged}" 
                                   Width="*"
                                   ElementStyle="{StaticResource CenterAlignStyle}"
                                   HeaderStyle="{StaticResource CenterHeaderStyle}"/>
-                <DataGridTextColumn Header="Điểm TB" 
+                        <DataGridTextColumn Header="Điểm TB" 
                                   Binding="{Binding DiemTrungBinh, StringFormat=F2}" 
                                   Width="*" 
                                   ElementStyle="{StaticResource CenterAlignStyle}" 
                                   HeaderStyle="{StaticResource CenterHeaderStyle}"
                                   IsReadOnly="True"/>
-                <DataGridTextColumn Header="Xếp loại" 
+                        <DataGridTextColumn Header="Xếp loại" 
                                   Binding="{Binding XepLoai}" 
                                   Width="*" 
                                   ElementStyle="{StaticResource CenterAlignStyle}" 
                                   HeaderStyle="{StaticResource CenterHeaderStyle}"
                                   IsReadOnly="True"/>
-                <DataGridTemplateColumn Header="Chức năng" 
+                        <DataGridTemplateColumn Header="Chức năng" 
                                       Width="*"
                                       HeaderStyle="{StaticResource CenterHeaderStyle}">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Style="{StaticResource MaterialDesignToolButton}"
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource MaterialDesignToolButton}"
                                     Visibility="{Binding DataContext.IsNotHocSinhVisible, ElementName=main, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     Background="Transparent" BorderThickness="0"
                                     Width="32" Height="32" Padding="0"
                                     Click="SuaDiem_Click"
                                     ToolTip="Sửa điểm">
-                                <materialDesign:PackIcon Kind="Pencil" Width="22" Height="22" Foreground="#0078D7" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            </Button>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-            </DataGrid>
-        </Border>
-        <!-- Nút xuất Excel và đóng -->
-        <Grid Grid.Row="4" HorizontalAlignment="Center">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Border Grid.Column="1" 
+                                        <materialDesign:PackIcon Kind="Pencil" Width="22" Height="22" Foreground="#0078D7" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+                </Grid>
+            </Border>
+            <!-- Nút xuất Excel và đóng -->
+            <Grid Grid.Row="4" HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="1" 
                     Style="{StaticResource ImageBorderStyle}"
                 Grid.Row="2"
                 Margin="50 0 50 0"
                 Background="#4CAF50">
-                <Button Content="Xuất Excel" 
+                    <Button Content="Xuất Excel" 
                         Command="{Binding ExportExcelCommand}"
                         BorderBrush="Transparent"
                         Style="{StaticResource MaterialDesignRaisedLightButton}"
                         Background="Transparent"
                         HorizontalAlignment="Center"/>
-            </Border>
-            <Border Grid.Column="0"
+                </Border>
+                <Border Grid.Column="0"
                     Style="{StaticResource ImageBorderStyle}" 
                     Background="#F08080"
                     VerticalAlignment="Center" 
                     Width="120"
                     Margin="50 0 50 0">
-                <Button Command="{Binding CancelCommand}" 
+                    <Button Command="{Binding CancelCommand}" 
                         CommandParameter="{Binding ElementName=passwordfield, Path=Password}"
                         Style="{StaticResource MaterialDesignRaisedLightButton}"
                         Background="Transparent"
@@ -162,8 +169,9 @@
                         FontWeight="Regular"
                         Click="BtnClose_Click"
                         Content="Đóng"/>
-            </Border>
+                </Border>
+            </Grid>
         </Grid>
-    </Grid>
+    </Border>
 </Window>
 

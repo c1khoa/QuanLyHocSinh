@@ -44,7 +44,7 @@
                    Grid.Row="0"/>
 
         <!-- Thanh lọc -->
-        <Border Grid.Row="1" Background="#85b6ff" CornerRadius="15" Padding="15" Margin="10">
+        <Border Grid.Row="1" Background="#FAFAFA" CornerRadius="15" Padding="15" Margin="10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="200"/>
@@ -142,6 +142,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button Command="{Binding DataContext.SuaHocSinhCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        Visibility="{Binding DataContext.IsGiaoVuVisible, ElementName=main, Converter={StaticResource BooleanToVisibilityConverter}}"
                                         CommandParameter="{Binding}"
                                         Width="32" Height="32"
                                         ToolTip="Sửa thông tin học sinh"
