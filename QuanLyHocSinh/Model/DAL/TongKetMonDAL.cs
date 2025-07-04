@@ -295,7 +295,7 @@ public class TongKetMonDAL
         string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
 
         string whereClause = "WHERE d.DiemTrungBinh IS NOT NULL AND d.DiemTrungBinh > 0";
-        
+
         if (!string.IsNullOrEmpty(monHoc) && monHoc != "Tất cả")
             whereClause += " AND mh.TenMonHoc = @MonHoc";
         if (hocKy.HasValue)
@@ -303,54 +303,54 @@ public class TongKetMonDAL
 
         string groupByClause;
         string selectClause;
-        
+
         if (!hocKy.HasValue)
         {
             groupByClause = "GROUP BY l.TenLop, l.SiSo, d.NamHocID";
             selectClause = @"
-                SELECT 
-                    ROW_NUMBER() OVER (ORDER BY l.TenLop) as STT,
-                    l.TenLop,
-                    COALESCE(mh.TenMonHoc, 'Tất cả môn') as MonHoc,
-                    d.NamHocID as NamHoc,
-                    -1 as HocKy,
-                    l.SiSo,
-                    COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) as SoLuongDat,
-                    ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat";
+            SELECT 
+                ROW_NUMBER() OVER (ORDER BY l.TenLop) as STT,
+                l.TenLop,
+                COALESCE(MAX(mh.TenMonHoc), 'Tất cả môn') as MonHoc,
+                d.NamHocID as NamHoc,
+                -1 as HocKy,
+                l.SiSo,
+                COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) as SoLuongDat,
+                ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat";
         }
         else
         {
             groupByClause = "GROUP BY l.TenLop, l.SiSo, d.NamHocID, d.HocKy";
             selectClause = @"
-                SELECT 
-                    ROW_NUMBER() OVER (ORDER BY l.TenLop) as STT,
-                    l.TenLop,
-                    COALESCE(mh.TenMonHoc, 'Tất cả môn') as MonHoc,
-                    d.NamHocID as NamHoc,
-                    d.HocKy,
-                    l.SiSo,
-                    COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) as SoLuongDat,
-                    ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat";
+            SELECT 
+                ROW_NUMBER() OVER (ORDER BY l.TenLop) as STT,
+                l.TenLop,
+                COALESCE(MAX(mh.TenMonHoc), 'Tất cả môn') as MonHoc,
+                d.NamHocID as NamHoc,
+                d.HocKy,
+                l.SiSo,
+                COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) as SoLuongDat,
+                ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat";
         }
 
         string query = $@"
-            {selectClause}
-            FROM DIEM d
-            LEFT JOIN HOCSINH hs ON d.HocSinhID = hs.HocSinhID
-            LEFT JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
-            LEFT JOIN LOP l ON LEFT(hhs.LopHocID, 4) = l.LopID
-            LEFT JOIN MONHOC mh ON d.MonHocID = mh.MonHocID
-            {whereClause}
-            {groupByClause}
-            HAVING l.SiSo > 0
-            ORDER BY l.TenLop
-        ";
+        {selectClause}
+        FROM DIEM d
+        LEFT JOIN HOCSINH hs ON d.HocSinhID = hs.HocSinhID
+        LEFT JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
+        LEFT JOIN LOP l ON LEFT(hhs.LopHocID, 4) = l.LopID
+        LEFT JOIN MONHOC mh ON d.MonHocID = mh.MonHocID
+        {whereClause}
+        {groupByClause}
+        HAVING l.SiSo > 0
+        ORDER BY l.TenLop
+    ";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
         {
             conn.Open();
             MySqlCommand cmd = new MySqlCommand(query, conn);
-            
+
             if (!string.IsNullOrEmpty(monHoc) && monHoc != "Tất cả")
                 cmd.Parameters.AddWithValue("@MonHoc", monHoc);
             if (hocKy.HasValue)
@@ -377,6 +377,7 @@ public class TongKetMonDAL
         }
         return list;
     }
+
 
     public static List<HocSinhChiTietItem> GetHocSinhTrongLop(string tenLop, string monHoc, int? hocKy, string? namHoc = null)
     {
