@@ -46,19 +46,12 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
             set { _danhSachHocKy = value; OnPropertyChanged(nameof(DanhSachHocKy)); }
         }
 
-        // Selected filters - chỉ còn môn học và học kỳ
-        private string _selectedMonHoc = "Tất cả";
+        // Selected filters - chỉ còn môn học
+        private string _selectedMonHoc;
         public string SelectedMonHoc
         {
             get => _selectedMonHoc;
             set { _selectedMonHoc = value; OnPropertyChanged(nameof(SelectedMonHoc)); Filter(); }
-        }
-
-        private string _selectedHocKy = "Tất cả";
-        public string SelectedHocKy
-        {
-            get => _selectedHocKy;
-            set { _selectedHocKy = value; OnPropertyChanged(nameof(SelectedHocKy)); Filter(); }
         }
         #endregion
 
@@ -149,24 +142,21 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
         {
             // Load môn học
             var dsMonHoc = TongKetMonDAL.GetAllMonHoc().OrderBy(m => m).ToList();
-            dsMonHoc.Insert(0, "Tất cả");
             DanhSachMonHoc = new ObservableCollection<string>(dsMonHoc);
-
-            // Load học kỳ
-            var dsHocKy = TongKetMonDAL.GetAllHocKy().Select(h => h.ToString()).OrderBy(h => h).ToList();
-            dsHocKy.Insert(0, "Tất cả");
-            DanhSachHocKy = new ObservableCollection<string>(dsHocKy);
+            
+            // Đặt mặc định môn học đầu tiên
+            if (DanhSachMonHoc.Count > 0)
+            {
+                SelectedMonHoc = DanhSachMonHoc[0];
+            }
         }
 
         private async void Filter()
         {
             try
             {
-                string? monHoc = SelectedMonHoc == "Tất cả" ? null : SelectedMonHoc;
-                int? hocKy = SelectedHocKy == "Tất cả" ? null : int.Parse(SelectedHocKy);
-
-                // Lấy dữ liệu đã lọc
-                var filteredData = TongKetMonDAL.GetTongKetTheoLop(monHoc, hocKy);
+                // Lấy dữ liệu đã lọc theo môn học đã chọn, học kỳ mặc định là 2
+                var filteredData = TongKetMonDAL.GetTongKetTheoLop(SelectedMonHoc, 2);
                 DanhSachTongKetLop = new ObservableCollection<TongKetLopItem>(filteredData);
 
                 // Cập nhật thống kê
@@ -180,11 +170,8 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
 
         private void CalculateStatistics()
         {
-            string? monHoc = SelectedMonHoc == "Tất cả" ? null : SelectedMonHoc;
-            int? hocKy = SelectedHocKy == "Tất cả" ? null : int.Parse(SelectedHocKy);
-
             var (TongSoLop, TongSoHocSinh, TongSoDat, TiLeDatChung) = 
-                TongKetMonDAL.GetThongKeTongHopTheoLop(monHoc, hocKy);
+                TongKetMonDAL.GetThongKeTongHopTheoLop(SelectedMonHoc, 2);
 
             this.TongSoLop = TongSoLop;
             this.TongHocSinh = TongSoHocSinh;
@@ -216,8 +203,8 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
                         worksheet.Cell(1, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
                         // Thông tin bộ lọc
-                        worksheet.Cell(3, 1).Value = $"Môn học: {(SelectedMonHoc == "Tất cả" ? "Tất cả môn học" : SelectedMonHoc)}";
-                        worksheet.Cell(4, 1).Value = $"Học kỳ: {(SelectedHocKy == "Tất cả" ? "Tất cả học kỳ" : SelectedHocKy)}";
+                        worksheet.Cell(3, 1).Value = $"Môn học: {SelectedMonHoc}";
+                        worksheet.Cell(4, 1).Value = $"Học kỳ: 2";
 
                         // Header
                         int row = 6;

@@ -109,29 +109,30 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
         {
             _mainVM = mainVM;
 
-            var dsNamHoc = TongKetNamDAL.GetAllNamHoc();
-            dsNamHoc.Insert(0, "Tất cả");
+            // Load danh sách năm học (loại bỏ option "Tất cả", sắp xếp mới nhất trước)
+            var dsNamHoc = TongKetNamDAL.GetAllNamHoc().OrderByDescending(n => n).ToList();
             DanhSachNamHoc = new ObservableCollection<string>(dsNamHoc);
 
+            // Load danh sách học kỳ (không có "Tất cả")
             var dsHocKy = new List<string> { "1", "2" };
             DanhSachHocKy = new ObservableCollection<string>(dsHocKy);
 
             ExportExcelCommand = new RelayCommand(ExportExcel);
 
-            SelectedNamHoc = DanhSachNamHoc.FirstOrDefault() ?? "Tất cả";
-            SelectedHocKy = "1";
+            // Đặt mặc định năm học mới nhất và học kỳ 2
+            SelectedNamHoc = DanhSachNamHoc.FirstOrDefault() ?? "";
+            SelectedHocKy = "2";
         }
 
         private void LoadData()
         {
-            if (string.IsNullOrEmpty(SelectedHocKy))
+            if (string.IsNullOrEmpty(SelectedHocKy) || string.IsNullOrEmpty(SelectedNamHoc))
                 return;
 
-            string? namHoc = SelectedNamHoc == "Tất cả" ? null : SelectedNamHoc;
-            int? hocKy = int.TryParse(SelectedHocKy, out int hk) ? hk : null;
+            int hocKy = int.Parse(SelectedHocKy);
 
             DanhSachTongKetLop.Clear();
-            var data = TongKetMonDAL.GetTongKetHocKyTheoLop(namHoc, hocKy);
+            var data = TongKetMonDAL.GetTongKetHocKyTheoLop(SelectedNamHoc, hocKy);
             
             int stt = 1;
             foreach (var item in data)
@@ -170,7 +171,7 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
             var dialog = new SaveFileDialog
             {
                 Filter = "Excel files (*.xlsx)|*.xlsx",
-                FileName = SelectedNamHoc == "Tất cả" ? $"TongKetHocKy_HK{SelectedHocKy}" : $"TongKetHocKy_{SelectedNamHoc}_HK{SelectedHocKy}"
+                FileName = $"TongKetHocKy_{SelectedNamHoc}_HK{SelectedHocKy}"
             };
 
             if (dialog.ShowDialog() == true)

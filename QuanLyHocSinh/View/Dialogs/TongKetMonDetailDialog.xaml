@@ -43,30 +43,40 @@
                 <ScrollViewer VerticalScrollBarVisibility="Disabled" 
                               HorizontalScrollBarVisibility="Auto">
                     <WrapPanel Orientation="Horizontal">
-                        <StackPanel Margin="15,5" VerticalAlignment="Center" MinWidth="120">
-                            <TextBlock Text="Năm học" FontSize="12" Margin="0,0,0,3" Foreground="#666"/>
-                            <TextBlock Text="{Binding NamHoc}" FontSize="14" FontWeight="Bold" Foreground="#1976D2"/>
-                        </StackPanel>
-                        
                         <StackPanel Margin="15,5" VerticalAlignment="Center" MinWidth="80">
                             <TextBlock Text="Lớp" FontSize="12" Margin="0,0,0,3" Foreground="#666"/>
                             <TextBlock Text="{Binding TenLop}" FontSize="14" FontWeight="Bold" Foreground="#1976D2"/>
                         </StackPanel>
                         
                         <StackPanel Margin="15,5" VerticalAlignment="Center" MinWidth="120">
-                            <TextBlock Text="Môn học" FontSize="12" Margin="0,0,0,3" Foreground="#666"/>
-                            <TextBlock Text="{Binding MonHoc}" FontSize="14" FontWeight="Bold" Foreground="#1976D2"/>
+                            <TextBlock Text="Môn học" FontSize="12" Margin="0,0,0,5"/>
+                            <ComboBox FontSize="13"
+                                      MinWidth="120"
+                                      ItemsSource="{Binding DanhSachMonHoc}"
+                                      SelectedItem="{Binding SelectedMonHoc, Mode=TwoWay}"
+                                      materialDesign:HintAssist.Hint="Môn học"
+                                      IsEditable="False"/>
                         </StackPanel>
                         
                         <StackPanel Margin="15,5" VerticalAlignment="Center" MinWidth="120">
-                            <TextBlock Text="Học kỳ" FontSize="12" Margin="0,0,0,3" Foreground="#666"/>
+                            <TextBlock Text="Năm học" FontSize="12" Margin="0,0,0,5"/>
                             <ComboBox FontSize="13"
-                                      MinWidth="100"
+                                      MinWidth="120"
+                                      ItemsSource="{Binding DanhSachNamHoc}"
+                                      SelectedItem="{Binding SelectedNamHoc, Mode=TwoWay}"
+                                      materialDesign:HintAssist.Hint="Năm học"
+                                      IsEditable="False"/>
+                        </StackPanel>
+                        
+                        <StackPanel Margin="15,5" VerticalAlignment="Center" MinWidth="120">
+                            <TextBlock Text="Học kỳ" FontSize="12" Margin="0,0,0,5"/>
+                            <ComboBox FontSize="13"
+                                      MinWidth="120"
                                       ItemsSource="{Binding DanhSachHocKy}"
                                       SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}"
                                       materialDesign:HintAssist.Hint="Học kỳ"
                                       IsEditable="False"/>
-                    </StackPanel>
+                        </StackPanel>
                     </WrapPanel>
                 </ScrollViewer>
             </Border>

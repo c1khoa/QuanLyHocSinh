@@ -39,7 +39,7 @@ namespace QuanLyHocSinh.View.Controls.BaoCao
                         return;
                     }
 
-                    if (mainViewModel.SelectedMonHoc == "Tất cả")
+                    if (string.IsNullOrEmpty(mainViewModel.SelectedMonHoc))
                     {
                         await ShowNotificationAsync("⚠️ Vui lòng chọn môn học cụ thể để xem chi tiết.");
                         return;
@@ -49,7 +49,7 @@ namespace QuanLyHocSinh.View.Controls.BaoCao
                     dialog.DataContext = new TongKetMonDetailDialogViewModel(
                         lopItem.TenLop, 
                         mainViewModel.SelectedMonHoc, 
-                        mainViewModel.SelectedHocKy == "Tất cả" ? null : (int?)int.Parse(mainViewModel.SelectedHocKy),
+                        2, // Mặc định học kỳ 2
                         lopItem.NamHoc
                     );
                 dialog.ShowDialog();

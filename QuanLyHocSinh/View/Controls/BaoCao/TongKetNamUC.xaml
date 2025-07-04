@@ -80,20 +80,8 @@
                               SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}"/>
                             </StackPanel>
 
-                            <!-- Các nút chức năng và thông tin tổng số -->
+                            <!-- Thông tin tổng số -->
                             <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                    <Border Style="{StaticResource ImageBorderStyle}"
-                                Margin="10 0 0 0"
-                                Background="#4CAF50">
-                                        <Button Content="Xuất Excel" 
-                                    Command="{Binding ExportExcelCommand}"
-                                    BorderBrush="Transparent"
-                                    Style="{StaticResource MaterialDesignRaisedLightButton}"
-                                    Background="Transparent"
-                                    HorizontalAlignment="Center"/>
-                                    </Border>
-                                </StackPanel>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,10,0">
                                     <TextBlock Text="Tổng số lớp: " FontWeight="Bold" FontSize="14"/>
                                     <TextBlock Text="{Binding TongSoLop}" FontSize="14" FontWeight="Bold"/>
@@ -148,39 +136,57 @@
                     </Border>
 
                     <!-- Thống kê -->
-                    <Border Grid.Row="2" Background="Transparent" CornerRadius="15" Padding="15" Margin="10,10,10,0">
-                        <StackPanel>
-                            <TextBlock Text="THỐNG KÊ TỔNG KẾT HỌC KỲ" FontWeight="Bold" FontSize="16" Margin="0,0,0,10" HorizontalAlignment="Center"/>
-                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                                <StackPanel Orientation="Horizontal" Margin="10">
-                                    <StackPanel Margin="5,5,15,5" MinWidth="120">
-                                        <TextBlock Text="Tổng số lớp:" FontWeight="Bold"/>
-                                        <TextBlock Text="{Binding TongSoLop}" Margin="0,5,0,0"/>
-                                    </StackPanel>
-                                    <StackPanel Margin="5,5,15,5" MinWidth="120">
-                                        <TextBlock Text="Tổng sỉ số:" FontWeight="Bold"/>
-                                        <TextBlock Text="{Binding TongSiSo}" Margin="0,5,0,0"/>
-                                    </StackPanel>
-                                    <StackPanel Margin="5,5,15,5" MinWidth="120">
-                                        <TextBlock Text="Tổng số đạt:" FontWeight="Bold"/>
-                                        <TextBlock Text="{Binding TongSoLuongDat}" Margin="0,5,0,0"/>
-                                    </StackPanel>
-                                    <StackPanel Margin="5,5,15,5" MinWidth="120">
-                                        <TextBlock Text="Tỉ lệ đạt chung:" FontWeight="Bold"/>
-                                        <TextBlock Text="{Binding TiLeDatChung, StringFormat={}{0:F2}%}" Margin="0,5,0,0"/>
-                                    </StackPanel>
-                                    <StackPanel Margin="5,5,15,5" MinWidth="120">
-                                        <TextBlock Text="Lớp đạt tỉ lệ cao nhất:" FontWeight="Bold"/>
-                                        <TextBlock Text="{Binding LopDatTiLeCaoNhat}" Margin="0,5,0,0"/>
-                                    </StackPanel>
-                                    <StackPanel Margin="5,5,15,5" MinWidth="120">
-                                        <TextBlock Text="Tỉ lệ cao nhất:" FontWeight="Bold"/>
-                                        <TextBlock Text="{Binding TiLeCaoNhat, StringFormat={}{0:F2}%}" Margin="0,5,0,0"/>
-                                    </StackPanel>
-                                </StackPanel>
-                            </ScrollViewer>
-                        </StackPanel>
+                    <Border Grid.Row="2" Background="#e8f5e8" CornerRadius="15" Padding="15" Margin="10,0,10,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
 
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="THỐNG KÊ TỔNG KẾT HỌC KỲ" FontWeight="Bold" FontSize="16" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                    <StackPanel Orientation="Horizontal" Margin="10">
+                                        <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                            <TextBlock Text="Tổng số lớp:" FontWeight="Bold" Foreground="#2E7D32"/>
+                                            <TextBlock Text="{Binding TongSoLop}" Margin="0,5,0,0" Foreground="#2E7D32" FontWeight="Bold"/>
+                                        </StackPanel>
+                                        <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                            <TextBlock Text="Tổng sỉ số:" FontWeight="Bold" Foreground="#1565C0"/>
+                                            <TextBlock Text="{Binding TongSiSo}" Margin="0,5,0,0" Foreground="#1565C0" FontWeight="Bold"/>
+                                        </StackPanel>
+                                        <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                            <TextBlock Text="Tổng số đạt:" FontWeight="Bold" Foreground="#4CAF50"/>
+                                            <TextBlock Text="{Binding TongSoLuongDat}" Margin="0,5,0,0" Foreground="#4CAF50" FontWeight="Bold"/>
+                                        </StackPanel>
+                                        <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                            <TextBlock Text="Tỉ lệ đạt chung:" FontWeight="Bold" Foreground="#1976D2"/>
+                                            <TextBlock Text="{Binding TiLeDatChung, StringFormat={}{0:F2}%}" Margin="0,5,0,0" Foreground="#1976D2" FontWeight="Bold"/>
+                                        </StackPanel>
+                                        <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                            <TextBlock Text="Lớp đạt tỉ lệ cao nhất:" FontWeight="Bold" Foreground="#E65100"/>
+                                            <TextBlock Text="{Binding LopDatTiLeCaoNhat}" Margin="0,5,0,0" Foreground="#E65100" FontWeight="Bold"/>
+                                        </StackPanel>
+                                        <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                            <TextBlock Text="Tỉ lệ cao nhất:" FontWeight="Bold" Foreground="#7B1FA2"/>
+                                            <TextBlock Text="{Binding TiLeCaoNhat, StringFormat={}{0:F2}%}" Margin="0,5,0,0" Foreground="#7B1FA2" FontWeight="Bold"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </StackPanel>
+
+                            <Border Grid.Column="1" 
+                                Style="{StaticResource ImageBorderStyle}"
+                                Margin="20 0 0 0"
+                                Background="#4CAF50">
+                                <Button Content="Xuất Excel" 
+                                    Command="{Binding ExportExcelCommand}"
+                                    BorderBrush="Transparent"
+                                    Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                    Background="Transparent"
+                                    HorizontalAlignment="Center"/>
+                            </Border>
+                        </Grid>
                     </Border>
                 </Grid>
             </Border>

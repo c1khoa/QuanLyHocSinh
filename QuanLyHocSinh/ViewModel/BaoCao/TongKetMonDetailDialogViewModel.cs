@@ -44,6 +44,44 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
             set { _hocKy = value; OnPropertyChanged(nameof(HocKy)); }
         }
 
+        // Danh sách môn học
+        private ObservableCollection<string> _danhSachMonHoc;
+        public ObservableCollection<string> DanhSachMonHoc
+        {
+            get => _danhSachMonHoc;
+            set { _danhSachMonHoc = value; OnPropertyChanged(nameof(DanhSachMonHoc)); }
+        }
+
+        private string _selectedMonHoc;
+        public string SelectedMonHoc
+        {
+            get => _selectedMonHoc;
+            set { 
+                _selectedMonHoc = value; 
+                OnPropertyChanged(nameof(SelectedMonHoc)); 
+                OnFilterChanged();
+            }
+        }
+
+        // Danh sách năm học
+        private ObservableCollection<string> _danhSachNamHoc;
+        public ObservableCollection<string> DanhSachNamHoc
+        {
+            get => _danhSachNamHoc;
+            set { _danhSachNamHoc = value; OnPropertyChanged(nameof(DanhSachNamHoc)); }
+        }
+
+        private string _selectedNamHoc;
+        public string SelectedNamHoc
+        {
+            get => _selectedNamHoc;
+            set { 
+                _selectedNamHoc = value; 
+                OnPropertyChanged(nameof(SelectedNamHoc)); 
+                OnFilterChanged();
+            }
+        }
+
         // Danh sách học kỳ
         private ObservableCollection<string> _danhSachHocKy;
         public ObservableCollection<string> DanhSachHocKy
@@ -59,7 +97,7 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
             set { 
                 _selectedHocKy = value; 
                 OnPropertyChanged(nameof(SelectedHocKy)); 
-                OnHocKyChanged();
+                OnFilterChanged();
             }
         }
 
@@ -103,21 +141,21 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
 
             // Khởi tạo thông tin
             TenLop = tenLop;
-            MonHoc = monHoc;
-            NamHoc = namHoc;
-            HocKy = hocKy ?? 0; // Nếu null thì hiển thị 0 để biết là "Tất cả"
-
-            // Khởi tạo danh sách học kỳ
-            DanhSachHocKy = new ObservableCollection<string> { "Tất cả", "1", "2" };
             
-            // Thiết lập học kỳ được chọn
-            if (hocKy == null || hocKy == 0)
-                SelectedHocKy = "Tất cả";
-            else
-                SelectedHocKy = hocKy.ToString();
+            // Load dữ liệu filter
+            LoadFilterData();
+            
+            // Đặt mặc định
+            SelectedMonHoc = !string.IsNullOrEmpty(monHoc) ? monHoc : 
+                            (DanhSachMonHoc?.FirstOrDefault() ?? "");
+            SelectedNamHoc = !string.IsNullOrEmpty(namHoc) ? namHoc : 
+                            (DanhSachNamHoc?.FirstOrDefault() ?? "");
+            SelectedHocKy = "2"; // Mặc định học kỳ 2
+
+            HocKy = 2;
 
             // Load dữ liệu học sinh
-            LoadDanhSachHocSinh(hocKy);
+            LoadDanhSachHocSinh();
         }
 
         // Constructor cũ để tương thích ngược (nếu cần)
@@ -128,21 +166,45 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
 
             // Khởi tạo thông tin từ item được chọn
             TenLop = lopItem.TenLop;
-            MonHoc = lopItem.MonHoc;
-            NamHoc = lopItem.NamHoc;
-            HocKy = lopItem.HocKy;
-
-            // Khởi tạo danh sách học kỳ
-            DanhSachHocKy = new ObservableCollection<string> { "Tất cả", "1", "2" };
             
-            // Thiết lập học kỳ được chọn
-            if (lopItem.HocKy == 0)
-                SelectedHocKy = "Tất cả";
-            else
-                SelectedHocKy = lopItem.HocKy.ToString();
+            // Load dữ liệu filter
+            LoadFilterData();
+            
+            // Đặt mặc định 
+            SelectedMonHoc = !string.IsNullOrEmpty(lopItem.MonHoc) ? lopItem.MonHoc : 
+                            (DanhSachMonHoc?.FirstOrDefault() ?? "");
+            SelectedNamHoc = !string.IsNullOrEmpty(lopItem.NamHoc) ? lopItem.NamHoc : 
+                            (DanhSachNamHoc?.FirstOrDefault() ?? "");
+            SelectedHocKy = "2"; // Mặc định học kỳ 2
+            
+            HocKy = 2;
 
             // Load dữ liệu học sinh
-            LoadDanhSachHocSinh(lopItem.HocKy);
+            LoadDanhSachHocSinh();
+        }
+
+        private void LoadFilterData()
+        {
+            try
+            {
+                // Load danh sách môn học
+                var dsMonHoc = TongKetMonDAL.GetAllMonHoc().OrderBy(m => m).ToList();
+                DanhSachMonHoc = new ObservableCollection<string>(dsMonHoc);
+                
+                // Load danh sách năm học
+                var dsNamHoc = TongKetNamDAL.GetAllNamHoc().OrderByDescending(n => n).ToList();
+                DanhSachNamHoc = new ObservableCollection<string>(dsNamHoc);
+                
+                // Load danh sách học kỳ (loại bỏ option "Tất cả")
+                DanhSachHocKy = new ObservableCollection<string> { "1", "2" };
+            }
+            catch (Exception ex)
+            {
+                // Fallback nếu có lỗi
+                DanhSachMonHoc = new ObservableCollection<string>();
+                DanhSachNamHoc = new ObservableCollection<string>();
+                DanhSachHocKy = new ObservableCollection<string> { "1", "2" };
+            }
         }
 
         // Helper method để hiển thị thông báo
@@ -160,13 +222,23 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
             }
         }
 
-        private async void LoadDanhSachHocSinh(int? hocKy)
+        private async void LoadDanhSachHocSinh()
         {
             try
             {
+                if (string.IsNullOrEmpty(SelectedNamHoc) || string.IsNullOrEmpty(SelectedHocKy) || string.IsNullOrEmpty(SelectedMonHoc))
+                    return;
+
+                int hocKy = int.Parse(SelectedHocKy);
+                
                 // Lấy danh sách học sinh trong lớp
-                var danhSach = TongKetMonDAL.GetHocSinhTrongLop(TenLop, MonHoc, hocKy, NamHoc);
+                var danhSach = TongKetMonDAL.GetHocSinhTrongLop(TenLop, SelectedMonHoc, hocKy, SelectedNamHoc);
                 DanhSachHocSinh = new ObservableCollection<HocSinhChiTietItem>(danhSach);
+
+                // Cập nhật các giá trị hiển thị
+                MonHoc = SelectedMonHoc;
+                NamHoc = SelectedNamHoc;
+                HocKy = hocKy;
 
                 // Tính thống kê
                 CalculateStatistics();
@@ -184,19 +256,9 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
             TiLeDat = TongSoHocSinh > 0 ? Math.Round((SoLuongDat * 100.0) / TongSoHocSinh, 2) : 0;
         }
 
-        private void OnHocKyChanged()
+        private void OnFilterChanged()
         {
-            if (string.IsNullOrEmpty(SelectedHocKy)) return;
-
-            int? hocKy = null;
-            if (SelectedHocKy != "Tất cả")
-            {
-                if (int.TryParse(SelectedHocKy, out int parsed))
-                    hocKy = parsed;
-            }
-
-            HocKy = hocKy ?? 0;
-            LoadDanhSachHocSinh(hocKy);
+            LoadDanhSachHocSinh();
         }
 
         private async void ExportToExcel()
