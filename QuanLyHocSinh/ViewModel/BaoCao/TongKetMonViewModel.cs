@@ -108,7 +108,7 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
         {
             try
             {
-                await DialogHost.Show(new NotifyDialog(title, message), "RootDialog_Main");
+                await DialogHost.Show(new ErrorDialog(title, message), "RootDialog_Main");
             }
             catch
                 {
@@ -122,8 +122,18 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
         {
             try
             {
-                // Load dữ liệu tổng kết theo lớp
-                _allTongKetLop = new ObservableCollection<TongKetLopItem>(TongKetMonDAL.GetTongKetTheoLop());
+                if (_mainVM.CurrentUser.VaiTro.VaiTroID == "VT02")
+                {
+                    // Nếu là giáo viên, chỉ lấy dữ liệu của lớp mình dạy
+                    _allTongKetLop = new ObservableCollection<TongKetLopItem>(
+                        TongKetMonDAL.GetTongKetTheoLop_GiaoVien(_mainVM.CurrentUser.GiaoVienID));
+                }
+                else
+                {
+                    // Nếu là quản trị viên, lấy tất cả dữ liệu
+                    _allTongKetLop = new ObservableCollection<TongKetLopItem>(
+                        TongKetMonDAL.GetTongKetTheoLop());
+                }
                 DanhSachTongKetLop = new ObservableCollection<TongKetLopItem>(_allTongKetLop);
 
                 // Load dữ liệu filter
@@ -140,8 +150,17 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
 
         private void LoadFilterData()
         {
-            // Load môn học
-            var dsMonHoc = TongKetMonDAL.GetAllMonHoc().OrderBy(m => m).ToList();
+            List<string> dsMonHoc;
+            if (_mainVM.CurrentUser.VaiTro.VaiTroID == "VT02")
+            {
+                dsMonHoc = TongKetMonDAL.GetMonHocTheoGiaoVien(_mainVM.CurrentUser.GiaoVienID);
+            }
+            else 
+            {
+                // Load môn học
+                dsMonHoc = TongKetMonDAL.GetAllMonHoc().OrderBy(m => m).ToList();
+            }
+
             DanhSachMonHoc = new ObservableCollection<string>(dsMonHoc);
             
             // Đặt mặc định môn học đầu tiên
@@ -155,9 +174,18 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
         {
             try
             {
-                // Lấy dữ liệu đã lọc theo môn học đã chọn, học kỳ mặc định là 2
-                var filteredData = TongKetMonDAL.GetTongKetTheoLop(SelectedMonHoc, 2);
-                DanhSachTongKetLop = new ObservableCollection<TongKetLopItem>(filteredData);
+                List<TongKetLopItem> filteredData;
+                if (_mainVM.CurrentUser.VaiTro.VaiTroID == "VT02")
+                {
+                    // Lấy dữ liệu đã lọc theo môn học đã chọn, học kỳ mặc định là 2
+                    filteredData = TongKetMonDAL.GetTongKetTheoLop_GiaoVien(_mainVM.CurrentUser.GiaoVienID, SelectedMonHoc, 2);
+                }
+                else
+                {
+                    // Lấy dữ liệu đã lọc theo môn học đã chọn, học kỳ mặc định là 2
+                    filteredData = TongKetMonDAL.GetTongKetTheoLop(SelectedMonHoc, 2);
+                }
+                    DanhSachTongKetLop = new ObservableCollection<TongKetLopItem>(filteredData);
 
                 // Cập nhật thống kê
                 CalculateStatistics();
@@ -251,7 +279,7 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
                         workbook.SaveAs(saveFileDialog.FileName);
                     }
 
-                    await ShowNotificationAsync("Thành công", "✅ Xuất Excel thành công!");
+                    await DialogHost.Show(new NotifyDialog("Thông báo", "✅ Xuất Excel thành công!"), "RootDialog_Main");
                 }
             }
             catch (Exception ex)

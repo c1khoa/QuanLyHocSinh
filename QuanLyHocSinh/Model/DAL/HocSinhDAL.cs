@@ -219,6 +219,112 @@ namespace QuanLyHocSinh.Model.Entities
             return list;
         }
 
+        public static List<TongKetMonItem> GetBangDiemHocSinh_GiaoVien(string hocSinhID, string giaoVienID, string namHoc = null, int? hocKy = null)
+        {
+            List<TongKetMonItem> list = new List<TongKetMonItem>();
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+
+            string query = @"
+                        SELECT 
+                            hs.HocSinhID,
+                            ho.HoTen,
+                            l.TenLop,
+                            mh.TenMonHoc as MonHoc,
+                            d.NamHocID as NamHoc,
+                            d.HocKy,
+                            d.DiemTrungBinh,
+                            CASE 
+                                WHEN d.DiemTrungBinh >= 8.5 THEN 'Giỏi'
+                                WHEN d.DiemTrungBinh >= 6.5 THEN 'Khá'
+                                WHEN d.DiemTrungBinh >= 5.0 THEN 'Trung bình'
+                                WHEN d.DiemTrungBinh >= 3.5 THEN 'Yếu'
+                                ELSE 'Kém'
+                            END as XepLoai,
+                            CASE 
+                                WHEN d.DiemTrungBinh >= 5.0 THEN 'Đạt'
+                                ELSE 'Không đạt'
+                            END as GhiChu,
+                            IFNULL(diem_mieng.GiaTri, NULL) AS DiemMieng,
+                            IFNULL(diem_15p.GiaTri, NULL) AS Diem15Phut,
+                            IFNULL(diem_1tiet.GiaTri, NULL) AS Diem1Tiet,
+                            IFNULL(diem_thi.GiaTri, NULL) AS DiemThi
+                        FROM HOCSINH hs
+                        JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
+                        JOIN HOSO ho ON hhs.HoSoID = ho.HoSoID
+                        JOIN LOP l ON hhs.LopHocID = l.LopID
+                        JOIN DIEM d ON d.HocSinhID = hs.HocSinhID
+                        JOIN MONHOC mh ON d.MonHocID = mh.MonHocID
+                        JOIN PHANCONGDAY pcd ON d.MonHocID = pcd.MonHocID 
+                                            AND d.NamHocID = pcd.NamHocID 
+                                            AND LEFT(hhs.LopHocID, 4) = pcd.LopID
+                        LEFT JOIN (
+                            SELECT d.DiemID, ctd.GiaTri FROM DIEM d
+                            JOIN CHITIETDIEM ctd ON d.DiemID = ctd.DiemID
+                            WHERE ctd.LoaiDiemID = 'LD01'
+                        ) diem_mieng ON d.DiemID = diem_mieng.DiemID
+                        LEFT JOIN (
+                            SELECT d.DiemID, ctd.GiaTri FROM DIEM d
+                            JOIN CHITIETDIEM ctd ON d.DiemID = ctd.DiemID
+                            WHERE ctd.LoaiDiemID = 'LD02'
+                        ) diem_15p ON d.DiemID = diem_15p.DiemID
+                        LEFT JOIN (
+                            SELECT d.DiemID, ctd.GiaTri FROM DIEM d
+                            JOIN CHITIETDIEM ctd ON d.DiemID = ctd.DiemID
+                            WHERE ctd.LoaiDiemID = 'LD03'
+                        ) diem_1tiet ON d.DiemID = diem_1tiet.DiemID
+                        LEFT JOIN (
+                            SELECT d.DiemID, ctd.GiaTri FROM DIEM d
+                            JOIN CHITIETDIEM ctd ON d.DiemID = ctd.DiemID
+                            WHERE ctd.LoaiDiemID = 'LD04'
+                        ) diem_thi ON d.DiemID = diem_thi.DiemID
+                        WHERE hs.HocSinhID = @HocSinhID
+                          AND pcd.GiaoVienID = @GiaoVienID
+                          " + (namHoc != null ? " AND d.NamHocID = @NamHoc " : "") +
+                                    (hocKy != null ? " AND d.HocKy = @HocKy " : "") + @"
+                        ORDER BY mh.TenMonHoc";
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@HocSinhID", hocSinhID);
+                    cmd.Parameters.AddWithValue("@GiaoVienID", giaoVienID);
+                    if (namHoc != null) cmd.Parameters.AddWithValue("@NamHoc", namHoc);
+                    if (hocKy != null) cmd.Parameters.AddWithValue("@HocKy", hocKy);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        int stt = 1;
+                        while (reader.Read())
+                        {
+                            TongKetMonItem item = new TongKetMonItem
+                            {
+                                STT = stt++,
+                                HocSinhID = reader["HocSinhID"]?.ToString() ?? "",
+                                HoTen = reader["HoTen"]?.ToString() ?? "",
+                                TenLop = reader["TenLop"]?.ToString() ?? "",
+                                MonHoc = reader["MonHoc"]?.ToString() ?? "",
+                                NamHoc = reader["NamHoc"]?.ToString() ?? "",
+                                HocKy = Convert.ToInt32(reader["HocKy"]),
+                                DiemTrungBinh = reader["DiemTrungBinh"] == DBNull.Value ? double.NaN : Convert.ToDouble(reader["DiemTrungBinh"]),
+                                XepLoai = reader["XepLoai"]?.ToString() ?? "",
+                                GhiChu = reader["GhiChu"]?.ToString() ?? "",
+                                DiemMieng = reader["DiemMieng"] == DBNull.Value ? double.NaN : Convert.ToDouble(reader["DiemMieng"]),
+                                Diem15Phut = reader["Diem15Phut"] == DBNull.Value ? double.NaN : Convert.ToDouble(reader["Diem15Phut"]),
+                                Diem1Tiet = reader["Diem1Tiet"] == DBNull.Value ? double.NaN : Convert.ToDouble(reader["Diem1Tiet"]),
+                                DiemThi = reader["DiemThi"] == DBNull.Value ? double.NaN : Convert.ToDouble(reader["DiemThi"])
+                            };
+                            list.Add(item);
+                        }
+                    }
+                }
+            }
+
+            return list;
+        }
+
+
         public static List<TongKetMonItem> GetBangDiemHocSinh(string hocSinhID, string namHoc = null, int? hocKy = null)
         {
             List<TongKetMonItem> list = new List<TongKetMonItem>();

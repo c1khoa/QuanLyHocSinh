@@ -31,5 +31,29 @@ namespace QuanLyHocSinh.View.Controls.DanhSachLop
             InitializeComponent();
             DataContext = new DanhSachLopViewModel(mainVM);
         }
+        private void DiemDataGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+            var mainWindow = Window.GetWindow(this); // Lấy cửa sổ chứa UserControl
+            if (mainWindow != null)
+            {
+                var mainVM = mainWindow.DataContext as MainViewModel;
+                if (mainVM != null)
+                {
+                    var chiTietColumn = DiemDataGrid.Columns.FirstOrDefault(c => c.Header?.ToString() == "Sửa");
+                    if (chiTietColumn != null)
+                    {
+                        chiTietColumn.Visibility = mainVM.IsGiaoVuVisible ? Visibility.Visible : Visibility.Collapsed;
+
+                        mainVM.PropertyChanged += (s, args) =>
+                        {
+                            if (args.PropertyName == nameof(mainVM.IsGiaoVuVisible))
+                            {
+                                chiTietColumn.Visibility = mainVM.IsGiaoVuVisible ? Visibility.Visible : Visibility.Collapsed;
+                            }
+                        };
+                    }
+                }
+            }
+        }
     }
 } 

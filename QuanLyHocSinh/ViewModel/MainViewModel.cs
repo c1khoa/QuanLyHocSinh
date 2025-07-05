@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.Service;
 using QuanLyHocSinh.View.Controls;
 using QuanLyHocSinh.View.Controls.BaoCao;
 using QuanLyHocSinh.View.Controls.QuanLyTaiKhoan;
@@ -80,6 +81,8 @@ namespace QuanLyHocSinh.ViewModel
                     IsGiaoVienVisible = roleName == "giáo viên";
                     IsNotHocSinhVisible = _currentUser != null && roleName != "học sinh";
                     IsNotGiaoVuVisible = _currentUser != null && roleName != "giáo vụ";
+                    IsGiaoVuOrGVCN = UserService.GetChucVuByUserID(CurrentUser.UserID) == "Giáo viên chủ nhiệm";
+
 
                     OnPropertyChanged(nameof(IsGiaoVuVisible));
                     OnPropertyChanged(nameof(IsHocSinhVisible));
@@ -152,6 +155,16 @@ namespace QuanLyHocSinh.ViewModel
             set
             {
                 _isNotGiaoVuVisible = value;
+                OnPropertyChanged();
+            }
+        }
+        private bool _isGiaoVuOrGVCN;
+        public bool IsGiaoVuOrGVCN
+        {
+            get => _isGiaoVuOrGVCN;
+            set
+            {
+                _isGiaoVuOrGVCN = value;
                 OnPropertyChanged();
             }
         }

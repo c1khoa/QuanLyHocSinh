@@ -134,14 +134,15 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
         // Commands
         public ICommand ExportExcelCommand { get; }
 
-        public TongKetMonDetailDialogViewModel(string tenLop, string monHoc, int? hocKy, string namHoc)
+        public TongKetMonDetailDialogViewModel(string tenLop, string monHoc, ObservableCollection<string> danhSachMonHoc, int? hocKy, string namHoc)
         {
             // Khởi tạo commands
             ExportExcelCommand = new RelayCommand(ExportToExcel);
 
             // Khởi tạo thông tin
             TenLop = tenLop;
-            
+            DanhSachMonHoc = danhSachMonHoc;
+
             // Load dữ liệu filter
             LoadFilterData();
             
@@ -187,9 +188,6 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
         {
             try
             {
-                // Load danh sách môn học
-                var dsMonHoc = TongKetMonDAL.GetAllMonHoc().OrderBy(m => m).ToList();
-                DanhSachMonHoc = new ObservableCollection<string>(dsMonHoc);
                 
                 // Load danh sách năm học
                 var dsNamHoc = TongKetNamDAL.GetAllNamHoc().OrderByDescending(n => n).ToList();
@@ -335,7 +333,7 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
                         workbook.SaveAs(saveFileDialog.FileName);
                     }
 
-                    await ShowNotificationAsync("Thành công", "✅ Xuất Excel thành công!");
+                    await ShowNotificationAsync("Thông báo", "✅ Xuất Excel thành công!");
                 }
             }
             catch (Exception ex)

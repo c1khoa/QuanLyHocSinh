@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
 using System.Configuration;
 using System.Xml.Xsl;
+using System.Windows;
 
 public class DiemDAL : BaseDAL
 {
@@ -229,101 +230,118 @@ public class DiemDAL : BaseDAL
     }
 
     // Sửa điểm
-    public static void UpdateDiem(Diem diem)
+    public static bool UpdateDiem(Diem diem, out string message)
     {
+        message = "";
         string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
-        using (MySqlConnection conn = new MySqlConnection(connectionString))
-        {
-            conn.Open();
 
-            // Lấy DiemID và MonHocID
-            string getIdQuery = @"
+        try
+        {
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+
+                // Lấy DiemID và MonHocID
+                string getIdQuery = @"
                 SELECT d.DiemID, mh.MonHocID
                 FROM DIEM d
                 JOIN MONHOC mh ON d.MonHocID = mh.MonHocID
                 WHERE d.HocSinhID = @MaHS AND mh.TenMonHoc = @MonHoc AND d.NamHocID = @NamHocID AND d.HocKy = @HocKy";
-            string diemID = "", monHocID = "";
-            using (var cmd = new MySqlCommand(getIdQuery, conn))
-            {
-                cmd.Parameters.AddWithValue("@MaHS", diem.MaHS);
-                cmd.Parameters.AddWithValue("@MonHoc", diem.MonHoc);
-                cmd.Parameters.AddWithValue("@NamHocID", diem.NamHocID);
-                cmd.Parameters.AddWithValue("@HocKy", diem.HocKy);
 
-                // Lấy thông tin điểm
-                using (var reader = cmd.ExecuteReader())
+                string diemID = "", monHocID = "";
+                using (var cmd = new MySqlCommand(getIdQuery, conn))
                 {
-                    if (reader.Read())
+                    cmd.Parameters.AddWithValue("@MaHS", diem.MaHS);
+                    cmd.Parameters.AddWithValue("@MonHoc", diem.MonHoc);
+                    cmd.Parameters.AddWithValue("@NamHocID", diem.NamHocID);
+                    cmd.Parameters.AddWithValue("@HocKy", diem.HocKy);
+
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        diemID = reader["DiemID"].ToString();
-                        monHocID = reader["MonHocID"].ToString();
+                        if (reader.Read())
+                        {
+                            diemID = reader["DiemID"].ToString();
+                            monHocID = reader["MonHocID"].ToString();
+                        }
+                        else
+                        {
+                            message = "Không tìm thấy thông tin điểm tương ứng.";
+                            return false;
+                        }
                     }
                 }
-            }
-            if (string.IsNullOrEmpty(diemID) || string.IsNullOrEmpty(monHocID)) return; // Không tìm thấy
 
-            // Danh sách loại điểm và giá trị
-            var diemTypes = new Dictionary<string, float>
+                var diemTypes = new Dictionary<string, float?>
             {
-                { "LD01", diem.DiemMieng ?? -1 },
-                { "LD02", diem.Diem15p ?? -1 },
-                { "LD03", diem.Diem1Tiet ?? -1 },
-                { "LD04", diem.DiemThi ?? -1 }
+                { "LD01", diem.DiemMieng },
+                { "LD02", diem.Diem15p },
+                { "LD03", diem.Diem1Tiet },
+                { "LD04", diem.DiemThi }
             };
 
-            foreach (var item in diemTypes)
-            {
-                if (item.Value < 0) continue; // Bỏ qua nếu không có điểm
-
-                // Kiểm tra tồn tại
-                string checkQuery = "SELECT COUNT(*) FROM CHITIETDIEM WHERE DiemID = @DiemID AND LoaiDiemID = @LoaiDiemID";
-                int count = 0;
-                using (var cmd = new MySqlCommand(checkQuery, conn))
+                foreach (var item in diemTypes)
                 {
+                    if (item.Value < 0 || item.Value > 10)
+                    {
+                        continue;
+                    }
+
+                    string checkQuery = "SELECT COUNT(*) FROM CHITIETDIEM WHERE DiemID = @DiemID AND LoaiDiemID = @LoaiDiemID";
+                    int count = 0;
+                    using (var cmd = new MySqlCommand(checkQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@DiemID", diemID);
+                        cmd.Parameters.AddWithValue("@LoaiDiemID", item.Key);
+                        count = Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                    if (count == 0)
+                    {
+                        string newChiTietDiemID = GenerateNewChiTietDiemID(conn);
+                        string insertQuery = @"
+                        INSERT INTO CHITIETDIEM (ChiTietDiemID, DiemID, LoaiDiemID, GiaTri)
+                        VALUES (@ChiTietDiemID, @DiemID, @LoaiDiemID, @GiaTri)";
+                        using (var cmd = new MySqlCommand(insertQuery, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@ChiTietDiemID", newChiTietDiemID);
+                            cmd.Parameters.AddWithValue("@DiemID", diemID);
+                            cmd.Parameters.AddWithValue("@LoaiDiemID", item.Key);
+                            cmd.Parameters.AddWithValue("@GiaTri", item.Value);
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                    else
+                    {
+                        string updateQuery = "UPDATE CHITIETDIEM SET GiaTri = @GiaTri WHERE DiemID = @DiemID AND LoaiDiemID = @LoaiDiemID";
+                        using (var cmd = new MySqlCommand(updateQuery, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@GiaTri", item.Value);
+                            cmd.Parameters.AddWithValue("@DiemID", diemID);
+                            cmd.Parameters.AddWithValue("@LoaiDiemID", item.Key);
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+
+                // Tính lại điểm trung bình
+                float diemTB = TinhDiemTrungBinh(diemID, conn);  // Hàm này bạn cần chắc chắn đã kiểm tra chia 0
+                string updateDiemTB = "UPDATE DIEM SET DiemTrungBinh = @DiemTB WHERE DiemID = @DiemID";
+                using (var cmd = new MySqlCommand(updateDiemTB, conn))
+                {
+                    cmd.Parameters.AddWithValue("@DiemTB", diemTB);
                     cmd.Parameters.AddWithValue("@DiemID", diemID);
-                    cmd.Parameters.AddWithValue("@LoaiDiemID", item.Key);
-                    count = Convert.ToInt32(cmd.ExecuteScalar());
+                    cmd.ExecuteNonQuery();
                 }
 
-                if (count == 0)
-                {
-                    // Sinh mã mới cho ChiTietDiemID
-                    string newChiTietDiemID = GenerateNewChiTietDiemID(conn);
-                    string insertQuery = "INSERT INTO CHITIETDIEM (ChiTietDiemID, DiemID, LoaiDiemID, GiaTri) VALUES (@ChiTietDiemID, @DiemID, @LoaiDiemID, @GiaTri)";
-                    using (var cmd = new MySqlCommand(insertQuery, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@ChiTietDiemID", newChiTietDiemID);
-                        cmd.Parameters.AddWithValue("@DiemID", diemID);
-                        cmd.Parameters.AddWithValue("@LoaiDiemID", item.Key);
-                        cmd.Parameters.AddWithValue("@GiaTri", item.Value);
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-                else
-                {
-                    // Nếu đã có, update
-                    string updateQuery = "UPDATE CHITIETDIEM SET GiaTri = @GiaTri WHERE DiemID = @DiemID AND LoaiDiemID = @LoaiDiemID";
-                    using (var cmd = new MySqlCommand(updateQuery, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@GiaTri", item.Value);
-                        cmd.Parameters.AddWithValue("@DiemID", diemID);
-                        cmd.Parameters.AddWithValue("@LoaiDiemID", item.Key);
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-            }
-
-            // Sau khi cập nhật các điểm, cập nhật điểm trung bình
-            float diemTB = TinhDiemTrungBinh(diemID, conn);
-            string updateDiemTB = "UPDATE DIEM SET DiemTrungBinh = @DiemTB WHERE DiemID = @DiemID";
-            using (var cmd = new MySqlCommand(updateDiemTB, conn))
-            {
-                cmd.Parameters.AddWithValue("@DiemTB", diemTB);
-                cmd.Parameters.AddWithValue("@DiemID", diemID);
-                cmd.ExecuteNonQuery();
+                return true;
             }
         }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+            return false;
+        }
     }
+
     //TÍnh điểm trung bình
     private static float TinhDiemTrungBinh(string diemID, MySqlConnection conn)
     {

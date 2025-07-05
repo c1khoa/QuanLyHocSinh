@@ -10,6 +10,7 @@ using System.Windows;
 using MaterialDesignThemes.Wpf;
 using QuanLyHocSinh.View.Dialogs.MessageBox;
 using System.Linq;
+using QuanLyHocSinh.View.RoleControls;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
@@ -92,8 +93,16 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             {
                 NamHoc = SelectedNamHoc;
                 HocKy = SelectedHocKy.Value;
-                var list = HocSinhDAL.GetBangDiemHocSinh(HocSinhID, NamHoc, HocKy);
-                BangDiemMon = new ObservableCollection<TongKetMonItem>(list);
+                List<TongKetMonItem> list;
+                if (_mainVM.CurrentUser.VaiTro.VaiTroID == "VT02")
+                {
+                    list = HocSinhDAL.GetBangDiemHocSinh_GiaoVien(HocSinhID, _mainVM.CurrentUser.GiaoVienID, NamHoc, HocKy);
+                }
+                else
+                {
+                    list = HocSinhDAL.GetBangDiemHocSinh(HocSinhID, NamHoc, HocKy);
+                }
+                    BangDiemMon = new ObservableCollection<TongKetMonItem>(list);
                 IsShowBangDiem = BangDiemMon != null && BangDiemMon.Count > 0;
                 OnPropertyChanged(nameof(BangDiemMon));
                 OnPropertyChanged(nameof(NamHoc));
@@ -190,7 +199,8 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                         Diem1Tiet = double.IsNaN(item.Diem1Tiet) ? -1f : (float)item.Diem1Tiet,
                         DiemThi = double.IsNaN(item.DiemThi) ? -1f : (float)item.DiemThi
                     };
-                    DiemDAL.UpdateDiem(diem);
+                    string errorMsg;
+                    bool result = DiemDAL.UpdateDiem(diem, out errorMsg);
                 }
 
                 var list = HocSinhDAL.GetBangDiemHocSinh(HocSinhID, NamHoc, HocKy);

@@ -91,6 +91,8 @@
         <Border Grid.Row="2" Background="White" CornerRadius="15" Padding="10" Margin="10" BorderBrush="#e0e0e0" BorderThickness="1">
             <DataGrid ItemsSource="{Binding DanhSachHocSinhLop}" 
                       Style="{StaticResource CommonDataGridStyle}"
+                      Loaded="DiemDataGrid_Loaded"
+                      x:Name="DiemDataGrid"
                       ScrollViewer.VerticalScrollBarVisibility="Auto"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                       ScrollViewer.CanContentScroll="True"
@@ -137,12 +139,12 @@
                                       MinWidth="250"
                                       ElementStyle="{StaticResource CenterAlignStyle}"
                                       HeaderStyle="{StaticResource CenterHeaderStyle}"/>
-                    <DataGridTemplateColumn Header="Chức năng" Width="80" MinWidth="80"
+                    <DataGridTemplateColumn Header="Sửa" Width="80" MinWidth="80"
+                                            x:Name="ChiTietDiemColumn"
                                           HeaderStyle="{StaticResource CenterHeaderStyle}">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button Command="{Binding DataContext.SuaHocSinhCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        Visibility="{Binding DataContext.IsGiaoVuVisible, ElementName=main, Converter={StaticResource BooleanToVisibilityConverter}}"
                                         CommandParameter="{Binding}"
                                         Width="32" Height="32"
                                         ToolTip="Sửa thông tin học sinh"

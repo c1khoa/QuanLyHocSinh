@@ -18,122 +18,124 @@
             <Setter Property="Margin" Value="20 80 20 80"/>
         </Style>
     </Window.Resources>
-    <Border Margin="20"
+    <materialDesign:DialogHost Identifier="RootDialog_SuaDiemVM">
+        <Border Margin="20"
                 BorderBrush="#03a9f4"
                 BorderThickness="2"
                 Background="#D0F0FD"
                 CornerRadius="30">
-        <Grid Margin="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="2*"/>
-                <RowDefinition Height="4*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="4*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-            <TextBlock Text="THÔNG TIN ĐIỂM HỌC SINH"
+                <TextBlock Text="THÔNG TIN ĐIỂM HỌC SINH"
                    FontSize="24"
                    FontWeight="Bold"
                    HorizontalAlignment="Center"
                    Margin="0,0,0,20"/>
 
-            <Border Grid.Row="1" Background="White" CornerRadius="15 15 0 0" Padding="15">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+                <Border Grid.Row="1" Background="White" CornerRadius="15 15 0 0" Padding="15">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,10,0">
+                            <TextBlock Text="Họ tên" Margin="0,5,0,0"/>
+                            <TextBox materialDesign:HintAssist.Hint="Học sinh"
+                             Text="{Binding HoTen}" IsReadOnly="True" Margin="0,5"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,0">
+                            <TextBlock Text="Môn học" Margin="0,5,0,0"/>
+                            <TextBox materialDesign:HintAssist.Hint="Môn học"
+                             Text="{Binding MonHoc}" IsReadOnly="True" Margin="0,5"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,10,0">
+                            <TextBlock Text="Năm học" Margin="0,5,0,0"/>
+                            <TextBox materialDesign:HintAssist.Hint="Năm học"
+                             Text="{Binding NamHoc}" IsReadOnly="True" Margin="0,5"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,0">
+                            <TextBlock Text="Học kỳ" Margin="0,5,0,0"/>
+                            <TextBox materialDesign:HintAssist.Hint="Học kỳ"
+                             Text="{Binding HocKy}" IsReadOnly="True" Margin="0,5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Border Grid.Row="2" Background="White" CornerRadius="0 0 15 15" Padding="15" >
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel>
+                            <TextBlock Text="Điểm miệng" Margin="0,5,0,0"/>
+                            <TextBox materialDesign:HintAssist.Hint="Điểm miệng"
+                             Text="{Binding DiemMieng, Converter={StaticResource DiemToStringConverter}, UpdateSourceTrigger=PropertyChanged}"
+                             PreviewTextInput="NumberValidationTextBox"
+                             Margin="0,5"/>
+                            <TextBlock Text="Điểm 15 phút" Margin="0,5,0,0"/>
+                            <TextBox materialDesign:HintAssist.Hint="Điểm 15 phút"
+                             Text="{Binding Diem15p, Converter={StaticResource DiemToStringConverter}, UpdateSourceTrigger=PropertyChanged}"
+                             PreviewTextInput="NumberValidationTextBox"
+                             Margin="0,5"/>
+                            <TextBlock Text="Điểm 1 tiết" Margin="0,5,0,0"/>
+                            <TextBox materialDesign:HintAssist.Hint="Điểm 1 tiết"
+                             Text="{Binding Diem1Tiet, Converter={StaticResource DiemToStringConverter}, UpdateSourceTrigger=PropertyChanged}"
+                             PreviewTextInput="NumberValidationTextBox"
+                             Margin="0,5"/>
+                            <TextBlock Text="Điểm thi" Margin="0,5,0,0"/>
+                            <TextBox materialDesign:HintAssist.Hint="Điểm thi"
+                             Text="{Binding DiemThi, Converter={StaticResource DiemToStringConverter}, UpdateSourceTrigger=PropertyChanged}"
+                             PreviewTextInput="NumberValidationTextBox"
+                             Margin="0,5"/>
+                            <TextBlock Text="Điểm trung bình" Margin="0,5,0,0"/>
+                            <TextBox materialDesign:HintAssist.Hint="Điểm trung bình"
+                             Text="{Binding DiemTB, StringFormat='F2'}"
+                             IsReadOnly="True"
+                             Margin="0,5"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+                <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,10,0">
-                        <TextBlock Text="Họ tên" Margin="0,5,0,0"/>
-                        <TextBox materialDesign:HintAssist.Hint="Học sinh"
-                             Text="{Binding HoTen}" IsReadOnly="True" Margin="0,5"/>
-                    </StackPanel>
-                    <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,0">
-                        <TextBlock Text="Môn học" Margin="0,5,0,0"/>
-                        <TextBox materialDesign:HintAssist.Hint="Môn học"
-                             Text="{Binding MonHoc}" IsReadOnly="True" Margin="0,5"/>
-                    </StackPanel>
-                    <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,10,0">
-                        <TextBlock Text="Năm học" Margin="0,5,0,0"/>
-                        <TextBox materialDesign:HintAssist.Hint="Năm học"
-                             Text="{Binding NamHoc}" IsReadOnly="True" Margin="0,5"/>
-                    </StackPanel>
-                    <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,0">
-                        <TextBlock Text="Học kỳ" Margin="0,5,0,0"/>
-                        <TextBox materialDesign:HintAssist.Hint="Học kỳ"
-                             Text="{Binding HocKy}" IsReadOnly="True" Margin="0,5"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
-            <Border Grid.Row="2" Background="White" CornerRadius="0 0 15 15" Padding="15" >
-                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel>
-                        <TextBlock Text="Điểm miệng" Margin="0,5,0,0"/>
-                        <TextBox materialDesign:HintAssist.Hint="Điểm miệng"
-                             Text="{Binding DiemMieng, Converter={StaticResource DiemToStringConverter}, UpdateSourceTrigger=PropertyChanged}"
-                             PreviewTextInput="NumberValidationTextBox"
-                             Margin="0,5"/>
-                        <TextBlock Text="Điểm 15 phút" Margin="0,5,0,0"/>
-                        <TextBox materialDesign:HintAssist.Hint="Điểm 15 phút"
-                             Text="{Binding Diem15p, Converter={StaticResource DiemToStringConverter}, UpdateSourceTrigger=PropertyChanged}"
-                             PreviewTextInput="NumberValidationTextBox"
-                             Margin="0,5"/>
-                        <TextBlock Text="Điểm 1 tiết" Margin="0,5,0,0"/>
-                        <TextBox materialDesign:HintAssist.Hint="Điểm 1 tiết"
-                             Text="{Binding Diem1Tiet, Converter={StaticResource DiemToStringConverter}, UpdateSourceTrigger=PropertyChanged}"
-                             PreviewTextInput="NumberValidationTextBox"
-                             Margin="0,5"/>
-                        <TextBlock Text="Điểm thi" Margin="0,5,0,0"/>
-                        <TextBox materialDesign:HintAssist.Hint="Điểm thi"
-                             Text="{Binding DiemThi, Converter={StaticResource DiemToStringConverter}, UpdateSourceTrigger=PropertyChanged}"
-                             PreviewTextInput="NumberValidationTextBox"
-                             Margin="0,5"/>
-                        <TextBlock Text="Điểm trung bình" Margin="0,5,0,0"/>
-                        <TextBox materialDesign:HintAssist.Hint="Điểm trung bình"
-                             Text="{Binding DiemTB, StringFormat='F2'}"
-                             IsReadOnly="True"
-                             Margin="0,5"/>
-                    </StackPanel>
-                </ScrollViewer>
-            </Border>
-            <Grid Grid.Row="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Border Grid.Column="1"
+                    <Border Grid.Column="1"
                     Style="{StaticResource ImageBorderStyle}" 
                     Background="#FF90CAF9"
                     VerticalAlignment="Center" 
                     Margin="50 0 50 0">
-                    <Button Command="{Binding SaveCommandDiem}" 
+                        <Button Command="{Binding SaveCommandDiem}" 
                         CommandParameter="{Binding ElementName=passwordfield, Path=Password}"
                         Style="{StaticResource MaterialDesignRaisedLightButton}"
                         Background="Transparent"
                         BorderBrush="Transparent"
                         FontWeight="Regular"
                         Content="Lưu"/>
-                </Border>
-                <Border Grid.Column="0"
+                    </Border>
+                    <Border Grid.Column="0"
                     Style="{StaticResource ImageBorderStyle}" 
                     Background="#F08080"
                     VerticalAlignment="Center" 
                     Margin="50 0 50 0">
-                    <Button Command="{Binding CancelCommandDiem}" 
+                        <Button Command="{Binding CancelCommandDiem}" 
                         CommandParameter="{Binding ElementName=passwordfield, Path=Password}"
                         Style="{StaticResource MaterialDesignRaisedLightButton}"
                         Background="Transparent"
                         BorderBrush="Transparent"
                         FontWeight="Regular"
                         Content="Hủy"/>
-                </Border>
+                    </Border>
+                </Grid>
             </Grid>
-        </Grid>
-    </Border>
+        </Border>
+    </materialDesign:DialogHost>
 </Window>
                      
                      

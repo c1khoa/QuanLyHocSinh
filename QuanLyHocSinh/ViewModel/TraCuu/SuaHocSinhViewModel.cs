@@ -132,7 +132,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             _hocSinhGoc.NienKhoa = NienKhoa;
 
                 HocSinhDAL.UpdateHocSinh(_hocSinhGoc);
-                await ShowNotificationAsync("Thành công", "✅ Cập nhật thông tin thành công!");
+                await DialogHost.Show(new NotifyDialog("Thành công", "✅ Cập nhật thông tin thành công!"), "RootDialog_SuaHS");
                 CloseDialog?.Invoke(true);
             }
             catch (Exception ex)
@@ -150,7 +150,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         {
             try
             {
-                await DialogHost.Show(new NotifyDialog(title, message), "RootDialog_Main");
+                await DialogHost.Show(new ErrorDialog(title, message), "RootDialog_SuaHS");
             }
             catch
             {

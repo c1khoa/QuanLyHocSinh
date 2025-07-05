@@ -255,10 +255,18 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
                 _diemGoc.Diem1Tiet = Diem1Tiet ?? -1;
                 _diemGoc.DiemThi = DiemThi ?? -1;
                 _diemGoc.DiemTB = DiemTB;
+                string errorMsg;
+                bool result = DiemDAL.UpdateDiem(_diemGoc, out errorMsg);
 
-                DiemDAL.UpdateDiem(_diemGoc);
-                await ShowNotificationAsync("Thông báo", "✅ Cập nhật điểm thành công!");
-                CloseDialog?.Invoke(true);
+                if (!result)
+                {
+                    await ShowNotificationAsync("Lỗi", $"{errorMsg}");
+                }
+                else
+                {
+                    await DialogHost.Show(new NotifyDialog("Thông báo", "✅ Cập nhật điểm thành công!"), "RootDialog_SuaDiemVM");
+                    CloseDialog?.Invoke(true);
+                }
             }
             catch (Exception ex)
             {
@@ -275,7 +283,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
         {
             try
             {
-                await DialogHost.Show(new NotifyDialog(title, message), "RootDialog_Main");
+                await DialogHost.Show(new ErrorDialog(title, message), "RootDialog_SuaDiemVM");
             }
             catch
             {

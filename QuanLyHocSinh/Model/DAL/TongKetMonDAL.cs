@@ -377,6 +377,131 @@ public class TongKetMonDAL
         }
         return list;
     }
+    public static List<TongKetLopItem> GetTongKetTheoLop_GiaoVien(string giaoVienID, string? monHoc = null, int? hocKy = null)
+    {
+        List<TongKetLopItem> list = new List<TongKetLopItem>();
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+
+        string whereClause = @"
+        JOIN PHANCONGDAY pcd ON d.MonHocID = pcd.MonHocID AND LEFT(hhs.LopHocID, 4) = pcd.LopID AND d.NamHocID = pcd.NamHocID
+        WHERE d.DiemTrungBinh IS NOT NULL AND d.DiemTrungBinh > 0
+          AND pcd.GiaoVienID = @GiaoVienID
+    ";
+
+        if (!string.IsNullOrEmpty(monHoc) && monHoc != "Tất cả")
+            whereClause += " AND mh.TenMonHoc = @MonHoc";
+        if (hocKy.HasValue)
+            whereClause += " AND d.HocKy = @HocKy";
+
+        string groupByClause;
+        string selectClause;
+
+        if (!hocKy.HasValue)
+        {
+            groupByClause = "GROUP BY l.TenLop, l.SiSo, d.NamHocID";
+            selectClause = @"
+        SELECT 
+            ROW_NUMBER() OVER (ORDER BY l.TenLop) as STT,
+            l.TenLop,
+            COALESCE(MAX(mh.TenMonHoc), 'Tất cả môn') as MonHoc,
+            d.NamHocID as NamHoc,
+            -1 as HocKy,
+            l.SiSo,
+            COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) as SoLuongDat,
+            ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat";
+        }
+        else
+        {
+            groupByClause = "GROUP BY l.TenLop, l.SiSo, d.NamHocID, d.HocKy";
+            selectClause = @"
+        SELECT 
+            ROW_NUMBER() OVER (ORDER BY l.TenLop) as STT,
+            l.TenLop,
+            COALESCE(MAX(mh.TenMonHoc), 'Tất cả môn') as MonHoc,
+            d.NamHocID as NamHoc,
+            d.HocKy,
+            l.SiSo,
+            COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) as SoLuongDat,
+            ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat";
+        }
+
+        string query = $@"
+        {selectClause}
+        FROM DIEM d
+        JOIN HOCSINH hs ON d.HocSinhID = hs.HocSinhID
+        JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
+        JOIN LOP l ON LEFT(hhs.LopHocID, 4) = l.LopID
+        JOIN MONHOC mh ON d.MonHocID = mh.MonHocID
+        {whereClause}
+        {groupByClause}
+        HAVING l.SiSo > 0
+        ORDER BY l.TenLop
+    ";
+
+        using (MySqlConnection conn = new MySqlConnection(connectionString))
+        {
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+
+            cmd.Parameters.AddWithValue("@GiaoVienID", giaoVienID);
+            if (!string.IsNullOrEmpty(monHoc) && monHoc != "Tất cả")
+                cmd.Parameters.AddWithValue("@MonHoc", monHoc);
+            if (hocKy.HasValue)
+                cmd.Parameters.AddWithValue("@HocKy", hocKy.Value);
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    TongKetLopItem item = new TongKetLopItem
+                    {
+                        STT = Convert.ToInt32(reader["STT"]),
+                        TenLop = reader["TenLop"]?.ToString() ?? "",
+                        MonHoc = reader["MonHoc"]?.ToString() ?? "",
+                        NamHoc = reader["NamHoc"]?.ToString() ?? "",
+                        HocKy = Convert.ToInt32(reader["HocKy"]),
+                        SiSo = Convert.ToInt32(reader["SiSo"]),
+                        SoLuongDat = Convert.ToInt32(reader["SoLuongDat"]),
+                        TiLeDat = Convert.ToDouble(reader["TiLeDat"])
+                    };
+                    list.Add(item);
+                }
+            }
+        }
+
+        return list;
+    }
+
+    public static List<string> GetMonHocTheoGiaoVien(string giaoVienId)
+    {
+        List<string> dsMon = new List<string>();
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+
+        using (MySqlConnection conn = new MySqlConnection(connectionString))
+        {
+            conn.Open();
+            string query = @"
+            SELECT DISTINCT mh.TenMonHoc
+            FROM PHANCONGDAY pcd
+            JOIN MONHOC mh ON pcd.MonHocID = mh.MonHocID
+            WHERE pcd.GiaoVienID = @GiaoVienID
+        ";
+
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@GiaoVienID", giaoVienId);
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        dsMon.Add(reader.GetString("TenMonHoc"));
+                    }
+                }
+            }
+        }
+
+        return dsMon.OrderBy(m => m).ToList();
+    }
 
 
     public static List<HocSinhChiTietItem> GetHocSinhTrongLop(string tenLop, string monHoc, int? hocKy, string? namHoc = null)

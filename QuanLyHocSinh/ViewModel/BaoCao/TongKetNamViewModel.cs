@@ -234,20 +234,7 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
                     workbook.SaveAs(dialog.FileName);
                 }
 
-                await ShowNotificationAsync("Thông báo", "✅ Xuất Excel thành công!");
-            }
-        }
-
-        private async Task ShowNotificationAsync(string title, string message)
-        {
-            try
-            {
-                await DialogHost.Show(new NotifyDialog(title, message), "RootDialog_Main");
-            }
-            catch
-            {
-                MessageBox.Show(message, title, MessageBoxButton.OK, 
-                    title.Contains("Lỗi") ? MessageBoxImage.Error : MessageBoxImage.Information);
+                await DialogHost.Show(new NotifyDialog("Thông báo", "✅ Xuất Excel thành công!"), "RootDialog_Main");
             }
         }
     }

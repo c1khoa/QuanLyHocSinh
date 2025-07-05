@@ -74,7 +74,7 @@
 
             <!-- Bảng dữ liệu -->
             <Border Grid.Row="1" Background="White" CornerRadius="15" Padding="10" Margin="10" BorderBrush="#e0e0e0" BorderThickness="1">
-                <DataGrid ItemsSource="{Binding DanhSachTongKetLop}" 
+                        <DataGrid ItemsSource="{Binding DanhSachTongKetLop}" 
                   Style="{StaticResource CommonDataGridStyle}"
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -116,7 +116,7 @@
                                   MinWidth="120"
                                   ElementStyle="{StaticResource CenterAlignStyle}"
                                   HeaderStyle="{StaticResource CenterHeaderStyle}"/>
-                        <DataGridTemplateColumn Header="Thao tác" 
+                        <DataGridTemplateColumn Header="Chi tiết" 
                                       Width="140" 
                                       MinWidth="120"
                                       HeaderStyle="{StaticResource CenterHeaderStyle}">

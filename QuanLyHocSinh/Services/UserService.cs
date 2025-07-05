@@ -12,6 +12,74 @@ namespace QuanLyHocSinh.Service
     public static class UserService
     {
         public static string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+        public static string GetChucVuByUserID(string userID)
+        {
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+
+                // 1. Lấy VaiTrò của user
+                string queryRole = @"
+                SELECT vt.TenVaiTro
+                FROM USERS u
+                JOIN VAITRO vt ON u.VaiTroID = vt.VaiTroID
+                WHERE u.UserID = @UserID";
+
+                string vaiTro = null;
+                using (var cmd = new MySqlCommand(queryRole, conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserID", userID);
+                    vaiTro = cmd.ExecuteScalar()?.ToString()?.Trim().ToLower();
+                }
+
+                if (string.IsNullOrEmpty(vaiTro))
+                    return null;
+
+                string query = null;
+
+                if (vaiTro == "giáo viên")
+                {
+                    query = @"
+                    SELECT cv.TenChucVu 
+                    FROM GIAOVIEN gv
+                    JOIN HOSOGIAOVIEN hsgv ON gv.GiaoVienID = hsgv.GiaoVienID
+                    JOIN HOSO hs ON hsgv.HoSoID = hs.HoSoID
+                    JOIN CHUCVU cv ON hs.ChucVuID = cv.ChucVuID
+                    WHERE gv.UserID = @UserID";
+                }
+                else if (vaiTro == "giáo vụ")
+                {
+                    query = @"
+                    SELECT cv.TenChucVu 
+                    FROM GIAOVU gv
+                    JOIN HOSOGIAOVU hsgv ON gv.GiaoVuID = hsgv.GiaoVuID
+                    JOIN HOSO hs ON hsgv.HoSoID = hs.HoSoID
+                    JOIN CHUCVU cv ON hs.ChucVuID = cv.ChucVuID
+                    WHERE gv.UserID = @UserID";
+                }
+                else if (vaiTro == "học sinh")
+                {
+                    query = @"
+                    SELECT cv.TenChucVu 
+                    FROM HOCSINH hsinh
+                    JOIN HOSOHOCSINH hshs ON hsinh.HocSinhID = hshs.HocSinhID
+                    JOIN HOSO hs ON hshs.HoSoID = hs.HoSoID
+                    JOIN CHUCVU cv ON hs.ChucVuID = cv.ChucVuID
+                    WHERE hsinh.UserID = @UserID";
+                }
+                else
+                {
+                    return null;
+                }
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserID", userID);
+                    var result = cmd.ExecuteScalar();
+                    return result?.ToString();
+                }
+            }
+        }
         public static void UpdateUserAndHoSo(User editedUser, string? newPassword, MySqlConnection conn, MySqlTransaction trans)
         {
             // Cập nhật bảng USERS

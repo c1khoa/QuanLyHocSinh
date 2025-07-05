@@ -49,6 +49,7 @@ namespace QuanLyHocSinh.View.Controls.BaoCao
                     dialog.DataContext = new TongKetMonDetailDialogViewModel(
                         lopItem.TenLop, 
                         mainViewModel.SelectedMonHoc, 
+                        mainViewModel.DanhSachMonHoc,
                         2, // Mặc định học kỳ 2
                         lopItem.NamHoc
                     );

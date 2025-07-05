@@ -246,75 +246,75 @@ CREATE TABLE CAPNHATDIEM (
     FOREIGN KEY (ChiTietDiemID) REFERENCES CHITIETDIEM(ChiTietDiemID)
 );
 
-DELIMITER $$
+-- DELIMITER $$
 
-CREATE TRIGGER trg_after_insert_chitietdiem
-AFTER INSERT ON CHITIETDIEM
-FOR EACH ROW
-BEGIN
-    DECLARE tb FLOAT;
-    DECLARE xeploai VARCHAR(20);
+-- CREATE TRIGGER trg_after_insert_chitietdiem
+-- AFTER INSERT ON CHITIETDIEM
+-- FOR EACH ROW
+-- BEGIN
+--     DECLARE tb FLOAT;
+--     DECLARE xeploai VARCHAR(20);
 
-    -- Tính điểm trung bình
-    SELECT 
-        IFNULL(ROUND(SUM(cd.GiaTri * ld.HeSo) / NULLIF(SUM(CASE WHEN cd.GiaTri IS NOT NULL THEN ld.HeSo ELSE 0 END), 0), 2), 0)
-    INTO tb
-    FROM CHITIETDIEM cd
-    JOIN LOAIDIEM ld ON cd.LoaiDiemID = ld.LoaiDiemID
-    WHERE cd.DiemID = NEW.DiemID;
+--     -- Tính điểm trung bình
+--     SELECT 
+--         IFNULL(ROUND(SUM(cd.GiaTri * ld.HeSo) / NULLIF(SUM(CASE WHEN cd.GiaTri IS NOT NULL THEN ld.HeSo ELSE 0 END), 0), 2), 0)
+--     INTO tb
+--     FROM CHITIETDIEM cd
+--     JOIN LOAIDIEM ld ON cd.LoaiDiemID = ld.LoaiDiemID
+--     WHERE cd.DiemID = NEW.DiemID;
 
-    -- Gán xếp loại
-    SET xeploai = 
-        CASE 
-            WHEN tb >= 8 THEN 'Giỏi'
-            WHEN tb >= 6.5 THEN 'Khá'
-            WHEN tb >= 5 THEN 'Trung bình'
-            ELSE 'Yếu'
-        END;
+--     -- Gán xếp loại
+--     SET xeploai = 
+--         CASE 
+--             WHEN tb >= 8 THEN 'Giỏi'
+--             WHEN tb >= 6.5 THEN 'Khá'
+--             WHEN tb >= 5 THEN 'Trung bình'
+--             ELSE 'Yếu'
+--         END;
 
-    -- Cập nhật bảng DIEM
-    UPDATE DIEM
-    SET DiemTrungBinh = tb,
-        XepLoai = xeploai
-    WHERE DiemID = NEW.DiemID;
-END$$
+--     -- Cập nhật bảng DIEM
+--     UPDATE DIEM
+--     SET DiemTrungBinh = tb,
+--         XepLoai = xeploai
+--     WHERE DiemID = NEW.DiemID;
+-- END$$
 
-DELIMITER ;
+-- DELIMITER ;
 
 
-DELIMITER $$
+-- DELIMITER $$
 
-CREATE TRIGGER trg_after_update_chitietdiem
-AFTER UPDATE ON CHITIETDIEM
-FOR EACH ROW
-BEGIN
-    DECLARE tb FLOAT;
-    DECLARE xeploai VARCHAR(20);
+-- CREATE TRIGGER trg_after_update_chitietdiem
+-- AFTER UPDATE ON CHITIETDIEM
+-- FOR EACH ROW
+-- BEGIN
+--     DECLARE tb FLOAT;
+--     DECLARE xeploai VARCHAR(20);
 
-    -- Tính điểm trung bình
-    SELECT 
-        IFNULL(ROUND(SUM(cd.GiaTri * ld.HeSo) / NULLIF(SUM(CASE WHEN cd.GiaTri IS NOT NULL THEN ld.HeSo ELSE 0 END), 0), 2), 0)
-    INTO tb
-    FROM CHITIETDIEM cd
-    JOIN LOAIDIEM ld ON cd.LoaiDiemID = ld.LoaiDiemID
-    WHERE cd.DiemID = NEW.DiemID;
+--     -- Tính điểm trung bình
+--     SELECT 
+--         IFNULL(ROUND(SUM(cd.GiaTri * ld.HeSo) / NULLIF(SUM(CASE WHEN cd.GiaTri IS NOT NULL THEN ld.HeSo ELSE 0 END), 0), 2), 0)
+--     INTO tb
+--     FROM CHITIETDIEM cd
+--     JOIN LOAIDIEM ld ON cd.LoaiDiemID = ld.LoaiDiemID
+--     WHERE cd.DiemID = NEW.DiemID;
 
-    -- Gán xếp loại
-    SET xeploai = 
-        CASE 
-            WHEN tb >= 8 THEN 'Giỏi'
-            WHEN tb >= 6.5 THEN 'Khá'
-            WHEN tb >= 5 THEN 'Trung bình'
-            ELSE 'Yếu'
-        END;
+--     -- Gán xếp loại
+--     SET xeploai = 
+--         CASE 
+--             WHEN tb >= 8 THEN 'Giỏi'
+--             WHEN tb >= 6.5 THEN 'Khá'
+--             WHEN tb >= 5 THEN 'Trung bình'
+--             ELSE 'Yếu'
+--         END;
 
-    -- Cập nhật bảng DIEM
-    UPDATE DIEM
-    SET DiemTrungBinh = tb,
-        XepLoai = xeploai
-    WHERE DiemID = NEW.DiemID;
-END$$
+--     -- Cập nhật bảng DIEM
+--     UPDATE DIEM
+--     SET DiemTrungBinh = tb,
+--         XepLoai = xeploai
+--     WHERE DiemID = NEW.DiemID;
+-- END$$
 
-DELIMITER ;
+-- DELIMITER ;
 
 
