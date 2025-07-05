@@ -39,7 +39,8 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
         private UserControl _currentControl;
         public ObservableCollection<MonHoc> DanhSachBoMon { get; set; } = new();
         public string BoMon { get; set; } // BoMonID
-
+        public QuyDinhTuoiEntities QuyDinhTuoiHocSinh { get; set; }
+        public QuyDinhTuoiEntities QuyDinhTuoiGiaoVien { get; set; }
 
         public string VaiTroID
         {
@@ -377,6 +378,9 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             AddAccountCommand = new RelayCommand(ExecuteAddAccount, CanExecuteAddAccount);
             CancelCommand = new RelayCommand(ExecuteCancel);
             QuayLaiCommand = new RelayCommand(ExecuteQuayLai);
+
+            QuyDinhTuoiHocSinh = QuyDinhTuoiDAL.GetQuyDinhTuoi("QDHS");
+            QuyDinhTuoiGiaoVien = QuyDinhTuoiDAL.GetQuyDinhTuoi("QDGV");
         }
 
         
@@ -412,35 +416,30 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                 var tuoi = DateTime.Today.Year - NgaySinh.Year;
                 if (NgaySinh > DateTime.Today.AddYears(-tuoi)) tuoi--;
 
+                int tuoiToiThieuHS = QuyDinhTuoiHocSinh?.TuoiToiThieu ?? 15;
+                int tuoiToiDaHS = QuyDinhTuoiHocSinh?.TuoiToiDa ?? 20;
+                int tuoiToiThieuGV = QuyDinhTuoiGiaoVien?.TuoiToiThieu ?? 22;
+
                 if (VaiTroID == "VT01") // Học sinh
                 {
-                    if (!string.IsNullOrEmpty(SelectedLopHocID) && (tuoi < 15 || tuoi > 20))
+                    if (!string.IsNullOrEmpty(SelectedLopHocID) && (tuoi < tuoiToiThieuHS || tuoi > tuoiToiDaHS))
                     {
-                        await DialogHost.Show(new ErrorDialog("Thất bại", "Học sinh chỉ có thể từ 15 đến 20 tuổi"), "RootDialog_Add");
+                        await DialogHost.Show(
+                            new ErrorDialog("Thất bại", $"Học sinh chỉ có thể từ {tuoiToiThieuHS} đến {tuoiToiDaHS} tuổi"),
+                            "RootDialog_Add");
                         return;
-
                     }
                 }
-                else
+                else // Giáo viên, giáo vụ
                 {
-                    if (tuoi < 22)
+                    if (tuoi < tuoiToiThieuGV)
                     {
-                        if (VaiTroID == "VT02")
-                        {
-                            var _ = await DialogHost.Show(
-                            new ConfirmDialog($"⚠️Giáo viên chưa đủ 22 tuổi. Bạn có muốn tiếp tục không?"),
+                        string roleText = VaiTroID == "VT02" ? "Giáo viên" : "Giáo vụ";
+                        var _ = await DialogHost.Show(
+                            new ConfirmDialog($"⚠️{roleText} chưa đủ {tuoiToiThieuGV} tuổi. Bạn có muốn tiếp tục không?"),
                             "RootDialog_Add");
-                            if (_?.ToString() == "False")
-                                return;
-                        }
-                        else
-                        {
-                            var _ = await DialogHost.Show(
-                            new ConfirmDialog($"⚠️Giáo vụ chưa đủ 22 tuổi. Bạn có muốn tiếp tục không?"),
-                            "RootDialog_Add");
-                            if (_?.ToString() == "False")
-                                return;
-                        }
+                        if (_?.ToString() == "False")
+                            return;
                     }
                 }
 
