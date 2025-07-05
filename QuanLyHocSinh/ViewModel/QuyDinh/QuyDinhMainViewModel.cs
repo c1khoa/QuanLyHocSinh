@@ -1,108 +1,82 @@
 using QuanLyHocSinh.Model.Entities;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using System.Windows; 
+using System.Windows;
 
 namespace QuanLyHocSinh.ViewModel.QuyDinh
 {
     public class QuyDinhMainViewModel : BaseViewModel
     {
+        // Các thuộc tính chứa dữ liệu quy định
+        private QuyDinhEntities _quyDinhChung;
+        public QuyDinhEntities QuyDinhChung { get => _quyDinhChung; set { _quyDinhChung = value; OnPropertyChanged(); } }
+
+        private QuyDinhTuoiEntities _quyDinhHocSinh;
+        public QuyDinhTuoiEntities QuyDinhHocSinh { get => _quyDinhHocSinh; set { _quyDinhHocSinh = value; OnPropertyChanged(); } }
+
+        private QuyDinhTuoiEntities _quyDinhGiaoVien;
+        public QuyDinhTuoiEntities QuyDinhGiaoVien { get => _quyDinhGiaoVien; set { _quyDinhGiaoVien = value; OnPropertyChanged(); } }
+
+        // Thuộc tính kiểm soát trạng thái chỉnh sửa chung
+        private bool _isEditing;
+        public bool IsEditing { get => _isEditing; set { _isEditing = value; OnPropertyChanged(); } }
+
+        // Các lệnh (Commands)
+        public ICommand LoadDataCommand { get; set; }
+        public ICommand EditCommand { get; set; }
+        public ICommand SaveCommand { get; set; }
+        public ICommand CancelCommand { get; set; }
         private MainViewModel _mainVM;
 
         public QuyDinhMainViewModel(MainViewModel mainVM)
         {
             _mainVM = mainVM;
+            // Gán các lệnh với phương thức xử lý
+            LoadDataCommand = new RelayCommand(LoadData);
+            EditCommand = new RelayCommand(() => IsEditing = true);
+            SaveCommand = new RelayCommand(SaveData);
+            CancelCommand = new RelayCommand(() => {
+                IsEditing = true;
+                LoadData(); // Tải lại dữ liệu gốc khi hủy
+            });
 
-            Regulations = new ObservableCollection<Model.Entities.QuyDinh>();
-            NewQuyDinh = new Model.Entities.QuyDinh();
-
-            AddRegulationCommand = new RelayCommand(AddRegulation, CanAddRegulation);
-            EditRegulationCommand = new RelayCommand(EditRegulation, CanEditRegulation);
-            DeleteRegulationCommand = new RelayCommand<Model.Entities.QuyDinh>(DeleteRegulation);
+            LoadData(); // Tải dữ liệu ban đầu
         }
 
-        private ObservableCollection<Model.Entities.QuyDinh> _regulations;
-        public ObservableCollection<Model.Entities.QuyDinh> Regulations
+        // Tải dữ liệu từ DAL
+        private void LoadData()
         {
-            get => _regulations;
-            set
+            try
             {
-                _regulations = value;
-                OnPropertyChanged();
+                IsEditing = false;
+                // Gọi các phương thức static từ DAL mà bạn đã cung cấp
+                QuyDinhChung = QuyDinhDAL.GetQuyDinh();
+                QuyDinhHocSinh = QuyDinhTuoiDAL.GetQuyDinhTuoi("QDHS");
+                QuyDinhGiaoVien = QuyDinhTuoiDAL.GetQuyDinhTuoi("QDGV");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi tải dữ liệu quy định: " + ex.Message);
             }
         }
 
-        private Model.Entities.QuyDinh _newQuyDinh;
-        public Model.Entities.QuyDinh NewQuyDinh
+        // Lưu dữ liệu thông qua DAL
+        private void SaveData()
         {
-            get => _newQuyDinh;
-            set
+            try
             {
-                _newQuyDinh = value;
-                OnPropertyChanged();
+                // Gọi các phương thức static từ DAL để cập nhật
+                QuyDinhDAL.UpdateQuyDinh(QuyDinhChung);
+                QuyDinhTuoiDAL.UpdateQuyDinhTuoi(QuyDinhHocSinh);
+                QuyDinhTuoiDAL.UpdateQuyDinhTuoi(QuyDinhGiaoVien);
+
+                IsEditing = false;
+                MessageBox.Show("Cập nhật quy định thành công!");
             }
-        }
-
-        private Model.Entities.QuyDinh _selectedRegulation;
-        public Model.Entities.QuyDinh SelectedRegulation
-        {
-            get => _selectedRegulation;
-            set
+            catch (Exception ex)
             {
-                _selectedRegulation = value;
-                OnPropertyChanged();
-
-                // Cập nhật lại trạng thái nút Sửa
-                CommandManager.InvalidateRequerySuggested();
+                MessageBox.Show("Lỗi khi cập nhật quy định: " + ex.Message);
             }
-        }
-
-        public ICommand AddRegulationCommand { get; set; }
-        public ICommand EditRegulationCommand { get; set; }
-        public ICommand DeleteRegulationCommand { get; set; }
-        private bool CanAddRegulation()
-        {
-            return NewQuyDinh != null && NewQuyDinh.TuoiToiThieu > 0;
-        }
-
-        private void AddRegulation()
-        {
-            var newItem = new Model.Entities.QuyDinh()
-            {
-                QuyDinhID = (Regulations.Count + 1).ToString(),
-                TuoiToiThieu = NewQuyDinh.TuoiToiThieu,
-                TuoiToiDa = NewQuyDinh.TuoiToiDa,
-                SiSoLop = NewQuyDinh.SiSoLop,
-                SoLuongMonHoc = NewQuyDinh.SoLuongMonHoc,
-                DiemDat = NewQuyDinh.DiemDat,
-                QuyDinhKhac = NewQuyDinh.QuyDinhKhac
-            };
-
-            Regulations.Add(newItem);
-
-            NewQuyDinh = new Model.Entities.QuyDinh();
-
-            CommandManager.InvalidateRequerySuggested();
-        }
-
-        private void DeleteRegulation(Model.Entities.QuyDinh quyDinh)
-        {
-            if (quyDinh == null) return;
-
-            Regulations.Remove(quyDinh);
-            CommandManager.InvalidateRequerySuggested();
-        }
-        private bool CanEditRegulation()
-        {
-            return SelectedRegulation != null;
-        }
-
-        public event Action<Model.Entities.QuyDinh> OpenEditViewRequested;
-        private void EditRegulation()
-        {
-            if (SelectedRegulation == null) return;
-
-            OpenEditViewRequested?.Invoke(SelectedRegulation);
         }
     }
 }
