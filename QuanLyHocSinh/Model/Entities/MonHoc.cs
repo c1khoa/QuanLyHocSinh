@@ -10,5 +10,9 @@ namespace QuanLyHocSinh.Model.Entities
     {
         public string MonHocID { get; set; }
         public string TenMonHoc { get; set; }
+        public MonHoc Clone()
+        {
+            return (MonHoc)this.MemberwiseClone();
+        }
     }
 }

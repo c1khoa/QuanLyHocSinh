@@ -1,58 +1,81 @@
 using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.View.Dialogs;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.Windows;
-
+using System.Threading.Tasks;
+using System.Linq;
 namespace QuanLyHocSinh.ViewModel.QuyDinh
 {
     public class QuyDinhMainViewModel : BaseViewModel
     {
-        // Các thuộc tính chứa dữ liệu quy định
-        private QuyDinhEntities _quyDinhChung;
-        public QuyDinhEntities QuyDinhChung { get => _quyDinhChung; set { _quyDinhChung = value; OnPropertyChanged(); } }
+        private MainViewModel _mainVM;
 
+        // Quy định tuổi
         private QuyDinhTuoiEntities _quyDinhHocSinh;
         public QuyDinhTuoiEntities QuyDinhHocSinh { get => _quyDinhHocSinh; set { _quyDinhHocSinh = value; OnPropertyChanged(); } }
 
         private QuyDinhTuoiEntities _quyDinhGiaoVien;
         public QuyDinhTuoiEntities QuyDinhGiaoVien { get => _quyDinhGiaoVien; set { _quyDinhGiaoVien = value; OnPropertyChanged(); } }
 
-        // Thuộc tính kiểm soát trạng thái chỉnh sửa chung
-        private bool _isEditing;
-        public bool IsEditing { get => _isEditing; set { _isEditing = value; OnPropertyChanged(); } }
+        // Quy định môn học
+        private int _soLuongMonHoc;
+        public int SoLuongMonHoc { get => _soLuongMonHoc; set { _soLuongMonHoc = value; OnPropertyChanged(); } }
 
-        // Các lệnh (Commands)
-        public ICommand LoadDataCommand { get; set; }
-        public ICommand EditCommand { get; set; }
-        public ICommand SaveCommand { get; set; }
-        public ICommand CancelCommand { get; set; }
-        private MainViewModel _mainVM;
+        private float _diemDat;
+        public float DiemDat { get => _diemDat; set { _diemDat = value; OnPropertyChanged(); } }
+
+        public ObservableCollection<MonHoc> DanhSachMonHoc { get; set; } = new();
+
+        // Quy định lớp
+        private int _siSoLopToiDa;
+        public int SiSoLopToiDa { get => _siSoLopToiDa; set { _siSoLopToiDa = value; OnPropertyChanged(); } }
+
+        public ObservableCollection<Lop> DanhSachLop { get; set; } = new();
+
+        // Quy định khác
+        private string _quyDinhKhac;
+        public string QuyDinhKhac { get => _quyDinhKhac; set { _quyDinhKhac = value; OnPropertyChanged(); } }
+
+        // Các command chỉnh sửa
+        public ICommand EditQuyDinhTuoiCommand { get; }
+        public ICommand EditQuyDinhMonHocCommand { get; }
+        public ICommand EditQuyDinhLopCommand { get; }
+        public ICommand EditQuyDinhKhacCommand { get; }
 
         public QuyDinhMainViewModel(MainViewModel mainVM)
         {
             _mainVM = mainVM;
-            // Gán các lệnh với phương thức xử lý
-            LoadDataCommand = new RelayCommand(LoadData);
-            EditCommand = new RelayCommand(() => IsEditing = true);
-            SaveCommand = new RelayCommand(SaveData);
-            CancelCommand = new RelayCommand(() => {
-                IsEditing = true;
-                LoadData(); // Tải lại dữ liệu gốc khi hủy
-            });
 
-            LoadData(); // Tải dữ liệu ban đầu
+            EditQuyDinhTuoiCommand = new RelayCommand(OpenEditQuyDinhTuoiDialog);
+            EditQuyDinhMonHocCommand = new RelayCommand(OpenEditQuyDinhMonHocDialog);
+            EditQuyDinhLopCommand = new RelayCommand(OpenEditQuyDinhLopDialog);
+            EditQuyDinhKhacCommand = new RelayCommand(OpenEditQuyDinhKhacDialog);
+
+            LoadData();
         }
 
-        // Tải dữ liệu từ DAL
-        private void LoadData()
+        // Tải dữ liệu từ DAL/service
+        private async Task LoadData()
         {
             try
             {
-                IsEditing = false;
-                // Gọi các phương thức static từ DAL mà bạn đã cung cấp
-                QuyDinhChung = QuyDinhDAL.GetQuyDinh();
                 QuyDinhHocSinh = QuyDinhTuoiDAL.GetQuyDinhTuoi("QDHS");
                 QuyDinhGiaoVien = QuyDinhTuoiDAL.GetQuyDinhTuoi("QDGV");
+
+                var quyDinh = QuyDinhDAL.GetQuyDinh();
+                SoLuongMonHoc = quyDinh.SoLuongMonHoc;
+                DiemDat = quyDinh.DiemDat;
+                SiSoLopToiDa = quyDinh.SiSoLop_ToiDa;
+                QuyDinhKhac = quyDinh.QuyDinhKhac;
+
+                var monHocDal = new MonHocDAL();
+                DanhSachMonHoc = new ObservableCollection<MonHoc>(await monHocDal.GetAllMonHocAsync());
+                OnPropertyChanged(nameof(DanhSachMonHoc));
+
+                var lopDal = new LopDAL();
+                DanhSachLop = new ObservableCollection<Lop>(await lopDal.GetAllLopAsync());
+                OnPropertyChanged(nameof(DanhSachLop));
             }
             catch (Exception ex)
             {
@@ -60,23 +83,47 @@ namespace QuanLyHocSinh.ViewModel.QuyDinh
             }
         }
 
-        // Lưu dữ liệu thông qua DAL
-        private void SaveData()
+        // Các hàm mở dialog chỉnh sửa
+        // Sửa quy định tuổi
+        private async void OpenEditQuyDinhTuoiDialog()
         {
-            try
-            {
-                // Gọi các phương thức static từ DAL để cập nhật
-                QuyDinhDAL.UpdateQuyDinh(QuyDinhChung);
-                QuyDinhTuoiDAL.UpdateQuyDinhTuoi(QuyDinhHocSinh);
-                QuyDinhTuoiDAL.UpdateQuyDinhTuoi(QuyDinhGiaoVien);
 
-                IsEditing = false;
-                MessageBox.Show("Cập nhật quy định thành công!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi khi cập nhật quy định: " + ex.Message);
-            }
+            var dialog = new SuaQuyDinhTuoiDialog();
+            var vm = new SuaQuyDinhTuoiViewModel(dialog, QuyDinhHocSinh, QuyDinhGiaoVien);
+            dialog.DataContext = vm;
+            if (dialog.ShowDialog() == true)
+                await LoadData();
+        }
+
+        // Sửa quy định môn học
+        private async void OpenEditQuyDinhMonHocDialog()
+        {
+            var danhSachMonHocClone = DanhSachMonHoc.Select(monHoc => monHoc.Clone()).ToList();
+            var dialog = new SuaQuyDinhMonHocDialog();
+            var vm = new SuaQuyDinhMonHocViewModel(dialog, SoLuongMonHoc, DiemDat, danhSachMonHocClone);
+            dialog.DataContext = vm;
+            if (dialog.ShowDialog() == true)
+                await LoadData();
+        }
+
+        // Sửa quy định lớp
+        private async void OpenEditQuyDinhLopDialog()
+        {
+            var danhSachLopClone = DanhSachLop.Select(lop => lop.Clone()).ToList();
+            var dialog = new SuaQuyDinhLopDialog();
+            var vm = new SuaQuyDinhLopViewModel(dialog, SiSoLopToiDa, danhSachLopClone);
+            dialog.DataContext = vm;
+            if (dialog.ShowDialog() == true)
+                await LoadData();
+        }
+        
+        private async void OpenEditQuyDinhKhacDialog()
+        {
+            var dialog = new SuaQuyDinhKhacDialog();
+            var vm = new SuaQuyDinhKhacViewModel(dialog, QuyDinhKhac);
+            dialog.DataContext = vm;
+            if (dialog.ShowDialog() == true)
+                await LoadData();
         }
     }
 }

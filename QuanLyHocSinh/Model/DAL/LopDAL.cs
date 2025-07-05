@@ -419,7 +419,41 @@ namespace QuanLyHocSinh.Model.Entities
                 }
             }
         }
-
+        public static void UpdateDanhSachLop(List<Lop> danhSachLop)
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                // Bắt đầu transaction để đảm bảo tất cả cập nhật đều thành công
+                using (var transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        string query = "UPDATE LOP SET TenLop = @TenLop WHERE LopID = @LopID";
+                        
+                        foreach (var lop in danhSachLop)
+                        {
+                            using (var cmd = new MySqlCommand(query, conn, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("@TenLop", lop.TenLop);
+                                cmd.Parameters.AddWithValue("@LopID", lop.LopID);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                        
+                        // Lưu tất cả thay đổi nếu không có lỗi
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        // Hủy bỏ tất cả thay đổi nếu có lỗi
+                        transaction.Rollback();
+                        throw; // Ném lại exception để ViewModel xử lý
+                    }
+                }
+            }
+        }
         // Xóa phân công giảng dạy (ChiTietMonHoc)
         public async Task RemoveMonHocAssignmentFromLopAsync(string chiTietMonHocID)
         {

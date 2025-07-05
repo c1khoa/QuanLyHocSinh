@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using QuanLyHocSinh.Model.Entities;
 using System.Threading.Tasks;
-
+using System.Configuration;
 namespace QuanLyHocSinh.Model.Entities
 {
-        public class MonHocDAL : BaseDAL
+    public class MonHocDAL : BaseDAL
     {
         private static async Task<string> GenerateNewMonHocIDAsync(MySqlConnection conn, MySqlTransaction transaction)
         {
@@ -192,5 +192,41 @@ namespace QuanLyHocSinh.Model.Entities
             }
             return monHocID;
         }
+        public static void UpdateDanhSachMonHoc(List<MonHoc> danhSachMonHoc)
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                // Bắt đầu một transaction để đảm bảo tất cả cập nhật thành công hoặc không gì cả
+                using (var transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        string query = "UPDATE MONHOC SET TenMonHoc = @TenMonHoc WHERE MonHocID = @MonHocID";
+                        
+                        foreach (var monHoc in danhSachMonHoc)
+                        {
+                            using (var cmd = new MySqlCommand(query, conn, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("@TenMonHoc", monHoc.TenMonHoc);
+                                cmd.Parameters.AddWithValue("@MonHocID", monHoc.MonHocID);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                        
+                        // Nếu không có lỗi, commit transaction để lưu tất cả thay đổi
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        // Nếu có lỗi, rollback để hủy bỏ tất cả thay đổi đã thực hiện
+                        transaction.Rollback();
+                        throw; // Ném lại exception để lớp ViewModel có thể bắt và thông báo
+                    }
+                }
+            }
+        }
+
     }
 }
