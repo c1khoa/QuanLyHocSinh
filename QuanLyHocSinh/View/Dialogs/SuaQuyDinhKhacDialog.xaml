@@ -1,0 +1,30 @@
+<Window x:Class="QuanLyHocSinh.View.Dialogs.SuaQuyDinhKhacDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sửa quy định khác" Height="300" Width="500"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize">
+    <Window.Resources>
+        <Style x:Key="DialogButtonStyle" TargetType="Button">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </Window.Resources>
+    <Border Margin="20" BorderBrush="#03a9f4" BorderThickness="2" Background="#D0F0FD" CornerRadius="20">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                <TextBlock Text="Quy định khác:"/>
+                <TextBox Text="{Binding QuyDinhKhac, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" Height="120" TextWrapping="Wrap"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="Lưu" Command="{Binding SaveCommand}" Style="{StaticResource DialogButtonStyle}"/>
+                <Button Content="Hủy" Command="{Binding CancelCommand}" Style="{StaticResource DialogButtonStyle}"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

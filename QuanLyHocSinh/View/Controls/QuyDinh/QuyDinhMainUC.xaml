@@ -5,81 +5,70 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls"
              xmlns:viewModel="clr-namespace:QuanLyHocSinh.ViewModel.QuyDinh"
-             xmlns:converters="clr-namespace:QuanLyHocSinh.View.Converters"
              mc:Ignorable="d"
              d:DesignHeight="550" d:DesignWidth="800" FontSize="14">
-
-    <!-- Đặt DataContext trong code-behind, không cần trong XAML -->
-
-    <UserControl.Resources>
-        <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
-    </UserControl.Resources>
 
     <Grid x:Name="MainGrid" Background="#FFF9FAFB">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="25">
+
+                <!-- Quy định tuổi -->
                 <GroupBox Header="Quy định về Tuổi" FontWeight="Bold" Margin="0,0,0,10" Padding="10">
                     <StackPanel>
-                        <TextBlock Text="Quy định tuổi Học Sinh" Margin="0,0,0,5" FontSize="15" Foreground="DarkBlue"/>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Tuổi tối thiểu:" VerticalAlignment="Center"/>
-                            <TextBox Grid.Column="1" Text="{Binding QuyDinhHocSinh.TuoiToiThieu}" Margin="5"/>
-                            <TextBlock Grid.Column="2" Text="Tuổi tối đa:" VerticalAlignment="Center" Margin="20,0,0,0"/>
-                            <TextBox Grid.Column="3" Text="{Binding QuyDinhHocSinh.TuoiToiDa}" Margin="5"/>
-                        </Grid>
-
-                        <TextBlock Text="Quy định tuổi Giáo Viên" Margin="0,15,0,5" FontSize="15" Foreground="DarkGreen"/>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Tuổi tối thiểu:" VerticalAlignment="Center"/>
-                            <TextBox Grid.Column="1" Text="{Binding QuyDinhGiaoVien.TuoiToiThieu}" Margin="5"/>
-                            <TextBlock Grid.Column="2" Text="Tuổi tối đa:" VerticalAlignment="Center" Margin="20,0,0,0"/>
-                            <TextBox Grid.Column="3" Text="{Binding QuyDinhGiaoVien.TuoiToiDa}" Margin="5"/>
-                        </Grid>
+                        <TextBlock Text="Học sinh:" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding QuyDinhHocSinh.TuoiToiThieu, StringFormat='Tuổi tối thiểu: {0}'}"/>
+                        <TextBlock Text="{Binding QuyDinhHocSinh.TuoiToiDa, StringFormat='Tuổi tối đa: {0}'}" Margin="0,0,0,5"/>
+                        <TextBlock Text="Giáo viên:" FontWeight="SemiBold" Margin="0,10,0,0"/>
+                        <TextBlock Text="{Binding QuyDinhGiaoVien.TuoiToiThieu, StringFormat='Tuổi tối thiểu: {0}'}"/>
+                        <TextBlock Text="{Binding QuyDinhGiaoVien.TuoiToiDa, StringFormat='Tuổi tối đa: {0}'}"/>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Quy định chung" FontWeight="Bold" Margin="0,10,0,10" Padding="10">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Sĩ số lớp tối đa:" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding QuyDinhChung.SiSoLop_ToiDa}" Margin="5"/>
-
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Số lượng môn học:" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding QuyDinhChung.SoLuongMonHoc}" Margin="5"/>
-
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Điểm đạt:" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding QuyDinhChung.DiemDat}" Margin="5"/>
-
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Quy định khác:" VerticalAlignment="Top" Margin="0,8,0,0"/>
-                        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding QuyDinhChung.QuyDinhKhac}" Margin="5" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80"/>
-                    </Grid>
+                <!-- Quy định môn học -->
+                <GroupBox Header="Quy định môn học" FontWeight="Bold" Margin="0,10,0,10" Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="Số lượng môn học: " FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding SoLuongMonHoc}" Margin="0,0,0,5"/>
+                        <TextBlock Text="Điểm đạt: " FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding DiemDat}" Margin="0,0,0,5"/>
+                        <TextBlock Text="Danh sách môn học:" FontWeight="SemiBold"/>
+                        <ItemsControl ItemsSource="{Binding DanhSachMonHoc}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding TenMonHoc}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
                 </GroupBox>
 
+                <!-- Quy định lớp -->
+                <GroupBox Header="Quy định lớp" FontWeight="Bold" Margin="0,10,0,10" Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="Sĩ số lớp tối đa: " FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding SiSoLopToiDa}" Margin="0,0,0,5"/>
+                        <TextBlock Text="Danh sách lớp:" FontWeight="SemiBold"/>
+                        <ItemsControl ItemsSource="{Binding DanhSachLop}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding TenLop}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Quy định khác -->
+                <GroupBox Header="Quy định khác" FontWeight="Bold" Margin="0,10,0,10" Padding="10">
+                    <TextBlock Text="{Binding QuyDinhKhac}" TextWrapping="Wrap"/>
+                </GroupBox>
+
+                <!-- Các nút chỉnh sửa -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-                    <Button Content="Lưu" Command="{Binding SaveCommand}" Width="120" Height="35" Margin="5" Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-                    <Button Content="Hủy" Command="{Binding CancelCommand}" Width="120" Height="35" Margin="5" Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                    <Button Content="Chỉnh sửa quy định tuổi" Command="{Binding EditQuyDinhTuoiCommand}" Margin="5"/>
+                    <Button Content="Chỉnh sửa quy định môn học" Command="{Binding EditQuyDinhMonHocCommand}" Margin="5"/>
+                    <Button Content="Chỉnh sửa quy định lớp" Command="{Binding EditQuyDinhLopCommand}" Margin="5"/>
+                    <Button Content="Chỉnh sửa quy định khác" Command="{Binding EditQuyDinhKhacCommand}" Margin="5"/>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
