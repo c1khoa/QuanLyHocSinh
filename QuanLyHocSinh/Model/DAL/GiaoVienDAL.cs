@@ -82,6 +82,23 @@ public class GiaoVienDAL
         }
         return list;
     }
+    public static bool DaPhanCongDay(string giaoVienID, string lopID, string boMon)
+    {
+        string connStr = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+        using (var conn = new MySqlConnection(connStr))
+        {
+            conn.Open();
+            string query = @"SELECT COUNT(*) FROM PHANCONGDAY
+                         WHERE LopID = @LopID AND MonHocID = @BoMon";
+            using (var cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@LopID", lopID);
+                cmd.Parameters.AddWithValue("@BoMon", boMon);
+                int count = Convert.ToInt32(cmd.ExecuteScalar());
+                return count > 0;
+            }
+        }
+    }
 
     public static List<string> GetLopDayCuaUser(string userID)
     {

@@ -152,32 +152,73 @@ namespace QuanLyHocSinh.Model.Entities
             return list;
         }
 
-        public static void UpdateHocSinh(HocSinh hocSinh)
+        public static bool UpdateHocSinh(HocSinh hocSinh, out string message)
         {
+            message = "";
             string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
-                            string query = @"UPDATE HOSO h
-                             JOIN HOSOHOCSINH hhs ON h.HoSoID = hhs.HoSoID
-                             SET h.HoTen = @HoTen, h.GioiTinh = @GioiTinh, h.NgaySinh = @NgaySinh, h.Email = @Email, h.DiaChi = @DiaChi,
-                                 h.NgayCapNhatGanNhat = NOW(),
-                                 hhs.LopHocID = (SELECT LopID FROM LOP WHERE TenLop = @TenLop), hhs.NienKhoa = @NienKhoa
-                             WHERE hhs.HocSinhID = @HocSinhID";
-            using (var conn = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+
+            using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                using (var cmd = new MySql.Data.MySqlClient.MySqlCommand(query, conn))
+
+                // Nếu chọn là Lớp trưởng → kiểm tra trùng
+                if (hocSinh.ChucVu == "Lớp trưởng")
                 {
-                    cmd.Parameters.AddWithValue("@HoTen", hocSinh.HoTen);
-                    cmd.Parameters.AddWithValue("@GioiTinh", hocSinh.GioiTinh);
-                    cmd.Parameters.AddWithValue("@NgaySinh", hocSinh.NgaySinh);
-                    cmd.Parameters.AddWithValue("@Email", hocSinh.Email);
-                    cmd.Parameters.AddWithValue("@DiaChi", hocSinh.DiaChi);
-                    cmd.Parameters.AddWithValue("@TenLop", hocSinh.TenLop);
-                    cmd.Parameters.AddWithValue("@NienKhoa", hocSinh.NienKhoa);
-                    cmd.Parameters.AddWithValue("@HocSinhID", hocSinh.HocSinhID);
-                    cmd.ExecuteNonQuery();
+                    string checkQuery = @"SELECT COUNT(*) 
+                                  FROM HOSO h
+                                  JOIN HOSOHOCSINH hhs ON h.HoSoID = hhs.HoSoID
+                                  JOIN CHUCVU cv ON h.ChucVuID = cv.ChucVuID
+                                  WHERE cv.TenChucVu = 'Lớp trưởng'
+                                        AND hhs.LopHocID = (SELECT LopID FROM LOP WHERE TenLop = @TenLop)
+                                        AND hhs.HocSinhID <> @HocSinhID";
+
+                    using (var checkCmd = new MySqlCommand(checkQuery, conn))
+                    {
+                        checkCmd.Parameters.AddWithValue("@TenLop", hocSinh.TenLop);
+                        checkCmd.Parameters.AddWithValue("@HocSinhID", hocSinh.HocSinhID);
+
+                        int count = Convert.ToInt32(checkCmd.ExecuteScalar());
+                        if (count > 0)
+                        {
+                            message = "Lớp này đã có lớp trưởng rồi.";
+                            return false;
+                        }
+                    }
+                }
+
+                // Nếu không vi phạm → Cập nhật
+                string updateQuery = @"UPDATE HOSO h
+                               JOIN HOSOHOCSINH hhs ON h.HoSoID = hhs.HoSoID
+                               SET h.HoTen = @HoTen,
+                                   h.GioiTinh = @GioiTinh,
+                                   h.NgaySinh = @NgaySinh,
+                                   h.Email = @Email,
+                                   h.DiaChi = @DiaChi,
+                                   h.ChucVuID = (SELECT ChucVuID FROM CHUCVU WHERE TenChucVu = @TenChucVu),
+                                   h.NgayCapNhatGanNhat = NOW(),
+                                   hhs.LopHocID = (SELECT LopID FROM LOP WHERE TenLop = @TenLop),
+                                   hhs.NienKhoa = @NienKhoa
+                               WHERE hhs.HocSinhID = @HocSinhID";
+
+                using (var updateCmd = new MySqlCommand(updateQuery, conn))
+                {
+                    updateCmd.Parameters.AddWithValue("@HoTen", hocSinh.HoTen);
+                    updateCmd.Parameters.AddWithValue("@GioiTinh", hocSinh.GioiTinh);
+                    updateCmd.Parameters.AddWithValue("@NgaySinh", hocSinh.NgaySinh);
+                    updateCmd.Parameters.AddWithValue("@Email", hocSinh.Email);
+                    updateCmd.Parameters.AddWithValue("@DiaChi", hocSinh.DiaChi);
+                    updateCmd.Parameters.AddWithValue("@TenChucVu", hocSinh.ChucVu);
+                    updateCmd.Parameters.AddWithValue("@TenLop", hocSinh.TenLop);
+                    updateCmd.Parameters.AddWithValue("@NienKhoa", hocSinh.NienKhoa);
+                    updateCmd.Parameters.AddWithValue("@HocSinhID", hocSinh.HocSinhID);
+                    updateCmd.ExecuteNonQuery();
                 }
             }
+
+            return true;
         }
+
+
 
         public static List<string> GetAllNamHoc()
         {
@@ -519,22 +560,25 @@ namespace QuanLyHocSinh.Model.Entities
             string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
             
             string query = @"
-                SELECT 
-                    hs.HocSinhID,
-                    ho.HoTen,
-                    ho.GioiTinh,
-                    ho.NgaySinh,
-                    YEAR(ho.NgaySinh) as NamSinh,
-                    ho.Email,
-                    ho.DiaChi,
-                    l.TenLop,
-                    hhs.NienKhoa
-                FROM HOCSINH hs
-                JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
-                JOIN HOSO ho ON hhs.HoSoID = ho.HoSoID
-                JOIN LOP l ON hhs.LopHocID = l.LopID
-                WHERE l.TenLop = @TenLop
-                ORDER BY ho.HoTen";
+                                    SELECT 
+                        hs.HocSinhID,
+                        ho.HoTen,
+                        ho.GioiTinh,
+                        ho.NgaySinh,
+                        YEAR(ho.NgaySinh) as NamSinh,
+                        ho.Email,
+                        ho.DiaChi,
+                        l.TenLop,
+                        hhs.NienKhoa,
+                        cv.TenChucVu
+                    FROM HOCSINH hs
+                    JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
+                    JOIN HOSO ho ON hhs.HoSoID = ho.HoSoID
+                    JOIN LOP l ON hhs.LopHocID = l.LopID
+                    LEFT JOIN CHUCVU cv ON ho.ChucVuID = cv.ChucVuID
+                    WHERE l.TenLop = @TenLop
+                    ORDER BY ho.HoTen;"
+                    ;
 
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
@@ -558,7 +602,8 @@ namespace QuanLyHocSinh.Model.Entities
                                 Email = reader["Email"]?.ToString() ?? "",
                                 DiaChi = reader["DiaChi"]?.ToString() ?? "",
                                 TenLop = reader["TenLop"]?.ToString() ?? "",
-                                NienKhoa = Convert.ToInt32(reader["NienKhoa"])
+                                NienKhoa = Convert.ToInt32(reader["NienKhoa"]),
+                                ChucVu = reader["TenChucVu"]?.ToString() ?? ""
                             };
                             list.Add(item);
                         }

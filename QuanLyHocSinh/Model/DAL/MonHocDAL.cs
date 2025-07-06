@@ -32,6 +32,23 @@ namespace QuanLyHocSinh.Model.Entities
             }
             return prefix + nextNumber.ToString("D2"); // Ensures MH01, MH10 etc.
         }
+        // MonHocDAL.cs
+        public static string? LayTenMonHocTheoID(string monHocID)
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT TenMonHoc FROM MONHOC WHERE MonHocID = @MonHocID";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MonHocID", monHocID);
+                    var result = cmd.ExecuteScalar();
+                    return result?.ToString();
+                }
+            }
+        }
+
 
         public async Task<List<MonHoc>> GetAllMonHocAsync()
         {

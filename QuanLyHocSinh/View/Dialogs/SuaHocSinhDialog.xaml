@@ -76,6 +76,12 @@
                             <TextBox materialDesign:HintAssist.Hint="Niên khóa"
                              Text="{Binding NienKhoa, UpdateSourceTrigger=PropertyChanged}"
                              Margin="0,5"/>
+
+                            <TextBlock Text="Chức vụ" Margin="0,5,0,0"/>
+                            <ComboBox materialDesign:HintAssist.Hint="Chức vụ"
+                              ItemsSource="{Binding DanhSachChucVu}"
+                              SelectedItem="{Binding ChucVu}"
+                              Margin="0,5"/>
                         </StackPanel>
                     </ScrollViewer>
                 </Border>

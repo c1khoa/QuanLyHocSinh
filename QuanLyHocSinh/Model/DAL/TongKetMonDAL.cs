@@ -11,9 +11,11 @@ public class TongKetMonDAL
     {
         List<TongKetMonItem> list = new List<TongKetMonItem>();
         string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
-        
+        QuyDinhEntities quyDinh = QuyDinhDAL.GetQuyDinh();
+        float diemdat = quyDinh.DiemDat;
+
         // Truy vấn tính điểm trung bình và xếp loại cho từng học sinh theo môn học
-        string query = @"
+        string query = $@"
             SELECT 
                 ROW_NUMBER() OVER (ORDER BY hs.HocSinhID, mh.TenMonHoc, d.NamHocID, d.HocKy) as STT,
                 hs.HocSinhID,
@@ -31,7 +33,7 @@ public class TongKetMonDAL
                     ELSE 'Kém'
                 END as XepLoai,
                 CASE 
-                    WHEN d.DiemTrungBinh >= 5.0 THEN 'Đạt'
+                    WHEN d.DiemTrungBinh >= {diemdat} THEN 'Đạt'
                     ELSE 'Không đạt'
                 END as GhiChu,
                 IFNULL(diem_mieng.GiaTri, NULL) AS DiemMieng,
@@ -86,7 +88,9 @@ public class TongKetMonDAL
     {
         List<TongKetMonItem> list = new List<TongKetMonItem>();
         string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
-        
+        QuyDinhEntities quyDinh = QuyDinhDAL.GetQuyDinh();
+        float diemdat = quyDinh.DiemDat;
+
         string whereClause = "WHERE d.DiemTrungBinh IS NOT NULL AND d.DiemTrungBinh > 0";
         
         if (!string.IsNullOrEmpty(namHoc) && namHoc != "Tất cả")
@@ -116,7 +120,7 @@ public class TongKetMonDAL
                     ELSE 'Kém'
                 END as XepLoai,
                 CASE 
-                    WHEN d.DiemTrungBinh >= 5.0 THEN 'Đạt'
+                    WHEN d.DiemTrungBinh >= {diemdat} THEN 'Đạt'
                     ELSE 'Không đạt'
                 END as GhiChu,
                 IFNULL(diem_mieng.GiaTri, NULL) AS DiemMieng,
@@ -293,6 +297,8 @@ public class TongKetMonDAL
     {
         List<TongKetLopItem> list = new List<TongKetLopItem>();
         string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+        QuyDinhEntities quyDinh = QuyDinhDAL.GetQuyDinh();
+        float diemdat = quyDinh.DiemDat;
 
         string whereClause = "WHERE d.DiemTrungBinh IS NOT NULL AND d.DiemTrungBinh > 0";
 
@@ -307,7 +313,7 @@ public class TongKetMonDAL
         if (!hocKy.HasValue)
         {
             groupByClause = "GROUP BY l.TenLop, l.SiSo, d.NamHocID";
-            selectClause = @"
+            selectClause = $@"
             SELECT 
                 ROW_NUMBER() OVER (ORDER BY l.TenLop) as STT,
                 l.TenLop,
@@ -315,13 +321,13 @@ public class TongKetMonDAL
                 d.NamHocID as NamHoc,
                 -1 as HocKy,
                 l.SiSo,
-                COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) as SoLuongDat,
-                ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat";
+                COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= {diemdat} THEN d.HocSinhID END) as SoLuongDat,
+                ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= {diemdat} THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat";
         }
         else
         {
             groupByClause = "GROUP BY l.TenLop, l.SiSo, d.NamHocID, d.HocKy";
-            selectClause = @"
+            selectClause = $@"
             SELECT 
                 ROW_NUMBER() OVER (ORDER BY l.TenLop) as STT,
                 l.TenLop,
@@ -329,8 +335,8 @@ public class TongKetMonDAL
                 d.NamHocID as NamHoc,
                 d.HocKy,
                 l.SiSo,
-                COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) as SoLuongDat,
-                ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat";
+                COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= {diemdat} THEN d.HocSinhID END) as SoLuongDat,
+                ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= {diemdat} THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat";
         }
 
         string query = $@"
@@ -381,6 +387,8 @@ public class TongKetMonDAL
     {
         List<TongKetLopItem> list = new List<TongKetLopItem>();
         string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+        QuyDinhEntities quyDinh = QuyDinhDAL.GetQuyDinh();
+        float diemdat = quyDinh.DiemDat;
 
         string whereClause = @"
         JOIN PHANCONGDAY pcd ON d.MonHocID = pcd.MonHocID AND LEFT(hhs.LopHocID, 4) = pcd.LopID AND d.NamHocID = pcd.NamHocID
@@ -399,7 +407,7 @@ public class TongKetMonDAL
         if (!hocKy.HasValue)
         {
             groupByClause = "GROUP BY l.TenLop, l.SiSo, d.NamHocID";
-            selectClause = @"
+            selectClause = $@"
         SELECT 
             ROW_NUMBER() OVER (ORDER BY l.TenLop) as STT,
             l.TenLop,
@@ -407,13 +415,13 @@ public class TongKetMonDAL
             d.NamHocID as NamHoc,
             -1 as HocKy,
             l.SiSo,
-            COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) as SoLuongDat,
-            ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat";
+            COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= {diemdat} THEN d.HocSinhID END) as SoLuongDat,
+            ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= {diemdat} THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat";
         }
         else
         {
             groupByClause = "GROUP BY l.TenLop, l.SiSo, d.NamHocID, d.HocKy";
-            selectClause = @"
+            selectClause = $@"
         SELECT 
             ROW_NUMBER() OVER (ORDER BY l.TenLop) as STT,
             l.TenLop,
@@ -421,8 +429,8 @@ public class TongKetMonDAL
             d.NamHocID as NamHoc,
             d.HocKy,
             l.SiSo,
-            COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) as SoLuongDat,
-            ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat";
+            COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= {diemdat} THEN d.HocSinhID END) as SoLuongDat,
+            ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= {diemdat} THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat";
         }
 
         string query = $@"
@@ -509,6 +517,7 @@ public class TongKetMonDAL
         List<HocSinhChiTietItem> list = new List<HocSinhChiTietItem>();
         string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
 
+
         string whereClause = @"WHERE l.TenLop = @TenLop 
                               AND mh.TenMonHoc = @MonHoc 
                               AND d.DiemTrungBinh IS NOT NULL 
@@ -585,7 +594,8 @@ public class TongKetMonDAL
     public static (int TongSoLop, int TongSoHocSinh, int TongSoDat, double TiLeDatChung) GetThongKeTongHopTheoLop(string? monHoc = null, int? hocKy = null)
     {
         string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
-
+        QuyDinhEntities quyDinh = QuyDinhDAL.GetQuyDinh();
+        float diemdat = quyDinh.DiemDat;
         string whereClause = "WHERE d.DiemTrungBinh IS NOT NULL AND d.DiemTrungBinh > 0";
         
         if (!string.IsNullOrEmpty(monHoc) && monHoc != "Tất cả")
@@ -606,7 +616,7 @@ public class TongKetMonDAL
                        {whereClause.Replace("d.", "d2.").Replace("mh.", "mh2.").Replace("l.", "l2.")}
                        AND l2.LopID IS NOT NULL) as lop_distinct
                 ) as TongSoHocSinh,
-                COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) as TongSoDat
+                COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= {diemdat} THEN d.HocSinhID END) as TongSoDat
             FROM DIEM d
             LEFT JOIN HOCSINH hs ON d.HocSinhID = hs.HocSinhID
             LEFT JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
@@ -620,6 +630,7 @@ public class TongKetMonDAL
         {
             conn.Open();
             MySqlCommand cmd = new MySqlCommand(query, conn);
+
             
             if (!string.IsNullOrEmpty(monHoc) && monHoc != "Tất cả")
             {
@@ -646,11 +657,12 @@ public class TongKetMonDAL
         
         return (0, 0, 0, 0.0);
     }
-
     public static List<TongKetLopItem> GetTongKetHocKyTheoLop(string? namHoc = null, int? hocKy = null)
     {
         List<TongKetLopItem> list = new List<TongKetLopItem>();
         string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+        QuyDinhEntities quyDinh = QuyDinhDAL.GetQuyDinh();
+        float diemdat = quyDinh.DiemDat;
 
         string whereClause = "";
         if (!string.IsNullOrEmpty(namHoc) && namHoc != "Tất cả")
@@ -659,28 +671,49 @@ public class TongKetMonDAL
             whereClause += " AND d.HocKy = @HocKy";
 
         string query = $@"
-            SELECT 
-                l.TenLop,
-                COALESCE(d.NamHocID, '') as NamHoc,
-                COALESCE(d.HocKy, 0) as HocKy,
-                l.SiSo,
-                COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) as SoLuongDat,
-                ROUND((COUNT(DISTINCT CASE WHEN d.DiemTrungBinh >= 5.0 THEN d.HocSinhID END) * 100.0 / l.SiSo), 2) as TiLeDat
-            FROM DIEM d
-            INNER JOIN HOCSINH hs ON d.HocSinhID = hs.HocSinhID
-            INNER JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
-            INNER JOIN LOP l ON LEFT(hhs.LopHocID, 4) = l.LopID
-            WHERE d.DiemTrungBinh IS NOT NULL AND d.DiemTrungBinh > 0 {whereClause}
-            GROUP BY l.TenLop, l.SiSo, d.NamHocID, d.HocKy
-            HAVING l.SiSo > 0
-            ORDER BY l.TenLop
-        ";
+        SELECT 
+            l.TenLop,
+            COALESCE(d.NamHocID, '') as NamHoc,
+            COALESCE(d.HocKy, 0) as HocKy,
+            l.SiSo,
+            COUNT(DISTINCT hs.HocSinhID) as TongSoHocSinh,
+            COUNT(DISTINCT CASE 
+                WHEN NOT EXISTS (
+                    SELECT 1 FROM DIEM d2
+                    WHERE d2.HocSinhID = hs.HocSinhID
+                      AND d2.HocKy = d.HocKy
+                      AND d2.NamHocID = d.NamHocID
+                      AND (d2.DiemTrungBinh IS NULL OR d2.DiemTrungBinh < {diemdat})
+                )
+                THEN hs.HocSinhID
+            END) as SoLuongDat,
+            ROUND((
+                COUNT(DISTINCT CASE 
+                    WHEN NOT EXISTS (
+                        SELECT 1 FROM DIEM d2
+                        WHERE d2.HocSinhID = hs.HocSinhID
+                          AND d2.HocKy = d.HocKy
+                          AND d2.NamHocID = d.NamHocID
+                          AND (d2.DiemTrungBinh IS NULL OR d2.DiemTrungBinh < {diemdat})
+                    )
+                    THEN hs.HocSinhID
+                END) * 100.0 / l.SiSo), 2
+            ) as TiLeDat
+        FROM DIEM d
+        INNER JOIN HOCSINH hs ON d.HocSinhID = hs.HocSinhID
+        INNER JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
+        INNER JOIN LOP l ON LEFT(hhs.LopHocID, 4) = l.LopID
+        WHERE d.DiemTrungBinh IS NOT NULL AND d.DiemTrungBinh > 0 {whereClause}
+        GROUP BY l.TenLop, l.SiSo, d.NamHocID, d.HocKy
+        HAVING l.SiSo > 0
+        ORDER BY l.TenLop;
+    ";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
         {
             conn.Open();
             MySqlCommand cmd = new MySqlCommand(query, conn);
-            
+
             if (!string.IsNullOrEmpty(namHoc) && namHoc != "Tất cả")
                 cmd.Parameters.AddWithValue("@NamHoc", namHoc);
             if (hocKy.HasValue)
@@ -706,6 +739,8 @@ public class TongKetMonDAL
                 }
             }
         }
+
         return list;
     }
+
 }

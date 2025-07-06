@@ -3,74 +3,173 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.QuyDinh"
              xmlns:viewModel="clr-namespace:QuanLyHocSinh.ViewModel.QuyDinh"
              mc:Ignorable="d"
-             d:DesignHeight="550" d:DesignWidth="800" FontSize="14">
+             d:DesignHeight="550" d:DesignWidth="800"
+             Background="#F4F6F8">
 
-    <Grid x:Name="MainGrid" Background="#FFF9FAFB">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="25">
+    <UserControl.Resources>
+        <Style x:Key="RoundedOuterBorder" TargetType="Border">
+            <Setter Property="BorderBrush" Value="#03a9f4"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="30"/>
+            <Setter Property="Background" Value="#D0F0FD"/>
+            <Setter Property="Margin" Value="20"/>
+        </Style>
+        <Style x:Key="InnerFieldBorder" TargetType="Border">
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="BorderBrush" Value="#03a9f4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Margin" Value="20,0"/>
+            <Setter Property="Padding" Value="10"/>
+        </Style>
+        <Style x:Key="SectionHeaderText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#2B4C6F"/>
+            <Setter Property="Margin" Value="0,10,0,10"/>
+        </Style>
+        <Style x:Key="ImageBorderStyle" TargetType="Border">
+                <Setter Property="BorderBrush" Value="Gray"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="CornerRadius" Value="30"/>
+                <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Margin" Value="50 0 50 0"/>
+            </Style>
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Margin" Value="20,10"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+    </UserControl.Resources>
 
-                <!-- Quy định tuổi -->
-                <GroupBox Header="Quy định về Tuổi" FontWeight="Bold" Margin="0,0,0,10" Padding="10">
-                    <StackPanel>
-                        <TextBlock Text="Học sinh:" FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding QuyDinhHocSinh.TuoiToiThieu, StringFormat='Tuổi tối thiểu: {0}'}"/>
-                        <TextBlock Text="{Binding QuyDinhHocSinh.TuoiToiDa, StringFormat='Tuổi tối đa: {0}'}" Margin="0,0,0,5"/>
-                        <TextBlock Text="Giáo viên:" FontWeight="SemiBold" Margin="0,10,0,0"/>
-                        <TextBlock Text="{Binding QuyDinhGiaoVien.TuoiToiThieu, StringFormat='Tuổi tối thiểu: {0}'}"/>
-                        <TextBlock Text="{Binding QuyDinhGiaoVien.TuoiToiDa, StringFormat='Tuổi tối đa: {0}'}"/>
+    <Grid>
+        <Border Style="{StaticResource RoundedOuterBorder}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="5*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Tiêu đề -->
+                <TextBlock Grid.Row="0" Text="QUY ĐỊNH" FontSize="24" FontWeight="Bold"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Margin="0 10"/>
+
+                <!-- Nội dung chính -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                              Style="{StaticResource MaterialDesignScrollViewer}">
+                    <StackPanel Margin="0">
+
+                        <!-- Quy định tuổi -->
+                        <Border Style="{StaticResource InnerFieldBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Quy định về Tuổi" Style="{StaticResource SectionHeaderText}" FontStyle="Italic"/>
+                                <TextBlock Text="Học sinh:" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding QuyDinhHocSinh.TuoiToiThieu, StringFormat='Tuổi tối thiểu: {0}'}"/>
+                                <TextBlock Text="{Binding QuyDinhHocSinh.TuoiToiDa, StringFormat='Tuổi tối đa: {0}'}" Margin="0,0,0,5"/>
+                                <TextBlock Text="Giáo viên:" FontWeight="SemiBold" Margin="0,10,0,0"/>
+                                <TextBlock Text="{Binding QuyDinhGiaoVien.TuoiToiThieu, StringFormat='Tuổi tối thiểu: {0}'}"/>
+                                <TextBlock Text="{Binding QuyDinhGiaoVien.TuoiToiDa, StringFormat='Tuổi tối đa: {0}'}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Quy định môn học -->
+                        <Border Style="{StaticResource InnerFieldBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Quy định môn học" Style="{StaticResource SectionHeaderText}" FontStyle="Italic"/>
+                                <TextBlock Text="Số lượng môn học: " FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding SoLuongMonHoc}" Margin="0,0,0,5"/>
+                                <TextBlock Text="Điểm đạt: " FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding DiemDat}" Margin="0,0,0,5"/>
+                                <TextBlock Text="Danh sách môn học:" FontWeight="SemiBold"/>
+                                <ItemsControl ItemsSource="{Binding DanhSachMonHoc}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding TenMonHoc}" Margin="5,0"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Quy định lớp -->
+                        <Border Style="{StaticResource InnerFieldBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Quy định lớp" Style="{StaticResource SectionHeaderText}" FontStyle="Italic"/>
+                                <TextBlock Text="Sĩ số lớp tối đa: " FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding SiSoLopToiDa}" Margin="0,0,0,5"/>
+                                <TextBlock Text="Danh sách lớp:" FontWeight="SemiBold"/>
+                                <ItemsControl ItemsSource="{Binding DanhSachLop}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding TenLop}" Margin="5,0"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Quy định khác -->
+                        <Border Style="{StaticResource InnerFieldBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Quy định khác" Style="{StaticResource SectionHeaderText}" FontStyle="Italic"/>
+                                <TextBlock Text="{Binding QuyDinhKhac}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
-                </GroupBox>
-
-                <!-- Quy định môn học -->
-                <GroupBox Header="Quy định môn học" FontWeight="Bold" Margin="0,10,0,10" Padding="10">
-                    <StackPanel>
-                        <TextBlock Text="Số lượng môn học: " FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding SoLuongMonHoc}" Margin="0,0,0,5"/>
-                        <TextBlock Text="Điểm đạt: " FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding DiemDat}" Margin="0,0,0,5"/>
-                        <TextBlock Text="Danh sách môn học:" FontWeight="SemiBold"/>
-                        <ItemsControl ItemsSource="{Binding DanhSachMonHoc}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding TenMonHoc}"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </GroupBox>
-
-                <!-- Quy định lớp -->
-                <GroupBox Header="Quy định lớp" FontWeight="Bold" Margin="0,10,0,10" Padding="10">
-                    <StackPanel>
-                        <TextBlock Text="Sĩ số lớp tối đa: " FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding SiSoLopToiDa}" Margin="0,0,0,5"/>
-                        <TextBlock Text="Danh sách lớp:" FontWeight="SemiBold"/>
-                        <ItemsControl ItemsSource="{Binding DanhSachLop}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding TenLop}"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </GroupBox>
-
-                <!-- Quy định khác -->
-                <GroupBox Header="Quy định khác" FontWeight="Bold" Margin="0,10,0,10" Padding="10">
-                    <TextBlock Text="{Binding QuyDinhKhac}" TextWrapping="Wrap"/>
-                </GroupBox>
+                </ScrollViewer>
 
                 <!-- Các nút chỉnh sửa -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-                    <Button Content="Chỉnh sửa quy định tuổi" Command="{Binding EditQuyDinhTuoiCommand}" Margin="5"/>
-                    <Button Content="Chỉnh sửa quy định môn học" Command="{Binding EditQuyDinhMonHocCommand}" Margin="5"/>
-                    <Button Content="Chỉnh sửa quy định lớp" Command="{Binding EditQuyDinhLopCommand}" Margin="5"/>
-                    <Button Content="Chỉnh sửa quy định khác" Command="{Binding EditQuyDinhKhacCommand}" Margin="5"/>
-                </StackPanel>
-            </StackPanel>
-        </ScrollViewer>
+                <Grid Grid.Row="2" Margin="0,20,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
+                        <Border Style="{StaticResource ImageBorderStyle}" Background="#EF9A9A" Margin="50 10">
+                            <Button Content="Chỉnh sửa tuổi"
+                    Command="{Binding EditQuyDinhTuoiCommand}"
+                    Style="{StaticResource MaterialDesignRaisedLightButton}"
+                    Background="Transparent"
+                    BorderBrush="Transparent"/>
+                        </Border>
+
+                        <Border Style="{StaticResource ImageBorderStyle}" Background="#FFCC80" Margin="50 10">
+                            <Button Content="Chỉnh sửa môn học"
+                    Command="{Binding EditQuyDinhMonHocCommand}"
+                    Style="{StaticResource MaterialDesignRaisedLightButton}"
+                    Background="Transparent"
+                    BorderBrush="Transparent"/>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                        <Border Style="{StaticResource ImageBorderStyle}" Background="#64B5F6" Margin="50 10">
+                            <Button Content="Chỉnh sửa lớp"
+                    Command="{Binding EditQuyDinhLopCommand}"
+                    Style="{StaticResource MaterialDesignRaisedLightButton}"
+                    Background="Transparent"
+                    BorderBrush="Transparent"/>
+                        </Border>
+
+                        <Border Style="{StaticResource ImageBorderStyle}" Background="#80DEEA" Margin="50 10">
+                            <Button Content="Chỉnh sửa khác"
+                    Command="{Binding EditQuyDinhKhacCommand}"
+                    Style="{StaticResource MaterialDesignRaisedLightButton}"
+                    Background="Transparent"
+                    BorderBrush="Transparent"/>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>

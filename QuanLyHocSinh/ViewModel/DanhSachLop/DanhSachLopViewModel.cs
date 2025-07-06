@@ -33,7 +33,6 @@ namespace QuanLyHocSinh.ViewModel.DanhSachLop
             get => _danhSachLop;
             set { _danhSachLop = value; OnPropertyChanged(nameof(DanhSachLop)); }
         }
-
         private string _selectedLop;
         public string SelectedLop
         {
@@ -136,7 +135,8 @@ namespace QuanLyHocSinh.ViewModel.DanhSachLop
                 Email = hocSinhItem.Email,
                 DiaChi = hocSinhItem.DiaChi,
                 TenLop = SelectedLop,
-                NienKhoa = hocSinhItem.NienKhoa
+                NienKhoa = hocSinhItem.NienKhoa,
+                ChucVu = hocSinhItem.ChucVu
             };
 
             var suaHSDialog = new SuaHocSinhDialog(hocSinh);

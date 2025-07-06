@@ -11,6 +11,50 @@ namespace QuanLyHocSinh.Model.Entities
     public class LopDAL : BaseDAL
     {
         public LopDAL() : base() { }
+        // LopDAL.cs
+        public static string? LayTenLopTheoID(string lopID)
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT TenLop FROM LOP WHERE LopID = @LopID";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@LopID", lopID);
+                    var result = cmd.ExecuteScalar();
+                    return result?.ToString();
+                }
+            }
+        }
+
+        public static int GetSiSo(string lopID)
+        {
+            int siSo = 0;
+
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+
+                string query = "SELECT SiSo FROM LOP WHERE LopID = @LopID";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@LopID", lopID);
+
+                    object result = cmd.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        siSo = Convert.ToInt32(result);
+                    }
+                }
+            }
+
+            return siSo;
+        }
+
 
         // --- 1. Xuất toàn bộ Lớp ---
         public async Task<List<Lop>> GetAllLopAsync()

@@ -13,6 +13,7 @@ using QuanLyHocSinh.Model.Entities;
 using MaterialDesignThemes.Wpf;
 using QuanLyHocSinh.View.Dialogs.MessageBox;
 using System.Configuration;
+using QuanLyHocSinh.Service;
 
 namespace QuanLyHocSinh.ViewModel.TraCuu
 {
@@ -67,11 +68,18 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             set { _nienKhoa = value; OnPropertyChanged(); }
         }
 
+        private string _chucVu;
+        public string ChucVu
+        {
+            get => _chucVu;
+            set { _chucVu = value; OnPropertyChanged(); }
+        }
+
         public ObservableCollection<string> DanhSachGioiTinh { get; } =
             new ObservableCollection<string> { "Nam", "Nữ" };
 
         public ObservableCollection<string> DanhSachLop { get; set; }
-
+        public ObservableCollection<string> DanhSachChucVu { get; set; }
         public ICommand SaveCommand { get; }
         public ICommand CancelCommand { get; }
 
@@ -90,9 +98,13 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             DiaChi = hocSinh.DiaChi;            
             TenLop = hocSinh.TenLop;
             NienKhoa = hocSinh.NienKhoa;
+            ChucVu = hocSinh.ChucVu;
 
             DanhSachLop = new ObservableCollection<string>(
                 HocSinhDAL.GetAllLop()
+            );
+            DanhSachChucVu = new ObservableCollection<string>(
+                UserService.LayDanhSachTenChucVuTheoVaiTro("VT01")
             );
 
             SaveCommand = new RelayCommand(Save);
@@ -130,14 +142,21 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             _hocSinhGoc.DiaChi = DiaChi;
             _hocSinhGoc.TenLop = TenLop;
             _hocSinhGoc.NienKhoa = NienKhoa;
+            _hocSinhGoc.ChucVu = ChucVu;
 
-                HocSinhDAL.UpdateHocSinh(_hocSinhGoc);
-                await DialogHost.Show(new NotifyDialog("Thành công", "✅ Cập nhật thông tin thành công!"), "RootDialog_SuaHS");
+                string message;
+                bool result = HocSinhDAL.UpdateHocSinh(_hocSinhGoc, out message);
+                if (!result)
+                {
+                    await DialogHost.Show(new ErrorDialog("Cập nhật thất bại", message), "RootDialog_SuaHS");
+                    return;
+                }
+                await DialogHost.Show(new NotifyDialog("Thông báo", "✅ Cập nhật thông tin thành công!"), "RootDialog_SuaHS");
                 CloseDialog?.Invoke(true);
             }
             catch (Exception ex)
             {
-                await ShowNotificationAsync("Lỗi", $"❌ Lỗi khi cập nhật: {ex.Message}");
+                await DialogHost.Show(new ErrorDialog("Lỗi", $"❌ Lỗi khi cập nhật: {ex.Message}"), "RootDialog_SuaHS");
             }
         }
 

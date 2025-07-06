@@ -1,30 +1,93 @@
 <Window x:Class="QuanLyHocSinh.View.Dialogs.SuaQuyDinhKhacDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Sửa quy định khác" Height="300" Width="500"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Sửa quy định khác" Height="400" Width="500"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize">
+
     <Window.Resources>
-        <Style x:Key="DialogButtonStyle" TargetType="Button">
-            <Setter Property="Margin" Value="10"/>
+        <Style x:Key="ImageBorderStyle" TargetType="Border">
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="30"/>
+            <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="50 0 50 0"/>
+        </Style>
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Margin" Value="20,10"/>
             <Setter Property="Padding" Value="10,5"/>
             <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
         </Style>
     </Window.Resources>
-    <Border Margin="20" BorderBrush="#03a9f4" BorderThickness="2" Background="#D0F0FD" CornerRadius="20">
-        <Grid Margin="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" Margin="0,0,0,10">
-                <TextBlock Text="Quy định khác:"/>
-                <TextBox Text="{Binding QuyDinhKhac, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" Height="120" TextWrapping="Wrap"/>
-            </StackPanel>
-            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Lưu" Command="{Binding SaveCommand}" Style="{StaticResource DialogButtonStyle}"/>
-                <Button Content="Hủy" Command="{Binding CancelCommand}" Style="{StaticResource DialogButtonStyle}"/>
-            </StackPanel>
-        </Grid>
-    </Border>
+
+    <materialDesign:DialogHost Identifier="RootDialog_SuaKhac">
+        <Border Margin="20"
+                BorderBrush="#03a9f4"
+                BorderThickness="2"
+                Background="#D0F0FD"
+                CornerRadius="30">
+
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="SỬA QUY ĐỊNH KHÁC"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"/>
+
+                <!-- Nội dung -->
+                <Border Grid.Row="1" Background="White" CornerRadius="15" Padding="20" Margin="10">
+                    <StackPanel>
+                        <TextBlock Text="Quy định khác" 
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,5"/>
+                        <TextBox materialDesign:HintAssist.Hint="Nhập nội dung quy định khác"
+                                 Text="{Binding QuyDinhKhac, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 Height="120"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Nút hành động -->
+                <Grid Grid.Row="2" Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0"
+                            Style="{StaticResource ImageBorderStyle}"
+                            Background="#F08080"
+                            VerticalAlignment="Center">
+                        <Button Command="{Binding CancelCommand}"
+                                Content="Hủy"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                FontWeight="Regular"/>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                            Style="{StaticResource ImageBorderStyle}"
+                            Background="#90CAF9"
+                            VerticalAlignment="Center">
+                        <Button Command="{Binding SaveCommand}"
+                                Content="Lưu"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                FontWeight="Regular"/>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Border>
+    </materialDesign:DialogHost>
 </Window>

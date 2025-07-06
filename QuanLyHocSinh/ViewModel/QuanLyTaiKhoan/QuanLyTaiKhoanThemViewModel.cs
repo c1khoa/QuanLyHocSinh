@@ -14,7 +14,6 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
 namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 {
     public class QuanLyTaiKhoanThemViewModel : BaseViewModel
@@ -41,6 +40,7 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
         public string BoMon { get; set; } // BoMonID
         public QuyDinhTuoiEntities QuyDinhTuoiHocSinh { get; set; }
         public QuyDinhTuoiEntities QuyDinhTuoiGiaoVien { get; set; }
+        public QuyDinhEntities QuyDinhEntities { get; set; }
 
         public string VaiTroID
         {
@@ -373,7 +373,7 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
             MatKhau = "123456";
             MaHoSoCaNhan = UserService.LayMaHoSoCaNhanMoi(VaiTroID);
 
-            NgaySinh = DateTime.Today.AddYears(0); // Mặc định 0 tuổi
+            NgaySinh = DateTime.Today.AddYears(-15); // Mặc định 0 tuổi
 
             AddAccountCommand = new RelayCommand(ExecuteAddAccount, CanExecuteAddAccount);
             CancelCommand = new RelayCommand(ExecuteCancel);
@@ -381,6 +381,7 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
 
             QuyDinhTuoiHocSinh = QuyDinhTuoiDAL.GetQuyDinhTuoi("QDHS");
             QuyDinhTuoiGiaoVien = QuyDinhTuoiDAL.GetQuyDinhTuoi("QDGV");
+            QuyDinhEntities = QuyDinhDAL.GetQuyDinh();
         }
 
         
@@ -419,6 +420,7 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                 int tuoiToiThieuHS = QuyDinhTuoiHocSinh?.TuoiToiThieu ?? 15;
                 int tuoiToiDaHS = QuyDinhTuoiHocSinh?.TuoiToiDa ?? 20;
                 int tuoiToiThieuGV = QuyDinhTuoiGiaoVien?.TuoiToiThieu ?? 22;
+                int tuoiToiDaGV = QuyDinhTuoiGiaoVien?.TuoiToiDa ?? 60;
 
                 if (VaiTroID == "VT01") // Học sinh
                 {
@@ -429,16 +431,27 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                             "RootDialog_Add");
                         return;
                     }
+                    // Kiểm tra sĩ số lớp
+                    int siSoHienTai = LopDAL.GetSiSo(SelectedLopHocID);
+                    int siSoToiDa = QuyDinhEntities?.SiSoLop_ToiDa ?? 40; // Mặc định 40 nếu không có quy định
+
+                    if (siSoHienTai >= siSoToiDa)
+                    {
+                        await DialogHost.Show(
+                            new ErrorDialog("Thất bại", $"Lớp đã đạt sĩ số tối đa ({siSoToiDa} học sinh). Không thể thêm học sinh mới."),
+                            "RootDialog_Add");
+                        return;
+                    }
+
                 }
                 else // Giáo viên, giáo vụ
                 {
-                    if (tuoi < tuoiToiThieuGV)
+                    if (tuoi < tuoiToiThieuGV || tuoi > tuoiToiDaGV)
                     {
                         string roleText = VaiTroID == "VT02" ? "Giáo viên" : "Giáo vụ";
-                        var _ = await DialogHost.Show(
-                            new ConfirmDialog($"⚠️{roleText} chưa đủ {tuoiToiThieuGV} tuổi. Bạn có muốn tiếp tục không?"),
+                        await DialogHost.Show(
+                            new ErrorDialog("Thất bại", $"⚠️{roleText} chưa đủ {tuoiToiThieuGV} hoặc hơn {tuoiToiDaGV} tuổi"),
                             "RootDialog_Add");
-                        if (_?.ToString() == "False")
                             return;
                     }
                 }
@@ -470,7 +483,29 @@ namespace QuanLyHocSinh.ViewModel.QuanLyTaiKhoan
                     BoMon = VaiTroID == "VT02" ? BoMon : null,
                     GiaoVuID = VaiTroID == "VT03" ? TenDangNhap : null
                 };
+                if (VaiTroID == "VT02")
+                {
+                    // Tạo danh sách gồm cả giá trị null
+                    List<string?> danhSachLopDay = new List<string?> { LopDayID1, LopDayID2, LopDayID3, LopDayIDCN };
 
+                    // Duyệt từng lớp dạy, bỏ qua nếu là null hoặc chuỗi rỗng
+                    foreach (var lopID in danhSachLopDay)
+                    {
+                        if (!string.IsNullOrWhiteSpace(lopID))
+                        {
+                            if (GiaoVienDAL.DaPhanCongDay(TenDangNhap, lopID, BoMon))
+                            {
+                                string? tenLop = LopDAL.LayTenLopTheoID(lopID);
+                                string? tenMon = MonHocDAL.LayTenMonHocTheoID(BoMon);
+                                await DialogHost.Show(
+                                    new ErrorDialog("Thất bại", $"Có giáo viên đã được phân công dạy môn {tenMon} tại lớp {tenLop} rồi."),
+                                    "RootDialog_Add");
+                                return;
+                            }
+                        }
+                    }
+
+                }
                 bool result = UserService.ThemTaiKhoan(userMoi);
 
                 if (!result)

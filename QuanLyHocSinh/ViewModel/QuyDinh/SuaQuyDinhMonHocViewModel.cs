@@ -1,5 +1,7 @@
+using MaterialDesignThemes.Wpf;
 using QuanLyHocSinh.Model.DAL; // Đảm bảo bạn đã có các lớp DAL
 using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -54,11 +56,38 @@ namespace QuanLyHocSinh.ViewModel.QuyDinh
         }
 
 
-        private void Save()
+        private async void Save()
         {
+            if (SoLuongMonHoc <= 0)
+            {
+                await ShowError("Lỗi nhập liệu", "Số lượng môn học phải lớn hơn 0.");
+                return;
+            }
+
+            if (DiemDat < 0 || DiemDat > 10)
+            {
+                await ShowError("Lỗi nhập liệu", "Điểm đạt phải nằm trong khoảng từ 0 đến 10.");
+                return;
+            }
+
+            if (DanhSachMonHoc == null || DanhSachMonHoc.Count == 0)
+            {
+                await ShowError("Lỗi nhập liệu", "Danh sách môn học không được để trống.");
+                return;
+            }
+
+            foreach (var monHoc in DanhSachMonHoc)
+            {
+                if (string.IsNullOrWhiteSpace(monHoc.TenMonHoc))
+                {
+                    await ShowError("Lỗi nhập liệu", "Tên môn học không được để trống.");
+                    return;
+                }
+            }
+
             try
             {
-                // Cập nhật các quy định chung (giữ nguyên như cũ)
+                // Cập nhật các quy định chung
                 var quyDinh = QuyDinhDAL.GetQuyDinh();
                 if (quyDinh != null)
                 {
@@ -67,18 +96,16 @@ namespace QuanLyHocSinh.ViewModel.QuyDinh
                     QuyDinhDAL.UpdateQuyDinh(quyDinh);
                 }
 
-                // === THÊM DÒNG NÀY ĐỂ LƯU TÊN MÔN HỌC ===
+                // Cập nhật danh sách môn học
                 MonHocDAL.UpdateDanhSachMonHoc(DanhSachMonHoc.ToList());
-                // ==========================================
-                
-                MessageBox.Show("Cập nhật quy định môn học thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
-
+               
+                await DialogHost.Show(new NotifyDialog("Thông báo", "Cập nhật quy định môn học thành công!"), "RootDialog_SuaMonHoc");
                 _window.DialogResult = true;
                 _window.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Đã có lỗi xảy ra khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                await ShowError("Lỗi hệ thống", "Đã xảy ra lỗi khi cập nhật: " + ex.Message);
             }
         }
 
@@ -86,6 +113,18 @@ namespace QuanLyHocSinh.ViewModel.QuyDinh
         {
             _window.DialogResult = false;
             _window.Close();
+        }
+        private async Task ShowError(string title, string message)
+        {
+            try
+            {
+                await DialogHost.Show(new ErrorDialog(title, message), "RootDialog_SuaMonHoc");
+            }
+            catch
+            {
+                MessageBox.Show(message, title, MessageBoxButton.OK,
+                    title.Contains("Lỗi") ? MessageBoxImage.Error : MessageBoxImage.Information);
+            }
         }
     }
 }

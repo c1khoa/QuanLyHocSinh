@@ -57,7 +57,7 @@ CREATE TABLE NAMHOC (
 CREATE TABLE LOP (
     LopID CHAR(4) PRIMARY KEY,
     TenLop VARCHAR(50) NOT NULL,
-    SiSo INT NOT NULL CHECK(SiSo > 0),
+    SiSo INT NOT NULL CHECK(SiSo >= 0),
     GVCNID CHAR(8),
     FOREIGN KEY (GVCNID) REFERENCES GIAOVIEN(GiaoVienID)
 );
@@ -185,12 +185,10 @@ CREATE TABLE QUYDINHTUOI (
 -- Tạo bảng QUYDINH
 CREATE TABLE QUYDINH (
     QuyDinhID CHAR(8) PRIMARY KEY,
-    QuyDinhTuoiID CHAR(8) NOT NULL,
     SiSoLop INT NOT NULL CHECK(SiSoLop > 0),
     SoLuongMonHoc INT NOT NULL CHECK(SoLuongMonHoc > 0),
     DiemDat INT NOT NULL CHECK (DiemDat BETWEEN 0 AND 10),
-    QuyDinhKhac FLOAT,
-    FOREIGN KEY (QuyDinhTuoiID) REFERENCES QUYDINHTUOI(QuyDinhTuoiID)
+    QuyDinhKhac TEXT
 );
 
 -- Tạo bảng QUYEN
@@ -246,75 +244,139 @@ CREATE TABLE CAPNHATDIEM (
     FOREIGN KEY (ChiTietDiemID) REFERENCES CHITIETDIEM(ChiTietDiemID)
 );
 
--- DELIMITER $$
-
--- CREATE TRIGGER trg_after_insert_chitietdiem
--- AFTER INSERT ON CHITIETDIEM
--- FOR EACH ROW
--- BEGIN
---     DECLARE tb FLOAT;
---     DECLARE xeploai VARCHAR(20);
-
---     -- Tính điểm trung bình
---     SELECT 
---         IFNULL(ROUND(SUM(cd.GiaTri * ld.HeSo) / NULLIF(SUM(CASE WHEN cd.GiaTri IS NOT NULL THEN ld.HeSo ELSE 0 END), 0), 2), 0)
---     INTO tb
---     FROM CHITIETDIEM cd
---     JOIN LOAIDIEM ld ON cd.LoaiDiemID = ld.LoaiDiemID
---     WHERE cd.DiemID = NEW.DiemID;
-
---     -- Gán xếp loại
---     SET xeploai = 
---         CASE 
---             WHEN tb >= 8 THEN 'Giỏi'
---             WHEN tb >= 6.5 THEN 'Khá'
---             WHEN tb >= 5 THEN 'Trung bình'
---             ELSE 'Yếu'
---         END;
-
---     -- Cập nhật bảng DIEM
---     UPDATE DIEM
---     SET DiemTrungBinh = tb,
---         XepLoai = xeploai
---     WHERE DiemID = NEW.DiemID;
--- END$$
-
--- DELIMITER ;
 
 
--- DELIMITER $$
+DELIMITER $$
 
--- CREATE TRIGGER trg_after_update_chitietdiem
--- AFTER UPDATE ON CHITIETDIEM
--- FOR EACH ROW
--- BEGIN
---     DECLARE tb FLOAT;
---     DECLARE xeploai VARCHAR(20);
+CREATE TRIGGER trg_AfterInsert_HoSoHocSinh
+AFTER INSERT ON HOSOHOCSINH
+FOR EACH ROW
+BEGIN
+    UPDATE LOP 
+    SET SiSo = SiSo + 1 
+    WHERE LopID = NEW.LopHocID;
+END$$
 
---     -- Tính điểm trung bình
---     SELECT 
---         IFNULL(ROUND(SUM(cd.GiaTri * ld.HeSo) / NULLIF(SUM(CASE WHEN cd.GiaTri IS NOT NULL THEN ld.HeSo ELSE 0 END), 0), 2), 0)
---     INTO tb
---     FROM CHITIETDIEM cd
---     JOIN LOAIDIEM ld ON cd.LoaiDiemID = ld.LoaiDiemID
---     WHERE cd.DiemID = NEW.DiemID;
+DELIMITER ;
 
---     -- Gán xếp loại
---     SET xeploai = 
---         CASE 
---             WHEN tb >= 8 THEN 'Giỏi'
---             WHEN tb >= 6.5 THEN 'Khá'
---             WHEN tb >= 5 THEN 'Trung bình'
---             ELSE 'Yếu'
---         END;
+DELIMITER $$
 
---     -- Cập nhật bảng DIEM
---     UPDATE DIEM
---     SET DiemTrungBinh = tb,
---         XepLoai = xeploai
---     WHERE DiemID = NEW.DiemID;
--- END$$
+CREATE TRIGGER trg_AfterDelete_HoSoHocSinh
+AFTER DELETE ON HOSOHOCSINH
+FOR EACH ROW
+BEGIN
+    UPDATE LOP 
+    SET SiSo = GREATEST(0, SiSo - 1) -- Dùng GREATEST để sĩ số không bị âm
+    WHERE LopID = OLD.LopHocID;
+END$$
 
--- DELIMITER ;
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_AfterUpdate_HoSoHocSinh
+AFTER UPDATE ON HOSOHOCSINH
+FOR EACH ROW
+BEGIN
+    -- Chỉ thực hiện khi mã lớp thay đổi
+    IF OLD.LopHocID <> NEW.LopHocID THEN
+        -- Giảm sĩ số lớp cũ
+        UPDATE LOP 
+        SET SiSo = GREATEST(0, SiSo - 1) 
+        WHERE LopID = OLD.LopHocID;
+
+        -- Tăng sĩ số lớp mới
+        UPDATE LOP 
+        SET SiSo = SiSo + 1 
+        WHERE LopID = NEW.LopHocID;
+    END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER trg_Check_SiSo_ToiDa
+BEFORE INSERT ON HOSOHOCSINH
+FOR EACH ROW
+BEGIN
+    DECLARE v_max_siso INT;
+    DECLARE v_current_siso INT;
+
+    -- Lấy sĩ số tối đa từ bảng quy định
+    SELECT SiSoLop INTO v_max_siso FROM QUYDINH LIMIT 1;
+
+    -- Lấy sĩ số hiện tại của lớp sắp được thêm vào
+    SELECT SiSo INTO v_current_siso FROM LOP WHERE LopID = NEW.LopHocID;
+
+    -- Kiểm tra vi phạm
+    IF v_current_siso >= v_max_siso THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Lỗi: Lớp đã đạt sĩ số tối đa theo quy định.';
+    END IF;
+END$$
+DELIMITER ;
 
 
+DELIMITER $$
+CREATE TRIGGER trg_Check_TuoiHocSinh
+BEFORE INSERT ON HOSOHOCSINH
+FOR EACH ROW
+BEGIN
+    DECLARE v_min_age INT;
+    DECLARE v_max_age INT;
+    DECLARE v_student_dob DATE;
+    DECLARE v_student_age INT;
+    DECLARE v_error_message VARCHAR(255); -- <-- 1. Khai báo biến chứa lỗi
+
+    -- Lấy quy định tuổi cho Học Sinh
+    SELECT TuoiToiThieu, TuoiToiDa INTO v_min_age, v_max_age 
+    FROM QUYDINHTUOI WHERE QuyDinhTuoiID = 'QDHS';
+    
+    -- Lấy ngày sinh của học sinh
+    SELECT NgaySinh INTO v_student_dob FROM HOSO WHERE HoSoID = NEW.HoSoID;
+
+    -- Tính tuổi
+    SET v_student_age = TIMESTAMPDIFF(YEAR, v_student_dob, CURDATE());
+
+    -- Kiểm tra vi phạm
+    IF v_student_age NOT BETWEEN v_min_age AND v_max_age THEN
+        -- 2. Dùng CONCAT để gán giá trị cho biến
+        SET v_error_message = CONCAT('Lỗi: Tuổi theo quy định phải từ ', v_min_age, ' đến ', v_max_age, ' tuổi.');
+        
+        -- 3. Gán biến vào MESSAGE_TEXT
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = v_error_message;
+    END IF;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE TRIGGER trg_Check_TuoiGiaoVien
+BEFORE INSERT ON HOSOGIAOVIEN
+FOR EACH ROW
+BEGIN
+    DECLARE v_min_age INT;
+    DECLARE v_max_age INT;
+    DECLARE v_teacher_dob DATE;
+    DECLARE v_teacher_age INT;
+    DECLARE v_error_message VARCHAR(255);
+
+    -- Lấy quy định tuổi cho Giáo Viên
+    SELECT TuoiToiThieu, TuoiToiDa INTO v_min_age, v_max_age 
+    FROM QUYDINHTUOI WHERE QuyDinhTuoiID = 'QDGV';
+    
+    -- Lấy ngày sinh của giáo viên
+    SELECT NgaySinh INTO v_teacher_dob FROM HOSO WHERE HoSoID = NEW.HoSoID;
+
+    -- Tính tuổi
+    SET v_teacher_age = TIMESTAMPDIFF(YEAR, v_teacher_dob, CURDATE());
+
+    -- Kiểm tra vi phạm
+    IF v_teacher_age NOT BETWEEN v_min_age AND v_max_age THEN
+		SET v_error_message = CONCAT('Lỗi: Tuổi của học sinh phải từ ', v_min_age, ' đến ', v_max_age, ' tuổi.');
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = v_error_message;
+    END IF;
+END$$
+DELIMITER ;

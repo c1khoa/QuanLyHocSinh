@@ -5,6 +5,8 @@ using System.Windows.Input;
 using System.Windows;
 using System.Threading.Tasks;
 using System.Linq;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
+using MaterialDesignThemes.Wpf;
 namespace QuanLyHocSinh.ViewModel.QuyDinh
 {
     public class QuyDinhMainViewModel : BaseViewModel
@@ -79,7 +81,7 @@ namespace QuanLyHocSinh.ViewModel.QuyDinh
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi tải dữ liệu quy định: " + ex.Message);
+                ShowError("Lỗi", ex.Message);
             }
         }
 
@@ -124,6 +126,31 @@ namespace QuanLyHocSinh.ViewModel.QuyDinh
             dialog.DataContext = vm;
             if (dialog.ShowDialog() == true)
                 await LoadData();
+        }
+        private async Task ShowError(string title, string message)
+        {
+            try
+            {
+                await DialogHost.Show(new ErrorDialog(title, message), "RootDialog_SuaGV");
+            }
+            catch
+            {
+                MessageBox.Show(message, title, MessageBoxButton.OK,
+                    title.Contains("Lỗi") ? MessageBoxImage.Error : MessageBoxImage.Information);
+            }
+        }
+
+        private async Task ShowNotify(string title, string message)
+        {
+            try
+            {
+                await DialogHost.Show(new ErrorDialog(title, message), "RootDialog_SuaGV");
+            }
+            catch
+            {
+                MessageBox.Show(message, title, MessageBoxButton.OK,
+                    title.Contains("Lỗi") ? MessageBoxImage.Error : MessageBoxImage.Information);
+            }
         }
     }
 }

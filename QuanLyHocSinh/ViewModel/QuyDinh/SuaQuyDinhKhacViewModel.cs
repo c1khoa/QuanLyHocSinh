@@ -1,6 +1,9 @@
-using QuanLyHocSinh.Model.DAL; // Đảm bảo bạn đã có các lớp DAL
+using MaterialDesignThemes.Wpf;
+using QuanLyHocSinh.Model.DAL;
 using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.View.Dialogs.MessageBox;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -8,7 +11,7 @@ namespace QuanLyHocSinh.ViewModel.QuyDinh
 {
     public class SuaQuyDinhKhacViewModel : BaseViewModel
     {
-        // Thuộc tính để lưu trữ chuỗi quy định
+        #region Properties
         private string _quyDinhKhac;
         public string QuyDinhKhac
         {
@@ -16,51 +19,66 @@ namespace QuanLyHocSinh.ViewModel.QuyDinh
             set { _quyDinhKhac = value; OnPropertyChanged(); }
         }
 
-        // Tham chiếu đến cửa sổ dialog để có thể đóng nó
-        private Window _dialog;
+        public ICommand SaveCommand { get; }
+        public ICommand CancelCommand { get; }
+        #endregion
 
-        // Các lệnh (Commands)
-        public ICommand SaveCommand { get; set; }
-        public ICommand CancelCommand { get; set; }
+        private readonly Window _dialog;
 
         public SuaQuyDinhKhacViewModel(Window dialog, string currentQuyDinhKhac)
         {
             _dialog = dialog;
-            QuyDinhKhac = currentQuyDinhKhac; // Nhận giá trị hiện tại
+            QuyDinhKhac = currentQuyDinhKhac;
 
-            // Khởi tạo các lệnh
-            SaveCommand = new RelayCommand(SaveChanges);
-            CancelCommand = new RelayCommand(() => _dialog.Close()); // Chỉ cần đóng dialog
+            SaveCommand = new RelayCommand(async () => await SaveChanges());
+            CancelCommand = new RelayCommand(() =>
+            {
+                _dialog.DialogResult = false;
+                _dialog.Close();
+            });
         }
 
-        private void SaveChanges()
+        private async Task SaveChanges()
         {
+            // Kiểm tra dữ liệu đầu vào
+            if (string.IsNullOrWhiteSpace(QuyDinhKhac))
+            {
+                await ShowError("Lỗi nhập liệu", "Quy định khác không được để trống.");
+                return;
+            }
+
             try
             {
-                // Bước 1: Lấy toàn bộ đối tượng QuyDinh hiện tại từ CSDL
-                // Vì hàm UpdateQuyDinh cần một đối tượng QuyDinh hoàn chỉnh
                 var currentQuyDinh = QuyDinhDAL.GetQuyDinh();
                 if (currentQuyDinh == null)
                 {
-                    MessageBox.Show("Không tìm thấy dữ liệu quy định gốc.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                    await ShowError("Lỗi hệ thống", "Không tìm thấy dữ liệu quy định gốc.");
                     return;
                 }
 
-                // Bước 2: Cập nhật chỉ thuộc tính QuyDinhKhac
                 currentQuyDinh.QuyDinhKhac = this.QuyDinhKhac;
-
-                // Bước 3: Gọi DAL để lưu lại toàn bộ đối tượng đã cập nhật
                 QuyDinhDAL.UpdateQuyDinh(currentQuyDinh);
 
-                MessageBox.Show("Cập nhật quy định thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                // Bước 4: Đóng dialog và trả về kết quả true
+                await DialogHost.Show(new NotifyDialog("Thông báo", "Cập nhật quy định khác thành công!"), "RootDialog_SuaKhac");
                 _dialog.DialogResult = true;
                 _dialog.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Đã xảy ra lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                await ShowError("Lỗi hệ thống", "Đã xảy ra lỗi khi cập nhật: " + ex.Message);
+            }
+        }
+
+        private async Task ShowError(string title, string message)
+        {
+            try
+            {
+                await DialogHost.Show(new ErrorDialog(title, message), "RootDialog_SuaKhac");
+            }
+            catch
+            {
+                MessageBox.Show(message, title, MessageBoxButton.OK,
+                    title.Contains("Lỗi") ? MessageBoxImage.Error : MessageBoxImage.Information);
             }
         }
     }

@@ -18,6 +18,7 @@ namespace QuanLyHocSinh.Model.Entities
         public string DiaChi { get; set; }
         public string TenLop { get; set; }
         public int NienKhoa { get; set; }
+        public string ChucVu { get; set; } // Chức vụ của học sinh (ví dụ: Lớp trưởng, Lớp phó, v.v.)
         public string TrangThaiHoSo { get; set; }
 
         public string HoSoID { get; set; }
@@ -58,5 +59,6 @@ namespace QuanLyHocSinh.Model.Entities
         public string DiaChi { get; set; } = "";
         public string TenLop { get; set; } = "";
         public int NienKhoa { get; set; }
+        public string ChucVu { get; set; }
     }
 }
