@@ -8,6 +8,9 @@ namespace QuanLyHocSinh.Model.Entities
 {
     public class HocSinhDAL
     {
+        // Event để notify khi thông tin học sinh thay đổi
+        public static event Action HocSinhDataChanged;
+
         public static List<HocSinh> GetAllHocSinh()
         {
             List<HocSinh> list = new List<HocSinh>();
@@ -213,6 +216,9 @@ namespace QuanLyHocSinh.Model.Entities
                     updateCmd.Parameters.AddWithValue("@HocSinhID", hocSinh.HocSinhID);
                     updateCmd.ExecuteNonQuery();
                 }
+                
+                // Fire event sau khi update thành công
+                HocSinhDataChanged?.Invoke();
             }
 
             return true;

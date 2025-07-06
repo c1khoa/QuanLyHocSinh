@@ -70,8 +70,34 @@ namespace QuanLyHocSinh.ViewModel.DanhSachLop
             
             SuaHocSinhCommand = new RelayCommand<HocSinhLopItem>(SuaHocSinh);
             ExportExcelCommand = new RelayCommand<object>((p) => !string.IsNullOrEmpty(SelectedLop), (p) => ExportExcel());
+                
+            SubscribeToQuyDinhChanges();
             
             LoadDanhSachLop();
+        }
+
+        private void SubscribeToQuyDinhChanges()
+        {
+            QuyDinhTuoiDAL.QuyDinhTuoiChanged += OnQuyDinhTuoiChanged;
+            
+            HocSinhDAL.HocSinhDataChanged += OnHocSinhDataChanged;
+            
+            GiaoVienDAL.GiaoVienDataChanged += OnGiaoVienDataChanged;
+        }
+
+        private void OnQuyDinhTuoiChanged()
+        {       
+            RefreshData();
+        }
+
+        private void OnHocSinhDataChanged()
+        {
+            RefreshData();
+        }
+
+        private void OnGiaoVienDataChanged()
+        {   
+            RefreshData();
         }
 
         private void LoadDanhSachLop()
@@ -107,8 +133,47 @@ namespace QuanLyHocSinh.ViewModel.DanhSachLop
                 return;
             }
 
-            var danhSach = HocSinhDAL.GetDanhSachHocSinhTheoLop(SelectedLop);
-            DanhSachHocSinhLop = new ObservableCollection<HocSinhLopItem>(danhSach);
+            try
+            {
+                var quyDinhTuoi = QuyDinhTuoiDAL.GetQuyDinhTuoi("QDHS");
+                if (quyDinhTuoi == null)
+                {
+                    var danhSach = HocSinhDAL.GetDanhSachHocSinhTheoLop(SelectedLop);
+                    DanhSachHocSinhLop = new ObservableCollection<HocSinhLopItem>(danhSach);
+                    return;
+                }
+
+                int tuoiMin = quyDinhTuoi.TuoiToiThieu;
+                int tuoiMax = quyDinhTuoi.TuoiToiDa;
+                int namHienTai = DateTime.Now.Year;
+
+                var tatCaHocSinh = HocSinhDAL.GetDanhSachHocSinhTheoLop(SelectedLop);
+                var danhSachDaLoc = tatCaHocSinh.Where(hs => {
+                    int tuoi = namHienTai - hs.NgaySinh.Year;
+                    
+                    if (DateTime.Now.Month < hs.NgaySinh.Month || 
+                        (DateTime.Now.Month == hs.NgaySinh.Month && DateTime.Now.Day < hs.NgaySinh.Day))
+                    {
+                        tuoi--;
+                    }
+                    
+                    return tuoi >= tuoiMin && tuoi <= tuoiMax;
+                }).ToList();
+
+                for (int i = 0; i < danhSachDaLoc.Count; i++)
+                {
+                    danhSachDaLoc[i].STT = i + 1;
+                }
+
+                DanhSachHocSinhLop = new ObservableCollection<HocSinhLopItem>(danhSachDaLoc);
+            }
+            catch (Exception ex)
+            {
+                var danhSach = HocSinhDAL.GetDanhSachHocSinhTheoLop(SelectedLop);
+                DanhSachHocSinhLop = new ObservableCollection<HocSinhLopItem>(danhSach);
+                
+                _ = ShowNotificationAsync("Cảnh báo", $"Không thể áp dụng quy định tuổi: {ex.Message}");
+            }
         }
 
         private void UpdateSiSoLop()
@@ -119,7 +184,7 @@ namespace QuanLyHocSinh.ViewModel.DanhSachLop
                 return;
             }
 
-            SiSoLop = HocSinhDAL.GetSiSoLop(SelectedLop);
+            SiSoLop = DanhSachHocSinhLop?.Count ?? 0;
         }
 
         private void SuaHocSinh(HocSinhLopItem hocSinhItem)
@@ -141,11 +206,6 @@ namespace QuanLyHocSinh.ViewModel.DanhSachLop
 
             var suaHSDialog = new SuaHocSinhDialog(hocSinh);
             var result = suaHSDialog.ShowDialog();
-
-            if (result == true)
-            {
-                LoadDanhSachHocSinhLop();
-            }
         }
 
         private async void ExportExcel()
@@ -234,6 +294,19 @@ namespace QuanLyHocSinh.ViewModel.DanhSachLop
             {
                 await ShowNotificationAsync("Lỗi", $"Lỗi khi xuất Excel: {ex.Message}");
             }
+        }
+
+        public void RefreshData()
+        {
+            LoadDanhSachHocSinhLop();
+            UpdateSiSoLop();
+        }
+
+        public void Cleanup()
+        {
+            QuyDinhTuoiDAL.QuyDinhTuoiChanged -= OnQuyDinhTuoiChanged;
+            HocSinhDAL.HocSinhDataChanged -= OnHocSinhDataChanged;
+            GiaoVienDAL.GiaoVienDataChanged -= OnGiaoVienDataChanged;
         }
 
         private async Task ShowNotificationAsync(string title, string message)

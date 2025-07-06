@@ -7,6 +7,9 @@ using System.Configuration;
 
 public class GiaoVienDAL
 {
+    // Event để notify khi thông tin giáo viên thay đổi
+    public static event Action GiaoVienDataChanged;
+
     public static List<GiaoVien> GetAllGiaoVien()
     {
         List<GiaoVien> list = new List<GiaoVien>();
@@ -266,6 +269,8 @@ public class GiaoVienDAL
                 cmdUpdate.Parameters.AddWithValue("@GiaoVienID", giaoVien.MaGV);
                 cmdUpdate.ExecuteNonQuery();
             }
+            
+            GiaoVienDataChanged?.Invoke();
         }
     }
 
@@ -431,6 +436,8 @@ public class GiaoVienDAL
 
                         transaction.Commit();
                         message = "✅ Cập nhật phân công giảng dạy thành công.";
+                        
+                        GiaoVienDataChanged?.Invoke();
                         return true;
                     }
                     catch (Exception ex)

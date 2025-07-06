@@ -9,6 +9,8 @@ namespace QuanLyHocSinh.Model.Entities
 {
     public class QuyDinhTuoiDAL
     {
+        public static event Action QuyDinhTuoiChanged;
+
         public static QuyDinhTuoiEntities GetQuyDinhTuoi(string quyDinhTuoiID)
         {
             QuyDinhTuoiEntities qdt = null;
@@ -52,6 +54,13 @@ namespace QuanLyHocSinh.Model.Entities
                     cmd.ExecuteNonQuery();
                 }
             }
+            
+            QuyDinhTuoiChanged?.Invoke();
+        }
+
+        public static void TriggerQuyDinhTuoiChanged()
+        {
+            QuyDinhTuoiChanged?.Invoke();
         }
     }
 }
