@@ -135,44 +135,21 @@ namespace QuanLyHocSinh.ViewModel.DanhSachLop
 
             try
             {
-                var quyDinhTuoi = QuyDinhTuoiDAL.GetQuyDinhTuoi("QDHS");
-                if (quyDinhTuoi == null)
+                var danhSach = HocSinhDAL.GetDanhSachHocSinhTheoLop(SelectedLop);
+                
+                for (int i = 0; i < danhSach.Count; i++)
                 {
-                    var danhSach = HocSinhDAL.GetDanhSachHocSinhTheoLop(SelectedLop);
-                    DanhSachHocSinhLop = new ObservableCollection<HocSinhLopItem>(danhSach);
-                    return;
+                    danhSach[i].STT = i + 1;
                 }
 
-                int tuoiMin = quyDinhTuoi.TuoiToiThieu;
-                int tuoiMax = quyDinhTuoi.TuoiToiDa;
-                int namHienTai = DateTime.Now.Year;
-
-                var tatCaHocSinh = HocSinhDAL.GetDanhSachHocSinhTheoLop(SelectedLop);
-                var danhSachDaLoc = tatCaHocSinh.Where(hs => {
-                    int tuoi = namHienTai - hs.NgaySinh.Year;
-                    
-                    if (DateTime.Now.Month < hs.NgaySinh.Month || 
-                        (DateTime.Now.Month == hs.NgaySinh.Month && DateTime.Now.Day < hs.NgaySinh.Day))
-                    {
-                        tuoi--;
-                    }
-                    
-                    return tuoi >= tuoiMin && tuoi <= tuoiMax;
-                }).ToList();
-
-                for (int i = 0; i < danhSachDaLoc.Count; i++)
-                {
-                    danhSachDaLoc[i].STT = i + 1;
-                }
-
-                DanhSachHocSinhLop = new ObservableCollection<HocSinhLopItem>(danhSachDaLoc);
+                DanhSachHocSinhLop = new ObservableCollection<HocSinhLopItem>(danhSach);
             }
             catch (Exception ex)
             {
                 var danhSach = HocSinhDAL.GetDanhSachHocSinhTheoLop(SelectedLop);
                 DanhSachHocSinhLop = new ObservableCollection<HocSinhLopItem>(danhSach);
                 
-                _ = ShowNotificationAsync("Cảnh báo", $"Không thể áp dụng quy định tuổi: {ex.Message}");
+                _ = ShowNotificationAsync("Cảnh báo", $"Lỗi khi tải danh sách học sinh: {ex.Message}");
             }
         }
 
