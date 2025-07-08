@@ -139,6 +139,12 @@
                                       MinWidth="250"
                                       ElementStyle="{StaticResource CenterAlignStyle}"
                                       HeaderStyle="{StaticResource CenterHeaderStyle}"/>
+                    <DataGridTextColumn Header="Vai trò" 
+                                      Binding="{Binding ChucVu}" 
+                                      Width="*"
+                                      MinWidth="120"
+                                      ElementStyle="{StaticResource CenterAlignStyle}"
+                                      HeaderStyle="{StaticResource CenterHeaderStyle}"/>
                     <DataGridTemplateColumn Header="Sửa" Width="80" MinWidth="80"
                                             x:Name="ChiTietDiemColumn"
                                           HeaderStyle="{StaticResource CenterHeaderStyle}">

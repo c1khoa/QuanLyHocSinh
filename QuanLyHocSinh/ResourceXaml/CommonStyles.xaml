@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:QuanLyHocSinh.View.Converters">
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
     <!-- Style căn giữa text -->
     <Style x:Key="CenterAlignStyle" TargetType="TextBlock">
         <Setter Property="TextAlignment" Value="Center"/>

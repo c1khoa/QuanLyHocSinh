@@ -743,4 +743,82 @@ public class TongKetMonDAL
         return list;
     }
 
+    public static Dictionary<string, int> GetThongKeHocSinhTheoXepLoai(string? namHoc = null, string? lop = null, int? hocKy = null, string? monHoc = null)
+    {
+        Dictionary<string, int> thongKe = new Dictionary<string, int>
+        {
+            ["Giỏi"] = 0,
+            ["Khá"] = 0,
+            ["Trung bình"] = 0,
+            ["Yếu"] = 0,
+            ["Kém"] = 0
+        };
+
+        string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+        QuyDinhEntities quyDinh = QuyDinhDAL.GetQuyDinh();
+        float diemdat = quyDinh.DiemDat;
+
+        string whereClause = "WHERE 1=1";
+        if (!string.IsNullOrEmpty(namHoc) && namHoc != "Tất cả")
+            whereClause += " AND d.NamHocID = @NamHoc";
+        if (!string.IsNullOrEmpty(lop) && lop != "Tất cả")
+            whereClause += " AND l.TenLop = @Lop";
+        if (hocKy.HasValue)
+            whereClause += " AND d.HocKy = @HocKy";
+        if (!string.IsNullOrEmpty(monHoc) && monHoc != "Tất cả")
+            whereClause += " AND mh.TenMonHoc = @MonHoc";
+            
+        string query = $@"
+        SELECT 
+            hs.HocSinhID,
+            AVG(d.DiemTrungBinh) as DiemTrungBinhTongKet,
+            CASE 
+                WHEN AVG(d.DiemTrungBinh) >= 8.5 THEN 'Giỏi'
+                WHEN AVG(d.DiemTrungBinh) >= 6.5 THEN 'Khá'
+                WHEN AVG(d.DiemTrungBinh) >= 5.0 THEN 'Trung bình'
+                WHEN AVG(d.DiemTrungBinh) >= 3.5 THEN 'Yếu'
+                ELSE 'Kém'
+            END as XepLoaiTongKet
+        FROM DIEM d
+        INNER JOIN HOCSINH hs ON d.HocSinhID = hs.HocSinhID
+        INNER JOIN HOSOHOCSINH hhs ON hs.HocSinhID = hhs.HocSinhID
+        INNER JOIN LOP l ON LEFT(hhs.LopHocID, 4) = l.LopID
+        INNER JOIN MONHOC mh ON d.MonHocID = mh.MonHocID
+        {whereClause}
+        AND d.DiemTrungBinh IS NOT NULL 
+        AND d.DiemTrungBinh > 0
+        GROUP BY hs.HocSinhID, l.TenLop
+        ORDER BY hs.HocSinhID
+        ";
+
+        using (MySqlConnection conn = new MySqlConnection(connectionString))
+        {
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+
+            if (!string.IsNullOrEmpty(namHoc) && namHoc != "Tất cả")
+                cmd.Parameters.AddWithValue("@NamHoc", namHoc);
+            if (!string.IsNullOrEmpty(lop) && lop != "Tất cả")
+                cmd.Parameters.AddWithValue("@Lop", lop);
+            if (hocKy.HasValue)
+                cmd.Parameters.AddWithValue("@HocKy", hocKy.Value);
+            if (!string.IsNullOrEmpty(monHoc) && monHoc != "Tất cả")
+                cmd.Parameters.AddWithValue("@MonHoc", monHoc);
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    string xepLoai = reader["XepLoaiTongKet"]?.ToString() ?? "";
+                    if (thongKe.ContainsKey(xepLoai))
+                    {
+                        thongKe[xepLoai]++;
+                    }
+                }
+            }
+        }
+
+        return thongKe;
+    }
+
 }

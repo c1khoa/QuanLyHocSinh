@@ -4,27 +4,246 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:QuanLyHocSinh.View.Controls.BaoCao"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             Background="White"
+             FontSize="13"
              mc:Ignorable="d" 
              MinHeight="600" MinWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <Style x:Key="BieuDoToggleButtonStyle" TargetType="ToggleButton">
+                <Setter Property="Background" Value="#E3F2FD"/>
+                <Setter Property="Foreground" Value="#1976D2"/>
+                <Setter Property="BorderBrush" Value="#1976D2"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="Padding" Value="15,8"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="20"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="Background" Value="#1976D2"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#BBDEFB"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <Border Margin="20"
-                BorderBrush="#03a9f4"
-                BorderThickness="2"
-                Background="#D0F0FD"
-                CornerRadius="30">
+            BorderBrush="#03a9f4"
+            BorderThickness="2"
+            Background="#D0F0FD"
+            CornerRadius="30">
         <Grid Margin="20">
             <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="8*"/>
             </Grid.RowDefinitions>
+        
+        <!-- Tiêu đề -->
             <TextBlock Text="BIỂU ĐỒ THỐNG KÊ" 
                    FontSize="24" 
                    FontWeight="Bold" 
                    HorizontalAlignment="Center" 
                    VerticalAlignment="Center"
-                   Margin="10 10 0 10"
+                   Margin="10 0 0 0"
                    Grid.Row="0"/>
-            <Border  Grid.Row="1" Background="White" CornerRadius="15">
+
+        <!-- Toggle Switch + Filters gộp chung -->
+        <Border Grid.Row="1" Background="#FAFAFA" CornerRadius="15" Padding="15" Margin="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Toggle buttons ở hàng đầu -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5">
+                    <ToggleButton x:Name="ToggleHocKy"
+                                  Content="Thống kê theo học kỳ" 
+                                  Style="{StaticResource BieuDoToggleButtonStyle}"
+                                  IsChecked="True"
+                                  Checked="OnToggleHocKy_Checked"
+                                  Margin="0,0,10,0"/>
+                    <ToggleButton x:Name="ToggleMonHoc"
+                                  Content="Thống kê theo môn học" 
+                                  Style="{StaticResource BieuDoToggleButtonStyle}"
+                                  IsChecked="False"
+                                  Checked="OnToggleMonHoc_Checked"/>
+                </StackPanel>
+                
+                <!-- Filters ở hàng thứ hai -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Học kỳ - Luôn hiển thị ở cả 2 mode -->
+                    <StackPanel x:Name="PanelHocKy" 
+                                Grid.Column="0" Margin="10,0" VerticalAlignment="Center"
+                                Visibility="Visible">
+                        <TextBlock Text="Học kỳ" FontSize="13" Margin="0,0,0,5"/>
+                        <ComboBox x:Name="ComboHocKy"
+                                  materialDesign:HintAssist.Hint="Chọn học kỳ"
+                                  IsEditable="False"
+                                  FontSize="13"
+                                  MinWidth="120"
+                                  ItemsSource="{Binding DanhSachHocKy}" 
+                                  SelectedItem="{Binding SelectedHocKy, Mode=TwoWay}"
+                                  SelectionChanged="OnComboBox_SelectionChanged"/>
+                    </StackPanel>
+
+                    <!-- Môn học (chỉ hiện khi chọn thống kê theo môn học) -->
+                    <StackPanel x:Name="PanelMonHoc" 
+                                Grid.Column="1" Margin="10,0" VerticalAlignment="Center"
+                                Visibility="Collapsed">
+                        <TextBlock Text="Môn học" FontSize="13" Margin="0,0,0,5"/>
+                        <ComboBox x:Name="ComboMonHoc"
+                                  materialDesign:HintAssist.Hint="Chọn môn học"
+                                  IsEditable="False"
+                                  FontSize="13"
+                                  MinWidth="140"
+                                  ItemsSource="{Binding DanhSachMonHoc}" 
+                                  SelectedItem="{Binding SelectedMonHoc, Mode=TwoWay}"
+                                  SelectionChanged="OnComboBox_SelectionChanged"/>
+                    </StackPanel>
+
+                    <!-- Lớp (chỉ hiện khi thống kê môn học) -->
+                    <StackPanel x:Name="PanelLop" 
+                                Grid.Column="2" Margin="10,0" VerticalAlignment="Center"
+                                Visibility="Collapsed">
+                        <TextBlock Text="Lớp" FontSize="13" Margin="0,0,0,5"/>
+                        <ComboBox x:Name="ComboLop"
+                                  materialDesign:HintAssist.Hint="Chọn lớp"
+                                  IsEditable="False"
+                                  FontSize="13"
+                                  MinWidth="120"
+                                  ItemsSource="{Binding DanhSachLop}" 
+                                  SelectedItem="{Binding SelectedLop, Mode=TwoWay}"
+                                  SelectionChanged="OnComboBox_SelectionChanged"/>
+                    </StackPanel>
+
+                    <!-- Nút refresh -->
+                    <Button x:Name="BtnRefresh"
+                            Grid.Column="3" 
+                            Content="Làm mới" 
+                            Click="OnRefresh_Click"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            Background="#4CAF50"
+                            BorderBrush="Transparent"
+                            Margin="10,0"
+                            Padding="15,8"
+                            VerticalAlignment="Bottom"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Khu vực biểu đồ -->
+        <Border Grid.Row="2" Background="White" CornerRadius="15" Padding="30" Margin="10" BorderBrush="#e0e0e0" BorderThickness="1">
                 <Grid>
+                    <Grid MinWidth="800" MinHeight="600">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" MinWidth="380"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*" MinWidth="380"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Border Grid.Column="0" Background="#FAFAFA" CornerRadius="10" Padding="10" BorderBrush="#E0E0E0" BorderThickness="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                
+                                <TextBlock Grid.Row="0" 
+                                           Text="BIỂU ĐỒ CỘT" 
+                                           FontSize="14" 
+                                           FontWeight="SemiBold" 
+                                           HorizontalAlignment="Center" 
+                                           Margin="0,0,0,10"
+                                           Foreground="#555"/>
+                                
+                                <lvc:CartesianChart x:Name="BieuDoChart" 
+                                                    Grid.Row="1" 
+                                                    LegendLocation="Bottom"
+                                                    Hoverable="True"
+                                                    DisableAnimations="False"
+                                                    Margin="5,5,5,100"
+                                                    MinHeight="420">
+                                </lvc:CartesianChart>
+                            </Grid>
+                        </Border>
+    
+                        <Border Grid.Column="2" Background="#FAFAFA" CornerRadius="10" Padding="10" BorderBrush="#E0E0E0" BorderThickness="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                
+                                <TextBlock Grid.Row="0" 
+                                           Text="BIỂU ĐỒ TRÒN" 
+                                           FontSize="14" 
+                                           FontWeight="SemiBold" 
+                                           HorizontalAlignment="Center" 
+                                           Margin="0,0,0,10"
+                                           Foreground="#555"/>
+                                
+                                <lvc:PieChart x:Name="PieChart" 
+                                              Grid.Row="1"
+                                              LegendLocation="Bottom"
+                                              Hoverable="True"
+                                              DisableAnimations="False"
+                                              Margin="5,5,5,100"
+                                              MinHeight="420"
+                                              InnerRadius="40">
+                                </lvc:PieChart>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                <StackPanel x:Name="NoDataPanel"
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            Visibility="Collapsed">
+                    <materialDesign:PackIcon Kind="ChartLine" 
+                                           Width="64" 
+                                           Height="64" 
+                                           Foreground="#BDBDBD"
+                                           Margin="0,0,0,10"/>
+                    <TextBlock Text="Không có dữ liệu để hiển thị" 
+                               FontSize="16" 
+                               Foreground="#757575"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Vui lòng chọn các bộ lọc phù hợp" 
+                               FontSize="12" 
+                               Foreground="#9E9E9E"
+                               HorizontalAlignment="Center"
+                               Margin="0,5,0,0"/>
+                </StackPanel>
                 </Grid>
             </Border>
         </Grid>
