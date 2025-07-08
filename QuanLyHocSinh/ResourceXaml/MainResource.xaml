@@ -91,6 +91,10 @@
     <DataTemplate DataType="{x:Type vmBaoCao:TongKetNamViewModel}">
         <viewbc:TongKetNamUC />
     </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type vmBaoCao:BieuDoThongKeViewModel}">
+        <viewbc:BieuDoThongKeUC />
+    </DataTemplate>
 
     <DataTemplate DataType="{x:Type vmQuyDinh:QuyDinhMainViewModel}">
         <viewqd:QuyDinhMainUC />

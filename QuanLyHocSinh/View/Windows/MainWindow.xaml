@@ -22,7 +22,7 @@
        FontFamily="{DynamicResource MaterialDesignFont}"
        ResizeMode="NoResize"
        WindowStyle="None"
-       WindowStartupLocation="CenterScreen" 
+       WindowState="Maximized"
 
        DataContext="{StaticResource MainVM}"
        x:Name="main"
@@ -298,6 +298,21 @@
                                     FontWeight="Regular"
                                     HorizontalAlignment="Stretch"
                                     Content="Tổng kết năm học"
+                                    Margin="50 10 0 10">
+                                    <Button.Triggers>
+                                        <EventTrigger RoutedEvent="Button.Click">
+                                            <BeginStoryboard Storyboard="{StaticResource CloseMenu}" />
+                                        </EventTrigger>
+                                    </Button.Triggers>
+                                </Button>
+                                <Button Command="{Binding ShowBieuDoCommand}"
+                                    Background="Transparent" 
+                                    BorderThickness="0"
+                                    Padding="0"
+                                    Foreground="Black"
+                                    FontWeight="Regular"
+                                    HorizontalAlignment="Stretch"
+                                    Content="Biểu đồ thống kê"
                                     Margin="50 10 0 10">
                                     <Button.Triggers>
                                         <EventTrigger RoutedEvent="Button.Click">

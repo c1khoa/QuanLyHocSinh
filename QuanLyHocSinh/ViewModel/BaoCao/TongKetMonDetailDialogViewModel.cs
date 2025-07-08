@@ -10,6 +10,7 @@ using System.Windows.Input;
 using QuanLyHocSinh.ViewModel.TraCuu;
 using ClosedXML.Excel;
 using Microsoft.Win32;
+using System.Configuration;
 
 namespace QuanLyHocSinh.ViewModel.BaoCao
 {
@@ -246,9 +247,9 @@ namespace QuanLyHocSinh.ViewModel.BaoCao
                 await ShowNotificationAsync("Lỗi", $"❌ Lỗi khi tải dữ liệu học sinh: {ex.Message}");
             }
         }
-
-        private void CalculateStatistics()
+        private async void CalculateStatistics()
         {
+
             TongSoHocSinh = DanhSachHocSinh.Count;
             SoLuongDat = DanhSachHocSinh.Count(hs => hs.DaDat);
             TiLeDat = TongSoHocSinh > 0 ? Math.Round((SoLuongDat * 100.0) / TongSoHocSinh, 2) : 0;

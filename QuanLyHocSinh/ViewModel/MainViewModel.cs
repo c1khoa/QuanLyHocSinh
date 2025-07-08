@@ -28,14 +28,6 @@ namespace QuanLyHocSinh.ViewModel
         private static MainViewModel _instance;
         public static MainViewModel Instance => _instance ??= new MainViewModel();
         // Các ViewModel con dùng cho điều hướng
-        public TrangChuViewModel TrangChuVM { get; set; }
-        public QuanLyTaiKhoanMainViewModel TaiKhoanVM { get; set; }
-        public DanhSachLopViewModel DanhSachLopVM { get; set; }
-        public TraCuuHocSinhViewModel HocSinhVM { get; set; }
-        public TraCuuGiaoVienViewModel GiaoVienVM { get; set; }
-        public TraCuuDiemHocSinhViewModel DiemHocSinhVM { get; set; }
-        public TongKetMonViewModel TongKetMonVM { get; set; }
-        public QuyDinhMainViewModel QuyDinhVM { get; set; }
 
 
 
@@ -198,6 +190,7 @@ namespace QuanLyHocSinh.ViewModel
         public ICommand ShowTongKetMonCommand { get; set; }
 
         public ICommand ShowTongKetNamCommand { get; set; }
+        public ICommand ShowBieuDoCommand { get; set; }
         public ICommand ShowQuyDinhCommand { get; set; }
 
         // Command chọn vai trò mở LoginWindow
@@ -269,6 +262,7 @@ namespace QuanLyHocSinh.ViewModel
             ShowDiemHocSinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TraCuuDiemHocSinhViewModel(this));
             ShowTongKetMonCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TongKetMonViewModel(this));
             ShowTongKetNamCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new TongKetNamViewModel(this));
+            ShowBieuDoCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new BieuDoThongKeViewModel(this));
             ShowQuyDinhCommand = new RelayCommand<object>((p) => true, (p) => CurrentView = new QuyDinhMainViewModel(this));
 
             // Command xử lý chọn role để mở LoginWindow

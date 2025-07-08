@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,7 +42,9 @@ namespace QuanLyHocSinh.Model.Entities
         public double TiLeDat { get; set; }
     }
 
-    // Entity cho chi tiết học sinh trong lớp
+    // Fix for CS0120: An object reference is required for the non-static field, method, or property 'QuyDinhEntities.DiemDat'
+
+    // Update the `DaDat` property to require an instance of `QuyDinhEntities` to access `DiemDat`.
     public class HocSinhChiTietItem
     {
         public int STT { get; set; }
@@ -52,6 +55,14 @@ namespace QuanLyHocSinh.Model.Entities
         public double Diem1Tiet { get; set; }
         public double DiemTrungBinh { get; set; }
         public string XepLoai { get; set; } = "";
-        public bool DaDat => DiemTrungBinh >= 5.0;
+
+        public bool DaDat => DiemTrungBinh >= GetDiem();
+
+        private float GetDiem()
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["MySqlConnection"].ConnectionString;
+            QuyDinhEntities quyDinh = QuyDinhDAL.GetQuyDinh();
+            return quyDinh.DiemDat;
+        }
     }
 }
