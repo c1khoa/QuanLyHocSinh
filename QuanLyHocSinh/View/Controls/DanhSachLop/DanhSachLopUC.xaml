@@ -139,7 +139,7 @@
                                       MinWidth="250"
                                       ElementStyle="{StaticResource CenterAlignStyle}"
                                       HeaderStyle="{StaticResource CenterHeaderStyle}"/>
-                    <DataGridTextColumn Header="Vai trò" 
+                    <DataGridTextColumn Header="Chức vụ" 
                                       Binding="{Binding ChucVu}" 
                                       Width="*"
                                       MinWidth="120"

@@ -188,6 +188,9 @@
                         <DatePicker SelectedDate="{Binding NgaySinh}" 
                                     Margin="10" Height="35"
                                     Loaded="DatePicker_Loaded"/>
+                        <TextBlock Text="{Binding CanhBaoTuoi}"
+                                   Visibility="{Binding CanhBaoTuoiVisibility}"
+                                   Foreground="Red" />
                         <TextBlock Text="Địa chỉ" FontWeight="Bold" Margin="10"/>
                         <TextBox Text="{Binding DiaChi}"
                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"

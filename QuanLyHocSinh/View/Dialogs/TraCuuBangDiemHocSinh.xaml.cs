@@ -1,5 +1,6 @@
 using System.Windows;
 using QuanLyHocSinh.Model.Entities;
+using QuanLyHocSinh.ViewModel;
 using QuanLyHocSinh.ViewModel.TraCuu;
 
 namespace QuanLyHocSinh.View.Dialogs
@@ -87,5 +88,19 @@ namespace QuanLyHocSinh.View.Dialogs
                 this.Topmost = false;
             }
         }
+        private void DiemDataGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is TraCuuBangDiemHocSinhViewModel vm)
+            {
+                var suaDiemColumn = DiemDataGrid.Columns
+                    .FirstOrDefault(c => c.Header?.ToString() == "Sửa điểm");
+
+                if (suaDiemColumn != null)
+                {
+                    suaDiemColumn.Visibility = vm.IsGiaoVienVisible ? Visibility.Visible : Visibility.Collapsed;
+                }
+            }
+        }
+
     }
 }

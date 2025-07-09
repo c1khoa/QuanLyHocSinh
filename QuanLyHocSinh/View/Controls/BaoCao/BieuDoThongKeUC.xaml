@@ -12,10 +12,18 @@
              MinHeight="600" MinWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
+            
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/QuanLyHocSinh;component/ResourceXaml/CommonStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            
+            <Style x:Key="ImageBorderStyle" TargetType="Border">
+                <Setter Property="BorderBrush" Value="Gray"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="CornerRadius" Value="30"/>
+                <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Margin" Value="20 80 20 80"/>
+            </Style>
             <Style x:Key="BieuDoToggleButtonStyle" TargetType="ToggleButton">
                 <Setter Property="Background" Value="#E3F2FD"/>
                 <Setter Property="Foreground" Value="#1976D2"/>
@@ -148,72 +156,80 @@
                     </StackPanel>
 
                     <!-- Nút refresh -->
-                    <Button x:Name="BtnRefresh"
-                            Grid.Column="3" 
+                        <Border Grid.Column="3" 
+                                Style="{StaticResource ImageBorderStyle}"
+                                Margin="20 0 0 0"
+                                HorizontalAlignment="Right"
+                                Background="#4CAF50">
+                            <Button x:Name="BtnRefresh"
                             Content="Làm mới" 
                             Click="OnRefresh_Click"
                             Style="{StaticResource MaterialDesignRaisedButton}"
-                            Background="#4CAF50"
+                            Background="Transparent"
                             BorderBrush="Transparent"
+                                    Foreground="Black"
                             Margin="10,0"
                             Padding="15,8"
                             VerticalAlignment="Bottom"/>
-                </Grid>
+                        </Border>
+                    </Grid>
             </Grid>
         </Border>
 
         <!-- Khu vực biểu đồ -->
         <Border Grid.Row="2" Background="White" CornerRadius="15" Padding="30" Margin="10" BorderBrush="#e0e0e0" BorderThickness="1">
-                <Grid>
-                    <Grid MinWidth="800" MinHeight="600">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" MinWidth="380"/>
-                            <ColumnDefinition Width="10"/>
-                            <ColumnDefinition Width="*" MinWidth="380"/>
-                        </Grid.ColumnDefinitions>
-                        
-                        <Border Grid.Column="0" Background="#FAFAFA" CornerRadius="10" Padding="10" BorderBrush="#E0E0E0" BorderThickness="1">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                
-                                <TextBlock Grid.Row="0" 
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" 
+                                          VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <Grid MinWidth="800" MinHeight="600">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" MinWidth="380"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*" MinWidth="380"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Background="#FAFAFA" CornerRadius="10" Padding="10" BorderBrush="#E0E0E0" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" 
                                            Text="BIỂU ĐỒ CỘT" 
                                            FontSize="14" 
                                            FontWeight="SemiBold" 
                                            HorizontalAlignment="Center" 
                                            Margin="0,0,0,10"
                                            Foreground="#555"/>
-                                
-                                <lvc:CartesianChart x:Name="BieuDoChart" 
+
+                                    <lvc:CartesianChart x:Name="BieuDoChart" 
                                                     Grid.Row="1" 
                                                     LegendLocation="Bottom"
                                                     Hoverable="True"
                                                     DisableAnimations="False"
                                                     Margin="5,5,5,100"
                                                     MinHeight="420">
-                                </lvc:CartesianChart>
-                            </Grid>
-                        </Border>
-    
-                        <Border Grid.Column="2" Background="#FAFAFA" CornerRadius="10" Padding="10" BorderBrush="#E0E0E0" BorderThickness="1">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                
-                                <TextBlock Grid.Row="0" 
+                                    </lvc:CartesianChart>
+                                </Grid>
+                            </Border>
+
+                            <Border Grid.Column="2" Background="#FAFAFA" CornerRadius="10" Padding="10" BorderBrush="#E0E0E0" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" 
                                            Text="BIỂU ĐỒ TRÒN" 
                                            FontSize="14" 
                                            FontWeight="SemiBold" 
                                            HorizontalAlignment="Center" 
                                            Margin="0,0,0,10"
                                            Foreground="#555"/>
-                                
-                                <lvc:PieChart x:Name="PieChart" 
+
+                                    <lvc:PieChart x:Name="PieChart" 
                                               Grid.Row="1"
                                               LegendLocation="Bottom"
                                               Hoverable="True"
@@ -221,30 +237,31 @@
                                               Margin="5,5,5,100"
                                               MinHeight="420"
                                               InnerRadius="40">
-                                </lvc:PieChart>
-                            </Grid>
-                        </Border>
-                    </Grid>
-                <StackPanel x:Name="NoDataPanel"
+                                    </lvc:PieChart>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                        <StackPanel x:Name="NoDataPanel"
                             HorizontalAlignment="Center" 
                             VerticalAlignment="Center"
                             Visibility="Collapsed">
-                    <materialDesign:PackIcon Kind="ChartLine" 
+                            <materialDesign:PackIcon Kind="ChartLine" 
                                            Width="64" 
                                            Height="64" 
                                            Foreground="#BDBDBD"
                                            Margin="0,0,0,10"/>
-                    <TextBlock Text="Không có dữ liệu để hiển thị" 
+                            <TextBlock Text="Không có dữ liệu để hiển thị" 
                                FontSize="16" 
                                Foreground="#757575"
                                HorizontalAlignment="Center"/>
-                    <TextBlock Text="Vui lòng chọn các bộ lọc phù hợp" 
+                            <TextBlock Text="Vui lòng chọn các bộ lọc phù hợp" 
                                FontSize="12" 
                                Foreground="#9E9E9E"
                                HorizontalAlignment="Center"
                                Margin="0,5,0,0"/>
-                </StackPanel>
-                </Grid>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
             </Border>
         </Grid>
     </Border>

@@ -63,22 +63,24 @@
             <!-- Bảng điểm các môn -->
             <Border Grid.Row="3" Background="White" Padding="10" CornerRadius="0 0 15 15">
                 <Grid Margin="0,0,0,16">
-                <DataGrid ItemsSource="{Binding BangDiemMon}" 
-                      Style="{StaticResource CommonDataGridStyle}" 
-                      Visibility="{Binding IsShowBangDiem, Converter={StaticResource BooleanToVisibilityConverter}}"
-                      CanUserAddRows="False"
-                      CanUserDeleteRows="False"
-                      AutoGenerateColumns="False"
-                      ScrollViewer.VerticalScrollBarVisibility="Auto"
-                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                      ScrollViewer.CanContentScroll="True"
-                      VirtualizingPanel.IsVirtualizing="True"
-                      VirtualizingPanel.VirtualizationMode="Recycling"
-                      EnableRowVirtualization="True"
-                      EnableColumnVirtualization="True"
-                      BorderBrush="Transparent"
-                      Background="Transparent">
-                    <DataGrid.Columns>
+                    <DataGrid ItemsSource="{Binding BangDiemMon}" 
+                          Loaded="DiemDataGrid_Loaded"
+                          x:Name="DiemDataGrid"
+                        Style="{StaticResource CommonDataGridStyle}" 
+                        Visibility="{Binding IsShowBangDiem, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        CanUserAddRows="False"
+                        CanUserDeleteRows="False"
+                        AutoGenerateColumns="False"
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                        ScrollViewer.CanContentScroll="True"
+                        VirtualizingPanel.IsVirtualizing="True"
+                        VirtualizingPanel.VirtualizationMode="Recycling"
+                        EnableRowVirtualization="True"
+                        EnableColumnVirtualization="True"
+                        BorderBrush="Transparent"
+                        Background="Transparent">
+                        <DataGrid.Columns>
                         <DataGridTextColumn Header="Môn học" 
                                   Binding="{Binding MonHoc}" 
                                   Width="*" 

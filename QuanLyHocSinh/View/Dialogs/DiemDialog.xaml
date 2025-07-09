@@ -4,9 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QuanLyHocSinh.View.Dialogs" 
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:conv="clr-namespace:QuanLyHocSinh.View.Converters"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+        xmlns:conv="clr-namespace:QuanLyHocSinh.View.Converters"
         mc:Ignorable="d"
-        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+        WindowState="Maximized"
+        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase" xmlns:quanlytaikhoan="clr-namespace:QuanLyHocSinh.ViewModel.QuanLyTaiKhoan" d:DataContext="{d:DesignInstance Type=quanlytaikhoan:DiemDialogViewModel}"
         Title="DiemDialog" Height="450" Width="800">
     <Window.Resources>
         <conv:InverseBoolToColumnSpanConverter x:Key="InverseBoolToColumnSpanConverter"/>
@@ -40,8 +42,9 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="5*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- Tiêu đề -->
@@ -94,8 +97,8 @@
 
         <!-- Bảng dữ liệu -->
                 <Border Grid.Row="2" Style="{StaticResource ImageBorderStyle}" 
-                        Background="White" Margin="5 0 5 5" CornerRadius="0 0 15 15">
-                    <Grid >
+                        Background="White" Margin="5 0 5 0" CornerRadius="0">
+                    <Grid>
                     <DataGrid x:Name="dataGridTaiKhoan"
                       ItemsSource="{Binding FilteredDiem}"
                       SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
@@ -134,6 +137,56 @@
                             </DataGrid.Columns>
                         </DataGrid>
             </Grid>            
+                </Border>
+                <Border Grid.Row="3" Style="{StaticResource ImageBorderStyle}" 
+                        Background="White" Margin="5 0 5 5" CornerRadius="0 0 15 15">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                            <StackPanel Orientation="Horizontal" Margin="0">
+                                <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                    <TextBlock Text="TB HKI:" FontWeight="Bold" Foreground="#4CAF50"/>
+                                    <TextBlock Text="{Binding TBHKI, StringFormat={}{0:F2}}" Margin="0,5,0,0" Foreground="#4CAF50" FontWeight="Bold"/>
+                                </StackPanel>
+                                <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                    <TextBlock Text="Xếp loại HKI:" FontWeight="Bold" Foreground="#7B1FA2"/>
+                                    <TextBlock Text="{Binding XepLoaiHKI}" Margin="0,5,0,0" Foreground="#7B1FA2" FontWeight="Bold"/>
+                                </StackPanel>
+                                <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                    <TextBlock Text="TB HKII:" FontWeight="Bold" Foreground="#1976D2"/>
+                                    <TextBlock Text="{Binding TBHKII, StringFormat={}{0:F2}}" Margin="0,5,0,0" Foreground="#1976D2" FontWeight="Bold"/>
+                                </StackPanel>
+                                <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                    <TextBlock Text="Xếp loại HKII:" FontWeight="Bold" Foreground="#7B1FA2"/>
+                                    <TextBlock Text="{Binding XepLoaiHKII}" Margin="0,5,0,0" Foreground="#7B1FA2" FontWeight="Bold"/>
+                                </StackPanel>
+                                <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                    <TextBlock Text="TB Cả năm:" FontWeight="Bold" Foreground="#E65100"/>
+                                    <TextBlock Text="{Binding TBCaNam, StringFormat={}{0:F2}}" Margin="0,5,0,0" Foreground="#E65100" FontWeight="Bold"/>
+                                </StackPanel>
+                                <StackPanel Margin="5,5,15,5" MinWidth="120">
+                                    <TextBlock Text="Xếp loại cả năm:" FontWeight="Bold" Foreground="#7B1FA2"/>
+                                    <TextBlock Text="{Binding XepLoai}" Margin="0,5,0,0" Foreground="#7B1FA2" FontWeight="Bold"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <Border Grid.Column="1" 
+                                Style="{StaticResource ImageBorderStyle}"
+                                Margin="20 0 20 0"
+                                Background="#4CAF50">
+                            <Button Content="Xuất Excel" 
+                                    Command="{Binding ExportToExcelCommand}"
+                                    BorderBrush="Transparent"
+                                    Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                    Background="Transparent"
+                                    HorizontalAlignment="Center"/>
+                        </Border>
+                    </Grid>
                 </Border>
             </Grid>
 

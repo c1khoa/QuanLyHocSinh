@@ -49,6 +49,7 @@ namespace QuanLyHocSinh.ViewModel.TraCuu
             get => _isShowBangDiem;
             set { _isShowBangDiem = value; OnPropertyChanged(); }
         }
+        public bool IsGiaoVienVisible => _mainVM.IsGiaoVienVisible;
 
         private HocSinh _hocSinh;
 
