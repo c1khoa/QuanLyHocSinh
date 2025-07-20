@@ -5,7 +5,7 @@
   </a>
 </p>
 
-<h1 align="center"><b>LẬP TRÌNH PYTHON CHO MÁY HỌC</b></h>
+<h1 align="center"><b>NHẬP MÔN CÔNG NGHỆ PHẦN MỀM</b></h>
 
 ## THÀNH VIÊN NHÓM
 
